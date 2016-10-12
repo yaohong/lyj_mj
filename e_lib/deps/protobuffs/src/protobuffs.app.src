@@ -1,0 +1,8 @@
+{application, protobuffs,
+ [{description, "ERLANG PROTOBUF"},
+  {vsn, "1.0.0"},
+  {modules, [protobuffs]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env, []},
+  {mod, {protobuffs_app, []}}]}.

@@ -1,0 +1,8 @@
+{application, server_frame,
+ [{description, "server_frame"},
+  {vsn, "1.0.0"},
+  {modules, [server_frame]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env, []},
+  {mod, {server_frame_app, [gateway_user_server, gateway_user, 4, gateway_user_sup, gateway_receiver_sup, {0,0,0,0}, 10888]}}]}.

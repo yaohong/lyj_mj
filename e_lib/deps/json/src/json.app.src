@@ -1,0 +1,16 @@
+{application, json,
+ [
+  {description, "JSON SERVICE"},
+  {vsn, "1.0.0"},
+  {registered, []},
+  {modules, [json,
+             json_app,
+             json_sup,
+             ieee754]},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, {json_app, []}},
+  {env, []}
+ ]}.

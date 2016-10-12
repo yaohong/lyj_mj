@@ -1,0 +1,93 @@
+﻿Relaxweb FAQ:
+#1. RelaxWeb入门的Example?
+#2. RelaxWeb如何动态的向客户端输出内容?
+#3. RelaxWeb如何处理Cookie?
+#4. RelaxWeb如何处理URL重定向?
+#5. Req:get(path)和Req:get(raw_path)的区别?
+#6. RelaxWeb是否有MultiPart协议的支持?
+
+详细信息:
+#1. RelaxWeb入门的Example?
+relaxweb/src/relax_demo.erl是一个使用RelaxWeb构建Web Application的例子.
+
+
+#2. RelaxWeb如何动态的向客户端输出内容?
+2.1 总结, 使用下面两个APIs输出动态内容 & 文件: 
+    a. 如果生成动态内容, 通过下面API输出:
+       Req:respond({Code :: integer(),
+                    ResponseHeaders :: [{relax_header:http_header_key(), relax_header:http_header_value()}] | 
+                                       relax_header:http_headers(),
+                    Body :: iodata() | {file, IoDevice :: file:io_device()}})来发送.
+    b. 如果响应静态文件, 通过下面API输出:
+       Req:server_file(Path :: string(),
+                       DocRoot :: string(),
+                       ExtraHeaders :: [{relax_header:http_header_key(), relax_header:http_header_value()}] |
+                                       relax_header:http_headers())
+
+2.2 常用 HTTP Status Code 的总结
+    200 - OK
+    301 - Moved Permanently
+    302 - Moved Temporarily
+    400 - 非法请求(Bad Request)
+    500 - 服务器内部错误(Internal Server Error)
+
+2.3 举例:
+    a. 输出 text/plain 和 text/html 的动态内容
+    Content = "<html><head></head><body><h2>this is h2</h2></body></html>";
+    注意下面两种输出方式在浏览器上呈现效果的区别:
+    Req:respond({200, [{"Content-Type", "text/plain"}], Content}).
+    Req:respond({200, [{"Content-Type", "text/html"}], Content}).
+   
+    b. 输出静态文件:
+    Req:server_file("image/mypic.jpg", "/var/relaxweb/www")
+    会将/var/relaxweb/www/image/mypic.jpg 的图片的内容读取后发送给客户端.
+
+
+
+#3. RelaxWeb如何处理Cookie?
+3.1 cookie读取的APIs:
+    a. 获取所有的Cookie K/V对
+    Req:parse_cookie() -> [{K :: string(), V :: string()}].
+
+    b. 获取一个特定的Cookie Value
+    Req:get_cookie_value(K :: string()) -> string() | undefined.
+    Req:get_cookie_value(K :: string(), Default :: string()) -> string() | undefined.
+
+3.2 cookie的设置:
+    a. 产生一条Cookie的APIs:
+    relax_cookie:cookie(
+        Key :: atom() | string() | binary() | integer(),
+        Value :: atom() | string() | binary() | integer(),
+        Options :: [{term(), term()}]) -> http_cookie().
+
+    b. 发送 Cookie(包含在 ResponseHeaders 中一起发送给客户端, 可以一次发送多条 cookie)
+    Req:respond({Code, ResponseHeaders, Body}).
+
+    例如:
+    Cookie1 = relax_cookie:cookie("key1", "val1", []),
+    Cookie2 = relax_cookie:cookie("key1", "val1", []),
+    Req:respond({200, [{"Content-Type","text/html"}, Cookie1, Cookie2], "test cookie page!!!"});
+
+#4. RelaxWeb如何处理URL重定向?
+原理非常简单, 直接使用 Req:respond/1 来根据Code和ResponseHeaders来重定向
+例如: 用户访问/login 的时候重定向到/user/liqiang 这个 URL
+Req:respond({302, [{"Location", "/user/liqiang"}], []})
+
+
+
+#5. Req:get(path)和Req:get(raw_path)的区别?
+5.1 path是不包含query string和fragment并且经过urldecode之后的path,
+    通常用于'HTTP 消息的路由', 根据path不同的消息路由到相应的controller.
+
+5.2 raw_path是没有经过urldecode的原始的path
+
+5.3 例如, 请求URL为:
+    http://domain.com/book%20food/my?user=id#sec1
+    a. raw_path: "/book%20food/my?user=id#sec1"
+    b. path:     "/book food/my"
+
+
+#6. RelaxWeb是否有MultiPart协议的支持?
+6.1 有MultiPart协议的支持, 在一个独立的模块实现了该协议relax_multipart.erl
+
+6.2 有一个通过MultiPart文件上传的Demo, relax_multipart_demo.erl

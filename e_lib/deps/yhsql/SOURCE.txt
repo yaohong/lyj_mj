@@ -1,0 +1,1 @@
+Taken from http://code.google.com/p/erlang-yhsql-driver/ SVN; revision 33

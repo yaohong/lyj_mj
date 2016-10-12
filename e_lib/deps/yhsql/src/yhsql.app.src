@@ -1,0 +1,10 @@
+{application, yhsql,
+ [{description, "YhSQL Library"},
+  {vsn, "34"},
+  {modules, [yhsql,
+	         yhsql_auth,
+             yhsql_conn]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+	 {mod, {yhsql_app, []}},{env, []}]}.
+

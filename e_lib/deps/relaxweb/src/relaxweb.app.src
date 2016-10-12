@@ -1,0 +1,12 @@
+{application, relaxweb,
+ [
+  {description, "RELAXWEB HTTP(S) SERVICE"},
+  {vsn, "1.0.0"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, {relax_app, []}},
+  {env, []}
+ ]}.

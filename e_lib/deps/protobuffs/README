@@ -1,0 +1,66 @@
+﻿是Protobuf的一个实现
+
+
+1. Encode & Decoder
+message Person {
+  required string name = 1;
+  required uint32 age = 2;
+}
+
+手动编码:
+> Name = protobuffs:encode(1, <<"liqiang">>, string).
+<<10,7,108,105,113,105,97,110,103>>
+> Age = protobuffs:encode(2, 29, uint32).
+<<16,29>>
+> Bin = iolist_to_binary([Name, Age]).
+<<10,7,108,105,113,105,97,110,103,16,29>>
+
+
+解码:
+> protobuffs:decode(Bin, bytes). 
+{{1,<<"liqiang">>},<<16,29>>}
+> protobuffs:decode(<<16, 29>>, uint32).
+{{2,29},<<>>}
+
+
+2. 利用*.proto文件
+$person.proto
+message Person {
+  required string name = 1;
+  required uint32 age = 2;
+}
+
+编译:
+> protobuffs_compile:scan_file("person.proto", [{output_ebin_dir, "ebin"}, {output_include_dir, "include"}]).  
+generate header file to "include/person_pb.hrl"
+generate beam file to "ebin/person_pb.beam"
+ok
+
+测试:
+> Bin = person_pb:encode_person({person, <<"liqiang">>, 29}).
+<<10,7,108,105,113,105,97,110,103,16,29>>
+4> person_pb:decode_person(Bin).
+{person,"liqiang",29}
+
+
+3. debug_info
+protobuffs_compile在编译目标模块的时候, 需要pokemon_pb的调试信息, 所以我们需要在emake.config中需要加入
+加入debug_info.
+
+
+4. 存在的问题
+<1> 在定义*.proto文件的时候, 字段的名字不能和protobuf协议定义的关键词(protobuffs_parser:get_keyword/1)冲突.
+
+例如:
+message Ping {
+  required string  sid = 1;
+  required string  seq = 2;
+  required string  from = 3;
+  required string  to = 4;
+}
+
+上面message中的to字段将不会被编译.
+
+
+
+

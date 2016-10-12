@@ -1,0 +1,8 @@
+{application, hash_service,
+ [{description, "hash_service"},
+  {vsn, "1.0.0"},
+  {modules, [hash_service]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env, []},
+  {mod, {hash_service_app, []}}]}.

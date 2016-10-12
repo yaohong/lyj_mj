@@ -1,0 +1,1 @@
+-module(hash_service).-author('yh@gmail.com').-export([start/0, stop/0]).-spec start() -> ok | {error, term()}.start() ->	application:start(hash_service).-spec stop() -> ok | {error, term()}.stop() ->	application:stop(hash_service).

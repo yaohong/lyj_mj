@@ -1,0 +1,26 @@
+﻿1. 这是一个UUID的生成模块, 可以保证每次调用会生成一个32 bytes的UUID, 例如:
+   <<"04be8bd8137f0226e1bafd22ec433c87">>
+   <<"04be8bd81fa2caf563677dc5fd27b5f9">>
+   <<"04be8bd82b51f6b5680682a2ee79fc12">>
+   <<"04be8bd835726a1bbe2536b0ce1af659">>
+   <<"04be8bd8718afb1b6389a8e6fde523d6">>
+
+
+2. 其它项目如何使用?
+<1> 只需要application:start(uuid)就可以使用
+<2> 如何生成uuid?
+    a. 如果包含uuid.hrl, 可以使用下面的宏来直接生成uuid
+       ?UUID
+    b. 如果不包含uuid.hrl, 可以使用下面函数直接生成uuid
+       uuid_server:get()
+
+3. 如何配置?
+uuid模块提供了3中生成UUID的算法, 默认为utc_random, 可以根据需求在uuid.app中实
+际修改.
+
+%%%            ==============
+%%%            uuid algorithm
+%%%
+%%% algorithm    - random | utc_random | sequential
+
+{env, [{algorithm, utc_random}]}

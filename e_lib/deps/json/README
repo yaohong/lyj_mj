@@ -1,0 +1,47 @@
+﻿json是一个独立的application, 不依赖任何外部的application,
+可以独立使用, 使用之前不需要任何配置.
+
+#1. Erlang如何处理JSON数据?
+
+1.1 json与erlang的映射 - json_term()的格式定义:
+<1> 编码时候的映射:
+    1) object - {struct, [{binary(), term()}]}
+    2) array  - [term()]
+    3) string - binary()  注意: 必须是binary, string()会被认为是array.
+    4) number - float() | integer()
+    5) true   - true
+    6) false  - false
+    7) null   - null
+
+<2> 解码规则:
+    1) Strings in JSON decode to UTF-8 binaries in Erlang
+    2) Objects decode to {struct, PropList}
+    3) Numbers decode to integer or float
+    4) true, false, null decode to their respective terms
+
+1.2 处理中文字符UTF-8:
+(每个unicode字符编码成\uXXXX)
+
+a. M = "李强".
+   [26446,24378]
+b. Bin = unicode:characters_to_binary(M).
+   <<230,157,142,229,188,186>>
+c. json:encode(Bin).   
+   [34,"\\u674e","\\u5f3a",34]
+
+
+1.3 注意:
+a. A1 = json:encode(<<"abc">>).
+   [34,<<"abc">>,34]
+b. json:decode(A1).
+   <<"abc">>
+
+c. A2 = json:encode("abc").  %% 等价于[97, 98, 99], 是一个array  
+   [91,"97",44,"98",44,"99",93]
+d. json:decode(A2).        
+   "abc"
+
+e. A2 = json:encode([97, 98, 99]).
+   [91,"97",44,"98",44,"99",93]
+f. json:decode(A2).              
+   "abc"

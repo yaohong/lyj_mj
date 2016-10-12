@@ -1,0 +1,95 @@
+﻿由于parameterized modules这一特性会在R16中被移除, 所以我们使用tuple modules来代替parameterized modules,
+这种变化对外部程序没有影响, 也就是使用这两种方式实现的模块, 对外部来说是透明的.
+
+
+1. parameterized modules的例子
+$test.erl
+-module(test, [Arg1, Arg2]).
+-export([dump/0]).
+
+dump() ->
+    io:format("arg1=~p, arg2=~p~n", [Arg1, Arg2]).
+
+
+测试
+> m(test).           
+Module test compiled: Date: February 17 2013, Time: 03.41
+Compiler options:  [{outdir,"/home/liqiang/workspace"}]
+Object file: /home/liqiang/workspace/test.beam
+Exports: 
+         dump/1
+         instance/2
+         module_info/0
+         module_info/1
+         new/2
+ok
+> T1 = test:new("aa", "bb").
+{test,"aa","bb"}
+> T1:dump().
+arg1="aa", arg2="bb"
+ok
+> T2 = test:new("cc", "dd").
+{test,"cc","dd"}
+> T2:dump().                
+arg1="cc", arg2="dd"
+ok
+> {test,"aa","bb"}:dump().
+arg1="aa", arg2="bb"
+ok
+> {test,"cc","dd"}:dump().
+arg1="cc", arg2="dd"
+ok
+
+
+注意:
+1. parameterized modules编译之后会多出一个new/N, instance/N函数, N就是参数的数量.
+2. parameterized modules编译之后导出的函数是dump/1而不是dump/0, 也就是
+   所有导出函数的参数会加1.
+
+
+2. tuple modules的例子
+$test.erl
+-module(test).
+-export([new/2,
+         dump/1]).
+
+new(Arg1, Arg2) ->
+    {?MODULE, [Arg1, Arg2]}.
+
+dump({?MODULE, [Arg1, Arg2]}) ->
+    io:format("arg1=~p, arg2=~p~n", [Arg1, Arg2]).
+
+
+测试:
+> m(test).
+Module test compiled: Date: February 17 2013, Time: 03.54
+Compiler options:  [{outdir,"/home/liqiang/workspace"}]
+Object file: /home/liqiang/workspace/test.beam
+Exports: 
+         dump/1
+         module_info/0
+         module_info/1
+         new/2
+ok
+> T1 = test:new("aa", "bb").
+{test,["aa","bb"]}
+> T1:dump().
+arg1="aa", arg2="bb"
+ok
+> T2 = test:new("cc", "dd").
+{test,["cc","dd"]}
+> T2:dump().
+arg1="cc", arg2="dd"
+ok
+> {test,["aa","bb"]}:dump().
+arg1="aa", arg2="bb"
+ok
+> {test,["cc","dd"]}:dump().
+arg1="cc", arg2="dd"
+ok
+
+
+注意:
+tuple modules本质上体现的是Erlang中函数调用的一种方式.
+
+

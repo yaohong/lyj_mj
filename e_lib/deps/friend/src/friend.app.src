@@ -1,0 +1,8 @@
+{application, friend,
+ [{description, "FRIEND"},
+  {vsn, "1.0.0"},
+  {modules, [friend]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env, [{friend_pool_size, 50}]},
+  {mod, {friend_app, []}}]}.

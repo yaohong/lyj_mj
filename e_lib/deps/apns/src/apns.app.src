@@ -1,0 +1,8 @@
+{application, apns,
+ [{description, "apns"},
+  {vsn, "1.0.0"},
+  {modules, [apns]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env, [{apns_service_node_name, 'iap_service@127.0.0.1'}]},
+  {mod, {apns_app, []}}]}.

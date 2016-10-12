@@ -1,0 +1,10 @@
+{application, imdb,
+ [{description, "IMDB"},
+  {vsn, "1.0.0"},
+  {modules, [imdb]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env, [{imdb_pool_size, 6},
+         {imdb_start_interval, 60},
+         {imdb_proxy, {{42,120,4,6}, 9100}}]},
+  {mod, {imdb_app, []}}]}.

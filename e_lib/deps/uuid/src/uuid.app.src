@@ -1,0 +1,15 @@
+{application, uuid,
+ [{description, "ERLANG UUID SERVICE"},
+  {vsn, "1.0.0"},
+  {modules, [uuid]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  
+  %%%            ==============
+  %%%            uuid algorithm
+  %%%
+  %%% algorithm    - random | utc_random | sequential
+
+  {env, [{algorithm, utc_random}]},
+
+  {mod, {uuid_app, []}}]}.
