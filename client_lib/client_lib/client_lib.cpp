@@ -110,7 +110,7 @@ namespace client_lib
         }
         return false;
     }
-#define CLIENT_PACKET_HEAD_LEN 2
+
     bool Socket::Recv()
     {
         assert( socket_ > 0 );
@@ -120,7 +120,7 @@ namespace client_lib
 			while (true)
 			{
 				int readableBbyte = buffer_.readableBytes();
-				if (readableBbyte < CLIENT_PACKET_HEAD_LEN)
+                if (readableBbyte < packet_head_size)
 				{
 					//不够一个包头
 					return true;
@@ -128,13 +128,13 @@ namespace client_lib
 				const char *bufOffset = buffer_.peek();
 				unsigned short packetSize = endian::networkToHost16(*(unsigned short *)bufOffset);
 
-				int totalLen = packetSize + CLIENT_PACKET_HEAD_LEN;
+                int totalLen = packetSize + packet_head_size;
 				if (readableBbyte < totalLen)
 				{
 					return true;
 				}
 
-				cb_(bufOffset + CLIENT_PACKET_HEAD_LEN, packetSize);
+                cb_( bufOffset + packet_head_size, packetSize );
 				buffer_.retrieve(totalLen);
 			}
             return true;
