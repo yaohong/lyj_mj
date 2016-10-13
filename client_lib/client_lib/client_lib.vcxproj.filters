@@ -36,6 +36,9 @@
     <ClInclude Include="sysdefine.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="endian.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

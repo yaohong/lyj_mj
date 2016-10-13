@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="buffer.h" />
     <ClInclude Include="client_lib.h" />
+    <ClInclude Include="endian.h" />
     <ClInclude Include="sockets.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sysdefine.h" />

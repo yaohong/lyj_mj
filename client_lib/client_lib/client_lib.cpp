@@ -1,6 +1,6 @@
 #include "client_lib.h"
 #include "sockets.h"
-
+#include "endian.h"
 namespace client_lib
 {
 #ifdef WIN32 
@@ -110,14 +110,33 @@ namespace client_lib
         }
         return false;
     }
-
+#define CLIENT_PACKET_HEAD_LEN 2
     bool Socket::Recv()
     {
         assert( socket_ > 0 );
         int n = buffer_.readFd( socket_ );
         if (n > 0)
         {
+			while (true)
+			{
+				int readableBbyte = buffer_.readableBytes();
+				if (readableBbyte < CLIENT_PACKET_HEAD_LEN)
+				{
+					//不够一个包头
+					return true;
+				}
+				const char *bufOffset = buffer_.peek();
+				unsigned short packetSize = endian::networkToHost16(*(unsigned short *)bufOffset);
 
+				int totalLen = packetSize + CLIENT_PACKET_HEAD_LEN;
+				if (readableBbyte < totalLen)
+				{
+					return true;
+				}
+
+				cb_(bufOffset + CLIENT_PACKET_HEAD_LEN, packetSize);
+				buffer_.retrieve(totalLen);
+			}
             return true;
         }
         
