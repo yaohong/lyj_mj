@@ -19,7 +19,7 @@ namespace client_lib
 
     Socket::~Socket()
     {
-        sockets::close( socket_ );
+        Close();
     }
 
     void Socket::SetCompletePackageCallback( const CompletePackageCallback &cb )
@@ -76,14 +76,17 @@ namespace client_lib
 #ifndef WIN32
                     int error = 0;
                     socklen_t len = sizeof(error);
-                    if (getsockopt( socket_), SOL_SOCKET, SO_ERROR, (char *)&error, &len ) == 0)
+                    if (getsockopt( socket_, SOL_SOCKET, SO_ERROR, (char *)&error, &len ) == 0)
                     {
                         if (error != 0)
                         {
+                            printf( "connect failed, getsockopt[error=%d]\n", error );
                             return false;
                         }
-                    } else 
+                    } 
+                    else 
                     {
+                        printf( "connect failed, getsockopt failed, errno=%d\n", errno );
                         return false;
                     }
 #endif 
@@ -91,11 +94,17 @@ namespace client_lib
                 else
                 {
                     //¡¥Ω” ß∞‹
+                    printf( "connect failed, timeout\n" );
                     return false;
                 }
-                
+
             }
-        }
+            else
+            {
+                printf( "connect failed, errno=%d\n", errno );
+                return false;
+            }
+        } 
 
         return true;
     }
@@ -150,6 +159,16 @@ namespace client_lib
         }
 
         return false;
+    }
+
+    void Socket::Close()
+    {
+        if (-1 != socket_)
+        {
+            sockets::close( socket_ );
+            socket_ = -1;
+        }
+        
     }
 }
 

@@ -1,6 +1,6 @@
 #ifndef _endian_h__
 #define _endian_h__
-
+#include "sysdefine.h"
 
 
 namespace client_lib

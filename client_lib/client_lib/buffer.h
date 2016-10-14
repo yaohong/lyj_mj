@@ -1,7 +1,6 @@
 #ifndef _Buffer_h__
 #define _Buffer_h__
-#include <assert.h>
-#include <vector>
+#include "sysdefine.h"
 namespace client_lib
 {
         static const size_t kCheapPrepend = 8;

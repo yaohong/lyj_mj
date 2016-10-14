@@ -22,6 +22,7 @@ namespace client_lib
         bool Connect(const std::string &addr, unsigned short port, int timeout);
         bool Send(const char *data, int dataLen);
         bool Recv();
+        void Close();
     private:
         Buffer buffer_;
         CompletePackageCallback cb_;

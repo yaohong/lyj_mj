@@ -13,6 +13,7 @@ namespace client_lib
 #else 
     IgnoreSigPipe::IgnoreSigPipe()
     {
+        printf("IgnoreSigPipe SIGPIPE\n");
         ::signal( SIGPIPE, SIG_IGN );
     }
 #endif
