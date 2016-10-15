@@ -13,7 +13,6 @@ static ERL_NIF_TERM change(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 	
 	int newValue = 0;
     enif_get_int(env, argv[1], &newValue);
-	foo->v1_ = newValue;
 	return enif_make_atom(env, "success");
 }
 
@@ -21,13 +20,13 @@ static ERL_NIF_TERM change(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
 	ErlNifBinary nifBin;
+	int brankerNumber = -1;
 	int Ret = enif_alloc_binary(sizeof(MainLogic), &nifBin);
 	printf("enif_alloc_binary %d\n", Ret);
 
-	int brankerNumer = -1;
-	enif_get_int(env, argv[1], &brankerNumer);
+	enif_get_int(env, argv[1], &brankerNumber);
 	MainLogic *foo = (MainLogic *)(nifBin.data);
-	foo->Init();
+	Init(foo, (int8)brankerNumber);
 	ERL_NIF_TERM binTerm = enif_make_binary(env, &nifBin);
 	return enif_make_tuple(env, 2, enif_make_atom(env, "success"), binTerm);
 }
