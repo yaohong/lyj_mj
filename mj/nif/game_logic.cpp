@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
-
+#include <iostream>
 void RandomPool(MainLogic *logic)
 {
     //初始化池里的牌
@@ -124,3 +124,21 @@ std::string getPaiString(uint8 p)
     sprintf(buff, "%d-%s", value, strType.c_str());
     return buff;
 }
+
+
+
+
+
+
+
+
+#ifdef EXE
+int main(int argc, const char * argv[]) {
+    // insert code here...
+    std::cout << "Hello, World!\n";
+    MainLogic logic;
+    Init(&logic);
+    
+    return 0;
+}
+#endif
