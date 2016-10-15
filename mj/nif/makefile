@@ -3,7 +3,7 @@ flag= -g -DEXE -fPIC -std=c++0x
 
 OBJDIR:=./obj
 
-e_so=./nif.so
+e_so=./mj_nif.so
 e_flag= -g -fPIC -shared -I./ -I/usr/local/erlang/lib/erlang/usr/include/
 
 
