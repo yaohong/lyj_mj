@@ -18,9 +18,9 @@ $(e_so): ${OBJ}
 	g++ -fPIC -shared $(e_flag) -o $@ $^
 
 clean:
-	rm $(OBJDIR)/*.o
-	rm client
-	rm $(e_so)
+	rm -rf $(OBJDIR)/*.o
+	rm -rf client
+	rm -rf $(e_so)
   
 $(OBJDIR)/%.o:%.cpp
 	g++ -c $< -o $@ $(flag)
