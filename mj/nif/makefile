@@ -8,7 +8,9 @@ e_flag= -g -fPIC -shared -I./ -I/usr/local/erlang/lib/erlang/usr/include/
 
 
 SRC:=$(wildcard *.cpp )
-OBJ:=$(patsubst %.cpp,$(OBJDIR)/%.o,$(notdir $(SRC)))
+CPP_OBJ:=$(patsubst %.cpp,$(OBJDIR)/%.o,$(notdir $(SRC)))
+C_OBJ:=$(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(SRC)))
+OBJ:= ${CPP_OBJ} ${C_OBJ}
 all:  client $(e_so) 
 
 client: ${OBJ} 

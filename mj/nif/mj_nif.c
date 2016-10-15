@@ -34,7 +34,7 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 
 
 static ErlNifFunc nif_funcs[] = {
-	{"game_start", 1, change}
+	{"game_start", 1, game_start}
 };
 
 
