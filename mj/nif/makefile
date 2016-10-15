@@ -1,12 +1,17 @@
-e_so=./nif_test.so
-e_flag= -g -Wno-pointer-arith -I./ -I./header -I/usr/local/erlang/lib/erlang/usr/include/
 
-all:  $(e_so)
+flag= -g -std=c++0x
+OBJDIR:=./obj
+SRC:=$(wildcard *.cpp )
+OBJ:=$(patsubst %.cpp,$(OBJDIR)/%.o,$(notdir $(SRC)))
+all:  client
 
-$(e_so): nif_test.c 
-	g++ -fPIC -shared $(e_flag) -o $@ nif_test.c
+client: ${OBJ} 
+	g++ $(flag) -o $@ $^
 
 
 clean:
-	rm $(e_so)
+	rm client
+	rm $(OBJDIR)/*.o
   
+$(OBJDIR)/%.o:%.cpp
+	g++ -c $< -o $@ $(flag)
