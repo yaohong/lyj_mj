@@ -64,7 +64,7 @@ void CrcPool(MainLogic *logic)
     }
 }
 
-void Init(MainLogic *logic)
+void Init(MainLogic *logic, int8 bankerSeatNumber)
 {
 	memset(logic, 0, sizeof(MainLogic));
     srand((uint32)time(NULL));
@@ -73,7 +73,15 @@ void Init(MainLogic *logic)
     //随即一个庄家
     logic->poolHeadReadIndex_ = 0;
     logic->poolTailReadIndex_ = MAX_COUNT -  1;
-    logic->bankerSeatNumber_ = rand() % 4;
+    if ( -1 == bankerSeatNumber )
+    {
+        logic->bankerSeatNumber_ = rand() % 4;
+    } 
+    else 
+    {
+        logic->bankerSeatNumber_ = bankerSeatNumber;
+    }
+    
     logic->currentSeatNumber_ = logic->bankerSeatNumber_;
     //发三轮四张
     for (int i=0; i<3; i++)

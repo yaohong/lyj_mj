@@ -51,6 +51,6 @@ struct MainLogic
 
 };
 
-void Init(MainLogic *logic);
+void Init(MainLogic *logic, int8 bankerSeatNumber);
 std::string getPaiString(uint8 p);
 #endif

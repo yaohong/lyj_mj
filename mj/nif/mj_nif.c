@@ -3,16 +3,13 @@
 #include <time.h>
 #include <assert.h>
 #include "erl_nif.h"
-
-typedef struct {
-	int v1_;
-} Foo;
+#include "game_logic.h"
 
 static ERL_NIF_TERM change(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
 	ErlNifBinary nifBin;
 	enif_inspect_binary(env, argv[0], &nifBin);
-	Foo *foo = (Foo *)(nifBin.data);
+	MainLogic *foo = (MainLogic *)(nifBin.data);
 	
 	int newValue = 0;
     enif_get_int(env, argv[1], &newValue);
@@ -21,22 +18,24 @@ static ERL_NIF_TERM change(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 }
 
 
-static ERL_NIF_TERM init_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
+static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
 	ErlNifBinary nifBin;
-	int Ret = enif_alloc_binary(sizeof(Foo), &nifBin);
+	int Ret = enif_alloc_binary(sizeof(MainLogic), &nifBin);
 	printf("enif_alloc_binary %d\n", Ret);
-	Foo *foo = (Foo *)(nifBin.data);
-	foo->v1_ = 1;
+
+	int brankerNumer = -1;
+	enif_get_int(env, argv[1], &brankerNumer);
+	MainLogic *foo = (MainLogic *)(nifBin.data);
+	foo->Init();
 	ERL_NIF_TERM binTerm = enif_make_binary(env, &nifBin);
 	return enif_make_tuple(env, 2, enif_make_atom(env, "success"), binTerm);
 }
 
 
 static ErlNifFunc nif_funcs[] = {
-	{"change", 2, change},
-	{"init_nif", 0, init_nif}
+	{"game_start", 1, change}
 };
 
 
-ERL_NIF_INIT(nif_test, nif_funcs, NULL, NULL, NULL, NULL);
+ERL_NIF_INIT(mj_nif, nif_funcs, NULL, NULL, NULL, NULL);
