@@ -1,11 +1,10 @@
 
-flag= -g -DEXE -std=c++0x
+flag= -g -DEXE -fPIC -std=c++0x
 
 OBJDIR:=./obj
-mkdir $(OBJ)
 
 e_so=./nif.so
-e_flag= -g -Wno-pointer-arith -I./ -I./header -I/usr/local/erlang/lib/erlang/usr/include/
+e_flag= -g -fPIC -shared -I./ -I/usr/local/erlang/lib/erlang/usr/include/
 
 
 SRC:=$(wildcard *.cpp )
@@ -19,9 +18,9 @@ $(e_so): ${OBJ}
 	g++ -fPIC -shared $(e_flag) -o $@ $^
 
 clean:
+	rm $(OBJDIR)/*.o
 	rm client
 	rm $(e_so)
-	rm $(OBJDIR)/*.o
   
 $(OBJDIR)/%.o:%.cpp
 	g++ -c $< -o $@ $(flag)
