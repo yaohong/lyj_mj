@@ -1,3 +1,3 @@
 %% return string()
--define(WORLD_VERSION, element(2, application:get_key(world, vsn))).
--define(WORLD_DESCRIPTION, element(2, application:get_key(world, description))).
+-define(QP_VERSION, element(2, application:get_key(qp, vsn))).
+-define(QP_DESCRIPTION, element(2, application:get_key(qp, description))).

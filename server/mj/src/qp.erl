@@ -1,4 +1,4 @@
--module(world).
+-module(qp).
 -author('yh@gmail.com').
 
 -include("../deps/file_log/include/file_log.hrl").
@@ -7,8 +7,8 @@
 
 -spec start() -> ok | {error, term()}.
 start() ->
-    application:start(world).
+    application:start(qp).
 
 -spec stop() -> ok | {error, term()}.
 stop() ->
-    application:stop(world).
+    application:stop(qp).

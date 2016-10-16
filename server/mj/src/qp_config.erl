@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 17. 二月 2014 下午3:30
 %%%-------------------------------------------------------------------
--module(world_config).
+-module(qp_config).
 -author("yaohong").
 
 -behaviour(gen_server).

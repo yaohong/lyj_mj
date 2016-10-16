@@ -1,11 +1,11 @@
-{application, world,
+{application, qp,
   [
-    {description, "WORLD"},
+    {description, "QP"},
     {vsn, "1.0.0"},
     {modules, []},
     {registered, []},
     {applications, [kernel, stdlib]},
     {env, []},
-    {mod, {world_app, []}}
+    {mod, {qp_app, []}}
   ]
 }.

@@ -1,4 +1,4 @@
--module(world_ctl).
+-module(qp_ctl).
 -author('yh@gmail.com').
 
 

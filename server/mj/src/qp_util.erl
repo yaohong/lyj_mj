@@ -1,4 +1,4 @@
--module(world_util).
+-module(qp_util).
 -author('yh@gmail.com').
 -export([
 	random_value/0,
