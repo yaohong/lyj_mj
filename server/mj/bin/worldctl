@@ -1,0 +1,115 @@
+#!/bin/sh
+
+###########################
+# Configuration
+###########################
+
+SETCOOKIE="zbcookie"
+APPNAME=world
+ERL=erl
+HOST=127.0.0.1
+
+POLL=true
+SMP=auto
+ERL_PROCESSES=1025000
+ERL_MAX_PORTS=3200
+ERL_MAX_ETS_TABLES=1400
+
+###########################
+# End of configuration
+###########################
+#主节点的名字
+MYAPP=zb_world
+
+NODE=$MYAPP@$HOST
+
+NAME=-name
+ROOT="`dirname "$0"`"
+ROOT="`cd "$ROOT"/.. && pwd`"
+
+ERLANG_OPTS="+K $POLL -smp $SMP +P $ERL_PROCESSES"
+
+export SASL_LOG_PATH=$ROOT/var/log/$MYAPP
+export OLD_LOG_PATH=$ROOT/old_log/$MYAPP
+if [ ! -x $SASL_LOG_PATH ]; then
+    mkdir -p $SASL_LOG_PATH
+fi
+
+if [ ! -x $OLD_LOG_PATH ]; then
+    mkdir -p $OLD_LOG_PATH
+fi
+export PRIVATE_CFG_PATH=$ROOT/var/config/world.cfg
+export PUBLIC_CFG_PATH=$ROOT/var/config/public.cfg
+export OSS_PATH=$ROOT/lt_oss/
+export CVS_PATH=$ROOT/csv/
+export MAP_PATH=$ROOT/map/
+export GLOBAL_CFG_PATH=$ROOT/var/config/globe_config.xml
+# define additional environment variables 
+MNESIA_PATH=$ROOT/var/mnesia/$MYAPP
+PID_DIR_PATH=$ROOT/var/pid
+PID_PATH=$ROOT/var/pid/$MYAPP.pid
+SASL_LOG_VALUE=$SASL_LOG_PATH/sasl.log
+LOG_PATH=$ROOT/var/log/$MYAPP/file_log.log
+LOG_LEVEL=debug
+LOG_ROTATE_INTERVAL=21600
+EBIN_PATH=$ROOT/ebin
+
+if [ ! -x $MNESIA_PATH ]; then
+    mkdir -p $MNESIA_PATH
+fi
+
+if [ ! -x $PID_DIR_PATH ]; then
+    mkdir -p $PID_DIR_PATH
+fi
+
+DATETIME=`date "+%Y%m%d-%H%M%S"`
+ERL_CRASH_DUMP=$ROOT/var/log/erl_crash_$DATETIME.dump 
+
+# export global variables 
+export MASTER_NODE
+export MNESIA_PATH
+export PID_PATH
+export SASL_LOG_PATH
+export LOG_PATH
+export LOG_LEVEL
+export LOG_ROTATE_INTERVAL
+export EBIN_PATH
+export ERL_CRASH_DUMP 
+export ERL_MAX_PORTS
+export ERL_MAX_ETS_TABLES
+
+case "$1" in
+    start)
+      $ERL -noinput -detached $NAME $NODE \
+           $ERLANG_OPTS \
+           -setcookie $SETCOOKIE \
+           -pa "$ROOT/ebin" -s $APPNAME start \
+           -sasl sasl_error_logger \{file,\"$SASL_LOG_VALUE\"\}
+      # 等待启动完成了返回
+      $ERL -noinput $NAME $MYAPP"_ctl@$HOST" \
+           -setcookie $SETCOOKIE \
+           -pa "$ROOT/ebin" -s world_ctl -extra $NODE "wait_start" $APPNAME
+      ;;
+    debug)
+      echo "Press any key to continue" 
+      read foo 
+      $ERL $NAME $MYAPP"_debug@$HOST" -remsh $NODE \
+           -setcookie $SETCOOKIE \
+           -pa "$ROOT/ebin"
+      ;;
+    status)
+      $ERL -noinput $NAME $MYAPP"_ctl@$HOST" \
+           -setcookie $SETCOOKIE \
+           -pa "$ROOT/ebin" -s world_ctl -extra $NODE $1 $APPNAME
+      ;;
+    create_room)
+      $ERL -noinput $NAME $MYAPP"_ctl@$HOST" \
+           -setcookie $SETCOOKIE \
+           -pa "$ROOT/ebin" -s room_script -extra $@
+      ;;
+    *)
+      $ERL -noinput $NAME $MYAPP"_ctl@$HOST" \
+           -setcookie $SETCOOKIE \
+           -pa "$ROOT/ebin" -s world_ctl -extra $NODE $@
+      ;;
+esac

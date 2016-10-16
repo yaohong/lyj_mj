@@ -1,0 +1,11 @@
+{application, world,
+  [
+    {description, "WORLD"},
+    {vsn, "1.0.0"},
+    {modules, []},
+    {registered, []},
+    {applications, [kernel, stdlib]},
+    {env, []},
+    {mod, {world_app, []}}
+  ]
+}.

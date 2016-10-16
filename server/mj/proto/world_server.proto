@@ -1,0 +1,181 @@
+// Client <-> WorldServer
+
+package world_server;
+
+// pack
+message ws_packet_req {
+    required int32 cmd = 1; // 协议ID
+    required uint32 seq_id = 2; // 流水号
+    required bytes body = 3; // 包体
+}
+
+message ws_packet_rsp {
+    required int32 cmd = 1; // 协议ID
+    required uint32 seq_id = 2; // 流水号
+    optional bytes body = 3; // 包体
+}
+
+enum ws_cmd {
+    CMD_DEV_LOGIN_REQ = 1001; // 登录请求 (ws_dev_login_req)
+    CMD_DEV_LOGIN_RSP = 1002; // 登录回复 (ws_dev_login_rsp)
+	
+	CMD_HJ_LOGIN_REQ = 1101; // 好接SDK (ws_hj_login_req)
+	CMD_HJ_LOGIN_RSP = 1102; // 好接SDK (ws_hj_login_rsp)
+    
+    CMD_CW_CREATE_ACTOR_REQ = 2001; // 创角请求
+    CMD_WC_CREATE_ACTOR_RSP = 2002; // 创角回复
+    
+    CMD_CW_ENTER_SCENE_REQ = 2003; // 选择角色并请求进入游戏
+    CMD_WC_ENTER_SCENE_RSP = 2004; // 告诉客户端，场景发生跳转，请立即向SceneServer发送JoinSceneReq消息
+    
+    CMD_WC_KICK_PUSH = 3001; // 踢出
+    
+    CMD_CW_DELETE_ACTOR_REQ = 3002; //删除角色
+    CMD_WC_DELETE_ACTOR_RSP = 3003; //删除角色的返回
+    
+    CMD_OTHER_PLAYER_INFO_REQ = 3004; // 获取其它玩家信息 (zbpkg_other_player_info_req)
+    CMD_OTHER_PLAYER_INFO_RSP = 3005; // 其它玩家信息回复 (zbpkg_other_player_info_rsp)
+	
+	CMD_STRONGHOLD_WAR_START_NOTIFY = 3006;	//据点战开始了 (zbpkg_stronghold_war_start_notify)
+}
+
+// 角色信息
+message ws_actor_info {
+    required int64 actor_id = 1;
+    required uint32 actor_type_id = 2;
+    required string name = 3;
+    repeated uint32 actor_avatar_id = 4;
+    required uint32 create_time = 5;
+    required uint32 login_time  = 6;
+    required uint32 level = 7;
+    repeated uint32 equip= 8;
+    optional string im_sdk_password = 9; // 三方聊天SDK的密码，三方帐号就是 tostring(actor_id)
+}
+
+// 登录请求
+message ws_dev_login_req {
+    required string acc = 1;
+}
+
+// 登录回复
+message ws_dev_login_rsp {
+    required sint32 state = 1; // 返回值
+    repeated ws_actor_info actors = 2;  // 角色列表
+    optional int64 userId = 3;  //userId
+    optional uint32 im_room_id = 4; //聊天的房间ID
+}
+
+// 好接SDK-登录请求
+message ws_hj_login_req {
+    required string hj_app_id = 1;
+    required string hj_channel = 2;
+    required string hj_uid = 3;
+    required string hj_token = 4;
+}
+
+// 好接SDK-登录回复
+message ws_hj_login_rsp {
+    required sint32 state = 1; // 返回值
+    repeated ws_actor_info actors = 2;  // 角色列表
+    optional int64 userId = 3;  //userId
+    optional uint32 im_room_id = 4; //聊天的房间ID
+}
+
+// 创角请求
+message ws_create_actor_req {
+    required string name = 1;  // 请求创建的名字
+    required uint32 actor_type_id = 2; // 请求创建的角色类型
+}
+
+// 创建回复
+message ws_create_actor_rsp {
+    required sint32 state = 1; // 返回值
+    optional ws_actor_info actor = 2; // 创建成功的角色信息
+}
+
+//删除角色
+message cw_delete_actor_req {
+    required int64 actor_id = 1; //角色的actorId
+}
+
+message wc_delete_actor_rsp {
+    required sint32 state = 1;          //0为成功
+}
+
+// 客户端请求进入游戏
+message cw_enter_scene_req {
+    required int64 account_id = 1; // 帐号ID
+    required int64 actor_id = 2;  // 角色ID
+}
+
+// 场景发生跳转，请立即向SceneServer发送JoinSceneReq消息
+message wc_enter_scene_rsp {
+    required int32 ret = 1; // 返回值
+    required int64 actor_id = 2; //选择的角色ID
+    required int64 target_id = 3; // 跳入的家园ID
+}
+
+// 通知被踢
+message ws_kick_push {
+    required sint32 state = 1; // 返回值
+}
+
+message equip_item_attr{
+    optional uint32 attr_ins_id = 1;//有就是浮动属性 没有就是固定属性
+    required uint32 attr_id = 2;
+    required uint32 attr_value = 3;
+}
+
+message equip_item{
+    required uint32 equp_type_id = 1;
+    required sint32 is_apparel = 2;         //是否穿戴 0:没有 1:有
+    optional uint32 bound_state = 3;
+    repeated equip_item_attr attrs = 4;
+}
+
+// 其它玩家的详细信息
+message zbpkg_other_player_detail_info {
+    required sint64 actor_id = 1; // actor id
+    required uint32 actor_type_id = 2;      // 角色ID
+    required int32 level = 3;               // 等级
+    required string name = 4;               // 角色名称
+    repeated equip_item equiped = 5; 
+    required uint32 murderous_value = 6;    // 杀气值
+    required int64 guild_id = 7;            //公会Idid 
+    required string guild_name = 8;         //公会名字  
+}
+
+message zbpkg_other_player_info_req{
+    required int64 actor_id = 1;
+}
+
+// 其它玩家信息回包
+message zbpkg_other_player_info_rsp{
+    required int32 ret = 1;
+    optional zbpkg_other_player_detail_info playerInfo = 2;
+}
+
+// 系统通知类型
+enum ZBIMNOTICETYPE {
+    IM_NOTICE_NONE = 0;
+	IM_NOTICE_SYSTEM = 1;
+}
+
+// 专门用于客户端与第三方聊天用，服务器不用。
+message zbpkg_imsdk_chat_message {
+    optional string nick_name = 1;  // 用户昵称
+    optional int64 actor_id = 2; // 用户ID
+    optional string voice_translate_text = 3; // 语音在录音时，翻译成的文本
+    optional int32 system_notice_type = 4; // 系统通知类型 （ZBIMNOTICETYPE）
+    optional string token = 5; // Token
+    repeated string args = 6; // [MONSTER_BOSS_BROADCAST] [map_id=3001] [stage_ins_id = 1] [x=2] [y=3] [boss_id=2001]
+}
+
+message zbpkg_stronghold_war_start_notify {
+	required int32 id = 1;
+}
+
+message zbpkg_broadcast {
+	required int32 system_notice_type = 1;	// 系统通知类型 （ZBIMNOTICETYPE）
+	repeated string args = 2; 				//
+}
