@@ -1,22 +1,12 @@
--record(ws_packet_req, {cmd, seq_id, body}).
--record(ws_packet_rsp, {cmd, seq_id, body}).
--record(ws_actor_info, {actor_id, actor_type_id, name, actor_avatar_id, create_time, login_time, level, equip, im_sdk_password}).
--record(ws_dev_login_req, {acc}).
--record(ws_dev_login_rsp, {state, actors, userid, im_room_id}).
--record(ws_hj_login_req, {hj_app_id, hj_channel, hj_uid, hj_token}).
--record(ws_hj_login_rsp, {state, actors, userid, im_room_id}).
--record(ws_create_actor_req, {name, actor_type_id}).
--record(ws_create_actor_rsp, {state, actor}).
--record(cw_delete_actor_req, {actor_id}).
--record(wc_delete_actor_rsp, {state}).
--record(cw_enter_scene_req, {account_id, actor_id}).
--record(wc_enter_scene_rsp, {ret, actor_id, target_id}).
--record(ws_kick_push, {state}).
--record(equip_item_attr, {attr_ins_id, attr_id, attr_value}).
--record(equip_item, {equp_type_id, is_apparel, bound_state, attrs}).
--record(zbpkg_other_player_detail_info, {actor_id, actor_type_id, level, name, equiped, murderous_value, guild_id, guild_name}).
--record(zbpkg_other_player_info_req, {actor_id}).
--record(zbpkg_other_player_info_rsp, {ret, playerinfo}).
--record(zbpkg_imsdk_chat_message, {nick_name, actor_id, voice_translate_text, system_notice_type, token, args}).
--record(zbpkg_stronghold_war_start_notify, {id}).
--record(zbpkg_broadcast, {system_notice_type, args}).
+-record(qp_packet_req, {cmd, seq_id, body}).
+-record(qp_packet_rsp, {cmd, seq_id, body}).
+-record(login_req, {acc}).
+-record(login_rsp, {state}).
+-record(create_room_req, {room_type, ready_state}).
+-record(create_room_rsp, {state, room_id}).
+-record(join_room_req, {}).
+-record(room_user, {seat_id}).
+-record(join_room_rsp, {users}).
+-record(ready_req, {}).
+-record(ready_rsp, {}).
+-record(game_data, {data}).

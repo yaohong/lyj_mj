@@ -2,4 +2,4 @@ deps/
 ebin/
 var/log/
 var/pid/
-
+old_log/
