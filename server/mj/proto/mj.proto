@@ -60,7 +60,7 @@ message create_room_rsp {
 
 //进入房间的请求
 message join_room_req {
-    requird int32 room_id = 1;
+    required int32 room_id = 1;
 }
 
 //房间玩家的信息
@@ -70,18 +70,18 @@ message room_user {
 
 //进入房间的应答
 message join_room_rsp {
-    requird int32 state = 1;
+    required int32 state = 1;
     repeated room_user users = 2;
 }
 
 //准备
 message ready_req {
-    requird int32 id = 1;
+    required int32 id = 1;
 }
 
 //准备应答
 message ready_rsp {
-    requird int32 state = 1;
+    required int32 state = 1;
 }
 
 //游戏开始的通知
