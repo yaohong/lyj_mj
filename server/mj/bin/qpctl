@@ -4,8 +4,8 @@
 # Configuration
 ###########################
 
-SETCOOKIE="zbcookie"
-APPNAME=world
+SETCOOKIE="qpcookie"
+APPNAME=qp
 ERL=erl
 HOST=127.0.0.1
 

@@ -231,7 +231,7 @@ load_all_cfg({local_cfg, CfgList}) ->
 			end, gb_trees:empty(), CfgList),
 	gb_trees:to_list(CfgParamTree);
 load_all_cfg({url, {UrlAddr, Uuid, AppName}}) ->
-	Value = ["uuid=",dd_util:to_list(Uuid), "&app_name=", dd_util:to_list(AppName)],
+	Value = ["uuid=",qp_util:to_list(Uuid), "&app_name=", qp_util:to_list(AppName)],
 	case httpc:request(
 		'post',
 		{
@@ -304,77 +304,77 @@ extract_public_param(PublicJsonList) ->
 	lists:foldr(
 		fun({<<"server_info">>, JsonValue}, TmpParam1) ->
 			{struct, [{<<"server_id">>,  ServerId}, {<<"server_srcid">>, SrcId}, {<<"server_name">>, ServerName}]} = JsonValue,
-			[{server_info, {dd_util:to_integer(ServerId), dd_util:to_integer(SrcId), dd_util:to_list(ServerName)}}|TmpParam1];
+			[{server_info, {qp_util:to_integer(ServerId), qp_util:to_integer(SrcId), qp_util:to_list(ServerName)}}|TmpParam1];
 			({<<"force_verify">>, JsonValue}, TmpParam1) ->
-				[{force_verify, dd_util:to_integer(JsonValue)}|TmpParam1];
+				[{force_verify, qp_util:to_integer(JsonValue)}|TmpParam1];
 			({<<"filter_proto">>, JsonValue}, TmpParam1) ->
-				FilterProtoList = string:tokens(dd_util:to_list(JsonValue), "#"),
+				FilterProtoList = string:tokens(qp_util:to_list(JsonValue), "#"),
 				FilterProSet =
 					lists:foldr(
 						fun(FilterProtoCmd, TmpSet) ->
-							gb_sets:add_element(dd_util:to_integer(FilterProtoCmd), TmpSet)
+							gb_sets:add_element(qp_util:to_integer(FilterProtoCmd), TmpSet)
 						end, gb_sets:new(), FilterProtoList),
 				[{filter_proto, FilterProSet}|TmpParam1];
 			({<<"server_version">>, JsonValue}, TmpParam1) ->
-				[{server_version, dd_util:to_list(JsonValue)}|TmpParam1];
+				[{server_version, qp_util:to_list(JsonValue)}|TmpParam1];
 			({<<"game_id">>, JsonValue}, TmpParam1) ->
-				[{game_id, dd_util:to_list(JsonValue)}|TmpParam1];
+				[{game_id, qp_util:to_list(JsonValue)}|TmpParam1];
 			({<<"cdk_srv">>, JsonValue}, TmpParam1) ->
 				{struct, [{<<"cdk_host">>,  CdkHost}, {<<"cdk_port">>, CdkPort}]} = JsonValue,
-				[{cdk_srv, {dd_util:to_list(CdkHost), dd_util:to_integer(CdkPort)}}|TmpParam1];
+				[{cdk_srv, {qp_util:to_list(CdkHost), qp_util:to_integer(CdkPort)}}|TmpParam1];
 
 			({<<"invite_srv">>, JsonValue}, TmpParam1) ->
 				{struct, [{<<"invite_host">>,  InviteHost}, {<<"invite_port">>, InvitePort}]} = JsonValue,
-				[{invite_srv, {dd_util:to_list(InviteHost), dd_util:to_integer(InvitePort)}}|TmpParam1];
+				[{invite_srv, {qp_util:to_list(InviteHost), qp_util:to_integer(InvitePort)}}|TmpParam1];
 
 			({<<"token_addr">>, JsonValue}, TmpParam1) ->
 				{struct, [{<<"token_host">>,  TokenHost}, {<<"token_port">>, TokenPort}]} = JsonValue,
-				[{token_addr, {dd_util:to_list(TokenHost), dd_util:to_integer(TokenPort)}}|TmpParam1];
+				[{token_addr, {qp_util:to_list(TokenHost), qp_util:to_integer(TokenPort)}}|TmpParam1];
 			({<<"gm_internal_url">>,JsonValue}, TmpParam1) ->
-				[{gm_internal_url, dd_util:to_list(JsonValue)}|TmpParam1];
+				[{gm_internal_url, qp_util:to_list(JsonValue)}|TmpParam1];
 			({<<"dir_svr_addr">>, JsonValue}, TmpParam1) ->
 				{struct, [{<<"dir_svr_host">>,  DirSvrHost}, {<<"dir_svr_port">>, DirSvrPort}]} = JsonValue,
-				[{dir_svr_addr, {dd_util:to_list(DirSvrHost), dd_util:to_integer(DirSvrPort)}}|TmpParam1];
+				[{dir_svr_addr, {qp_util:to_list(DirSvrHost), qp_util:to_integer(DirSvrPort)}}|TmpParam1];
 			({<<"dbmgr_node">>, JsonValue}, TmpParam1) ->
-				[{dbmgr_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{dbmgr_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"gateway_node">>, JsonValue}, TmpParam1) ->
-				[{gateway_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{gateway_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"verify_node">>, JsonValue}, TmpParam1) ->
-				[{verify_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{verify_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"gmcontrol_node">>, JsonValue}, TmpParam1) ->
-				[{gmcontrol_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{gmcontrol_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"pvp_node">>, JsonValue}, TmpParam1) ->
-				[{pvp_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{pvp_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"rcservice_node">>, JsonValue}, TmpParam1) ->
-				[{rcservice_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{rcservice_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"oss_node">>, JsonValue}, TmpParam1) ->
-				[{oss_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{oss_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"cache_node">>, JsonValue}, TmpParam1) ->
-				[{cache_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{cache_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"im_node">>, JsonValue}, TmpParam1) ->
-				[{im_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{im_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"push_node">>, JsonValue}, TmpParam1) ->
-				[{push_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{push_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"filter_node">>, JsonValue}, TmpParam1) ->
-				[{filter_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{filter_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"ap_node">>, JsonValue}, TmpParam1) ->
-				[{ap_node, dd_util:to_atom(JsonValue)}|TmpParam1];
+				[{ap_node, qp_util:to_atom(JsonValue)}|TmpParam1];
 			({<<"mail_server">>, JsonValue}, TmpParam1) ->
-				[{mail_server, dd_util:to_list(JsonValue)}|TmpParam1];
+				[{mail_server, qp_util:to_list(JsonValue)}|TmpParam1];
 			({<<"db_addr">>, JsonValue}, TmpParam1) ->
 				{struct, [{<<"db_ip">>,  DbIp}, {<<"db_port">>, DbPort}, {<<"db_account">>, DbAccount}, {<<"db_pwd">>, DbPwd}, {<<"db_suffix">>, DbSuffix}]} = JsonValue,
-				[{db_addr, {dd_util:to_list(DbIp), dd_util:to_integer(DbPort), dd_util:to_list(DbAccount),dd_util:to_list(DbPwd), dd_util:to_list(DbSuffix)}}|TmpParam1];
+				[{db_addr, {qp_util:to_list(DbIp), qp_util:to_integer(DbPort), qp_util:to_list(DbAccount),qp_util:to_list(DbPwd), qp_util:to_list(DbSuffix)}}|TmpParam1];
 			({<<"intranet_ip">>, JsonValue}, TmpParam1) ->
-				[{intranet_ip, dd_util:to_list(JsonValue)}|TmpParam1];
+				[{intranet_ip, qp_util:to_list(JsonValue)}|TmpParam1];
 			({<<"extranet_ip">>, JsonValue}, TmpParam1) ->
-				[{extranet_ip, dd_util:to_list(JsonValue)}|TmpParam1];
+				[{extranet_ip, qp_util:to_list(JsonValue)}|TmpParam1];
 			({<<"activity_state_list">>, JsonValue}, TmpParam1) ->
-				ActivityItemList = string:tokens(dd_util:to_list(JsonValue), "#"),
+				ActivityItemList = string:tokens(qp_util:to_list(JsonValue), "#"),
 				ErlActivityList =
 					lists:map(
 						fun(ActivityItem) ->
 							[ActivityId, IsOpen] = string:tokens(ActivityItem, "-"),
-							{dd_util:to_integer(ActivityId), dd_util:to_integer(IsOpen)}
+							{qp_util:to_integer(ActivityId), qp_util:to_integer(IsOpen)}
 						end, ActivityItemList),
 				[{activity_state_list, ErlActivityList}|TmpParam1]
 		end, [], PublicJsonList).
@@ -382,60 +382,60 @@ extract_public_param(PublicJsonList) ->
 extract_debug_param(DebugJsonList) ->
 	lists:foldr(
 		fun({<<"debug_fast_game">>, JsonValue}, TmpParam1) ->
-			[{debug_fast_game, dd_util:to_integer(JsonValue)}|TmpParam1];
+			[{debug_fast_game, qp_util:to_integer(JsonValue)}|TmpParam1];
 			({<<"debug_pvp_rank_update">>, JsonValue}, TmpParam1) ->
-				[{debug_pvp_rank_update, dd_util:to_integer(JsonValue)}|TmpParam1];
+				[{debug_pvp_rank_update, qp_util:to_integer(JsonValue)}|TmpParam1];
 			({<<"debug_test_recharge">>, JsonValue}, TmpParam1) ->
-				[{debug_test_recharge, dd_util:to_integer(JsonValue)}|TmpParam1];
+				[{debug_test_recharge, qp_util:to_integer(JsonValue)}|TmpParam1];
 			({<<"debug_test_vr">>, JsonValue}, TmpParam1) ->
-				[{debug_test_vr, dd_util:to_integer(JsonValue)}|TmpParam1];
+				[{debug_test_vr, qp_util:to_integer(JsonValue)}|TmpParam1];
 			({<<"debug_gm_control">>,JsonValue}, TmpParam1) ->
-				[{debug_gm_control, dd_util:to_integer(JsonValue)}|TmpParam1]
+				[{debug_gm_control, qp_util:to_integer(JsonValue)}|TmpParam1]
 		end, [], DebugJsonList).
 
 
 extract_app_param(<<"cache">>, AppJsonList) ->
 	lists:foldr(
 		fun({<<"server_start_time">>, JsonValue}, TmpParam1) ->
-			[{server_start_time, dd_util:to_list(JsonValue)}|TmpParam1];
+			[{server_start_time, qp_util:to_list(JsonValue)}|TmpParam1];
 			({<<"family_start_time">>, JsonValue}, TmpParam1) ->
-				[{family_start_time, dd_util:to_list(JsonValue)}|TmpParam1];
+				[{family_start_time, qp_util:to_list(JsonValue)}|TmpParam1];
 			({<<"register_limit">>, JsonValue}, TmpParam1) ->
-				[{register_limit, dd_util:to_integer(JsonValue)}|TmpParam1]
+				[{register_limit, qp_util:to_integer(JsonValue)}|TmpParam1]
 		end, [], AppJsonList);
 extract_app_param(<<"gateway">>, AppJsonList) ->
 	lists:foldr(
 		fun({<<"listen_port">>, JsonValue}, TmpParam1) ->
-			[{listen_port, dd_util:to_integer(JsonValue)}|TmpParam1]
+			[{listen_port, qp_util:to_integer(JsonValue)}|TmpParam1]
 		end, [], AppJsonList);
 extract_app_param(<<"gmcontrol">>, AppJsonList) ->
 	lists:foldr(
 		fun({<<"listen_port">>, JsonValue}, TmpParam1) ->
-			[{listen_port, dd_util:to_integer(JsonValue)}|TmpParam1];
+			[{listen_port, qp_util:to_integer(JsonValue)}|TmpParam1];
 			({<<"lt_listen_port">>, JsonValue}, TmpParam1) ->
-				[{lt_listen_port, dd_util:to_integer(JsonValue)}|TmpParam1];
+				[{lt_listen_port, qp_util:to_integer(JsonValue)}|TmpParam1];
 			({<<"dis_listen_port">>, JsonValue}, TmpParam1) ->
-				[{dis_listen_port, dd_util:to_integer(JsonValue)}|TmpParam1];
+				[{dis_listen_port, qp_util:to_integer(JsonValue)}|TmpParam1];
 			({<<"enter_ip_list">>, JsonValue}, TmpParam1) ->
-				IpList = string:tokens(dd_util:to_list(JsonValue), "#"),
+				IpList = string:tokens(qp_util:to_list(JsonValue), "#"),
 				EmterIpList =
 					lists:map(
 						fun(IpItem) ->
-							dd_util:to_list(IpItem)
+							qp_util:to_list(IpItem)
 						end, IpList),
 				[{enter_ip_list, EmterIpList}|TmpParam1]
 		end, [], AppJsonList);
 extract_app_param(<<"im">>, AppJsonList) ->
 	lists:foldr(
 		fun({<<"max_global_msg_count">>, JsonValue}, TmpParam1) ->
-			[{max_global_msg_count, dd_util:to_integer(JsonValue)}|TmpParam1];
+			[{max_global_msg_count, qp_util:to_integer(JsonValue)}|TmpParam1];
 			({<<"max_union_msg_count">>, JsonValue}, TmpParam1) ->
-				[{max_union_msg_count, dd_util:to_integer(JsonValue)}|TmpParam1]
+				[{max_union_msg_count, qp_util:to_integer(JsonValue)}|TmpParam1]
 		end, [], AppJsonList);
 extract_app_param(<<"rc">>, AppJsonList) ->
 	lists:foldr(
 		fun({<<"listen_port">>, JsonValue}, TmpParam1) ->
-			[{listen_port, dd_util:to_integer(JsonValue)}|TmpParam1]
+			[{listen_port, qp_util:to_integer(JsonValue)}|TmpParam1]
 		end, [], AppJsonList).
 
 
@@ -443,7 +443,7 @@ extract_app_param(<<"rc">>, AppJsonList) ->
 read_cfg_url() ->
 	case file:read_file("/sl/cfg_addr.cfg") of
 		{ok, CfgUrl} ->
-			{success, dd_util:to_list(CfgUrl)};
+			{success, qp_util:to_list(CfgUrl)};
 		{error, Reason} ->
 			?FILE_LOG_ERROR("read local cfg fail, reason=~p", [Reason]),
 			fail

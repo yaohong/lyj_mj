@@ -1,5 +1,5 @@
 -module(tcp_socket).
--author('erlangonrails@gmail.com').
+-author('yh').
 -include("../deps/file_log/include/file_log.hrl").
 -export([start/6,
          close/1, 

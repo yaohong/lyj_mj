@@ -122,7 +122,7 @@ handle_cast(_Request, State) ->
 	{noreply, NewState :: #state{}, timeout() | hibernate} |
 	{stop, Reason :: term(), NewState :: #state{}}).
 handle_info({timeout, _TimerRef, 'timerTask'}, #state{tableId = TableId} = State) ->
-	CurrentTime = world_util:timestamp(),
+	CurrentTime = qp_util:timestamp(),
 	TaskKeyList =
 		case ets:first(TableId) of
 			'$end_of_table' -> [];
