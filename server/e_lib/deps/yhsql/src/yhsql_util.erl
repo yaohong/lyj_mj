@@ -1,4 +1,4 @@
-﻿-module(yhsql_util).
+-module(yhsql_util).
 -author('erlangonrails@gmail.com').
 -include("yhsql.hrl").
 -export([ensure_app_started/1,
