@@ -31,7 +31,6 @@ init([]) ->
 		 worker,
 		 [timer_manager]},
 
-
 	{success, {ListenIp, ListenPort}} = qp_config:get_cfg(listen_addr),
 
 	QpReceiverSupervisor =
