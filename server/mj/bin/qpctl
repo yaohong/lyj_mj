@@ -38,7 +38,7 @@ fi
 if [ ! -x $OLD_LOG_PATH ]; then
     mkdir -p $OLD_LOG_PATH
 fi
-export PRIVATE_CFG_PATH=$ROOT/var/config/world.cfg
+export PRIVATE_CFG_PATH=$ROOT/var/config/qp.cfg
 export PUBLIC_CFG_PATH=$ROOT/var/config/public.cfg
 export OSS_PATH=$ROOT/lt_oss/
 export CVS_PATH=$ROOT/csv/
@@ -88,7 +88,7 @@ case "$1" in
       # 等待启动完成了返回
       $ERL -noinput $NAME $MYAPP"_ctl@$HOST" \
            -setcookie $SETCOOKIE \
-           -pa "$ROOT/ebin" -s world_ctl -extra $NODE "wait_start" $APPNAME
+           -pa "$ROOT/ebin" -s qp_ctl -extra $NODE "wait_start" $APPNAME
       ;;
     debug)
       echo "Press any key to continue" 
@@ -100,7 +100,7 @@ case "$1" in
     status)
       $ERL -noinput $NAME $MYAPP"_ctl@$HOST" \
            -setcookie $SETCOOKIE \
-           -pa "$ROOT/ebin" -s world_ctl -extra $NODE $1 $APPNAME
+           -pa "$ROOT/ebin" -s qp_ctl -extra $NODE $1 $APPNAME
       ;;
     create_room)
       $ERL -noinput $NAME $MYAPP"_ctl@$HOST" \
@@ -110,6 +110,6 @@ case "$1" in
     *)
       $ERL -noinput $NAME $MYAPP"_ctl@$HOST" \
            -setcookie $SETCOOKIE \
-           -pa "$ROOT/ebin" -s world_ctl -extra $NODE $@
+           -pa "$ROOT/ebin" -s qp_ctl -extra $NODE $@
       ;;
 esac
