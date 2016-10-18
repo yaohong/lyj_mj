@@ -1,5 +1,5 @@
 deps/
 ebin/
 var/log/
-
+var/pid/
 

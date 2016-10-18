@@ -19,7 +19,7 @@ ERL_MAX_ETS_TABLES=1400
 # End of configuration
 ###########################
 #主节点的名字
-MYAPP=zb_world
+MYAPP=qp
 
 NODE=$MYAPP@$HOST
 
