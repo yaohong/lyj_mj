@@ -26,12 +26,10 @@ enum ws_cmd {
     CMD_JOIN_ROOM_REQ = 1005;   //进入房间
     CMD_JOIN_ROOM_RSP = 1006;   //进入房间的应答
 
-    CMD_GAME_START_NOTIFY = 1007;   //游戏开始的通知
-    CMD_GAME_END_NOTIFY = 1008;     //游戏结束的通知
+    CMD_READY_REQ = 1007;   //游戏开始的通知
+    CMD_READY_RSP = 1008;     //游戏结束的通知
 
-    CMD_GAME_DATA_REQ = 1009;       //游戏数据的请求
-    CMD_GAME_DATA_RSP=  1010;       //游戏数据的应答
-    CMD_GAME_DATA_PUSH = 1011;      //游戏数据主动推送
+    CMD_GAME_DATA = 1009;       //游戏数据的请求
 
 }
 
