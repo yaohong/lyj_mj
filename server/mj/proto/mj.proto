@@ -3,16 +3,10 @@
 package qp_server;
 
 
-message qp_packet_req {
+message qp_packet {
     required int32 cmd = 1; // 协议ID
     required uint32 seq_id = 2; // 流水号
     required bytes body = 3; // 包体
-}
-
-message qp_packet_rsp {
-    required int32 cmd = 1; // 协议ID
-    required uint32 seq_id = 2; // 流水号
-    optional bytes body = 3; // 包体
 }
 
 enum ws_cmd {

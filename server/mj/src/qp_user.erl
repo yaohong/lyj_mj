@@ -11,19 +11,29 @@
 
 -behaviour(gen_fsm).
 
+-include("qp_type.hrl").
+
 %% API
 -export([start_link/0]).
 
 %% gen_fsm callbacks
 -export([init/1,
-         state_name/2,
-         state_name/3,
+         wait_login/2,              %%等待登陆
+         hall/2,                    %%大厅
+         room/2,                    %%房间
+         game/2,                    %%游戏
          handle_event/3,
          handle_sync_event/4,
          handle_info/3,
          terminate/3,
          code_change/4]).
+-export([head_len/2,
+         closed/1,
+         complete_packet/2
+]).
+-export([
 
+]).
 -define(SERVER, ?MODULE).
 
 -record(state, {}).
@@ -31,6 +41,16 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
+head_len(HeadBin, _HeadLen) when is_binary(HeadBin) ->
+    %%读取头
+    <<PacketSize:?BIG_UINT16>> = HeadBin,
+    PacketSize.
+
+closed(Pid) when is_pid(Pid) ->
+    Pid ! closed.
+
+complete_packet(Pid, Bin) when is_pid(Pid) andalso is_binary(Bin) ->
+    gen_fsm:send_event(Pid, {complete_packet, Bin}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -43,7 +63,7 @@
 -spec(start_link() ->
     {ok, pid()} | ignore | {error, Reason :: term()}).
 start_link() ->
-    gen_fsm:start_link({local, ?SERVER}, ?MODULE, [], []).
+    gen_fsm:start_link(?MODULE, [], []).
 
 %%%===================================================================
 %%% gen_fsm callbacks
@@ -63,7 +83,7 @@ start_link() ->
     {ok, StateName :: atom(), StateData :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
 init([]) ->
-    {ok, state_name, #state{}}.
+    {ok, wait_login, #state{}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -76,12 +96,24 @@ init([]) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(state_name(Event :: term(), State :: #state{}) ->
+-spec(wait_login(Event :: term(), State :: #state{}) ->
     {next_state, NextStateName :: atom(), NextState :: #state{}} |
     {next_state, NextStateName :: atom(), NextState :: #state{},
      timeout() | hibernate} |
     {stop, Reason :: term(), NewState :: #state{}}).
-state_name(_Event, State) ->
+wait_login(_Event, State) ->
+    {next_state, state_name, State}.
+
+
+hall(_Event, State) ->
+    {next_state, state_name, State}.
+
+
+room(_Event, State) ->
+    {next_state, state_name, State}.
+
+
+game(_Event, State) ->
     {next_state, state_name, State}.
 
 %%--------------------------------------------------------------------
@@ -95,20 +127,20 @@ state_name(_Event, State) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(state_name(Event :: term(), From :: {pid(), term()},
-                 State :: #state{}) ->
-                    {next_state, NextStateName :: atom(), NextState :: #state{}} |
-                    {next_state, NextStateName :: atom(), NextState :: #state{},
-                     timeout() | hibernate} |
-                    {reply, Reply, NextStateName :: atom(), NextState :: #state{}} |
-                    {reply, Reply, NextStateName :: atom(), NextState :: #state{},
-                     timeout() | hibernate} |
-                    {stop, Reason :: normal | term(), NewState :: #state{}} |
-                    {stop, Reason :: normal | term(), Reply :: term(),
-                     NewState :: #state{}}).
-state_name(_Event, _From, State) ->
-    Reply = ok,
-    {reply, Reply, state_name, State}.
+%%-spec(state_name(Event :: term(), From :: {pid(), term()},
+%%                 State :: #state{}) ->
+%%                    {next_state, NextStateName :: atom(), NextState :: #state{}} |
+%%                    {next_state, NextStateName :: atom(), NextState :: #state{},
+%%                     timeout() | hibernate} |
+%%                    {reply, Reply, NextStateName :: atom(), NextState :: #state{}} |
+%%                    {reply, Reply, NextStateName :: atom(), NextState :: #state{},
+%%                     timeout() | hibernate} |
+%%                    {stop, Reason :: normal | term(), NewState :: #state{}} |
+%%                    {stop, Reason :: normal | term(), Reply :: term(),
+%%                     NewState :: #state{}}).
+%%state_name(_Event, _From, State) ->
+%%    Reply = ok,
+%%    {reply, Reply, state_name, State}.
 
 %%--------------------------------------------------------------------
 %% @private

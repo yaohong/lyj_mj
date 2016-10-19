@@ -3,3 +3,4 @@ ebin/
 var/log/
 var/pid/
 old_log/
+__build.log
