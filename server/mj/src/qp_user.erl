@@ -243,6 +243,9 @@ handle_sync_event(_Event, _From, StateName, State) ->
                      {next_state, NextStateName :: atom(), NewStateData :: term(),
                       timeout() | hibernate} |
                      {stop, Reason :: normal | term(), NewStateData :: term()}).
+handle_info(closed, _StateName, State) ->
+    ?FILE_LOG_DEBUG("qp_user socket close", []),
+    {stop, normal, State};
 handle_info(timeout_check, StateName, #state{last_recv_packet_time = LastRecvPackTime} = State) ->
     CurrentTime = qp_util:timestamp(),
     SpacheTime = CurrentTime - LastRecvPackTime,
@@ -274,7 +277,8 @@ handle_info(_Info, StateName, State) ->
 -spec(terminate(Reason :: normal | shutdown | {shutdown, term()}
                 | term(), StateName :: atom(), StateData :: term()) ->
                    term()).
-terminate(_Reason, _StateName, _State) ->
+terminate(_Reason, _StateName, State) ->
+    (State#state.sockModule):close(State#state.sockData),
     ok.
 
 %%--------------------------------------------------------------------
