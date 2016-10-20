@@ -16,7 +16,7 @@
 -include("qp_proto.hrl").
 -include("../include/mj_pb.hrl").
 %% API
--export([start_link/0]).
+-export([start_link/2]).
 
 %% gen_fsm callbacks
 -export([init/1,
@@ -31,13 +31,16 @@
          code_change/4]).
 -export([head_len/2,
          closed/1,
-         complete_packet/2
+         complete_packet/2,
+         timer_callback/2
 ]).
 -export([
-
+    start/3,
+    start_link/2
 ]).
 -define(SERVER, ?MODULE).
-
+-define(TIMER_SPACE, 3).
+-define(RECV_TIMEOUT, 10).
 -record(state, {last_recv_packet_time}).
 
 %%%===================================================================
@@ -54,6 +57,9 @@ closed(Pid) when is_pid(Pid) ->
 complete_packet(Pid, Bin) when is_pid(Pid) andalso is_binary(Bin) ->
     gen_fsm:send_all_state_event(Pid, {complete_packet, Bin}).
 
+timer_callback(_Ref, Pid) ->
+    Pid ! timeout_check.
+
 %%--------------------------------------------------------------------
 %% @doc
 %% Creates a gen_fsm process which calls Module:init/1 to
@@ -62,10 +68,15 @@ complete_packet(Pid, Bin) when is_pid(Pid) andalso is_binary(Bin) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(start_link() ->
-    {ok, pid()} | ignore | {error, Reason :: term()}).
-start_link() ->
-    gen_fsm:start_link(?MODULE, [], []).
+
+
+-spec start(UserSup :: atom(), SockModule :: module(), Socket :: tcp_socket:socket()) ->
+    {ok, pid()}.
+start(UserSup, SockModule, SocketData) ->
+    supervisor:start_child(UserSup, [SockModule, SocketData]).
+
+start_link(SockModule, Socket) ->
+    gen_fsm:start_link(?MODULE, [SockModule, Socket], []).
 
 %%%===================================================================
 %%% gen_fsm callbacks
@@ -85,7 +96,12 @@ start_link() ->
     {ok, StateName :: atom(), StateData :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
 init([]) ->
-    {ok, wait_login, #state{last_recv_packet_time = qp_util:timestamp()}}.
+    CurrentTime = qp_util:timestamp(),
+    timer_manager:addDelayTask(
+        CurrentTime,
+        CurrentTime + ?TIMER_SPACE,
+        qp_user, timer_callback, [self()]),
+    {ok, wait_login, #state{last_recv_packet_time = CurrentTime}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -209,6 +225,21 @@ handle_sync_event(_Event, _From, StateName, State) ->
                      {next_state, NextStateName :: atom(), NewStateData :: term(),
                       timeout() | hibernate} |
                      {stop, Reason :: normal | term(), NewStateData :: term()}).
+handle_info(timeout_check, StateName, #state{last_recv_packet_time = LastRecvPackTime} = State) ->
+    CurrentTime = qp_util:timestamp(),
+    SpacheTime = CurrentTime - LastRecvPackTime,
+    if
+        SpacheTime > ?RECV_TIMEOUT ->
+            ?FILE_LOG_DEBUG("timeout_check true , exit.", []),
+            {stop,normal,State};
+        true ->
+            ?FILE_LOG_DEBUG("timeout_check space_time=~p , not timeout.", [SpacheTime]),
+            timer_manager:addDelayTask(
+                CurrentTime,
+                CurrentTime + ?TIMER_SPACE,
+                qp_user, timer_callback, [self()]),
+            {next_state, StateName, State}
+    end;
 handle_info(_Info, StateName, State) ->
     {next_state, StateName, State}.
 
