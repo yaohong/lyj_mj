@@ -3,4 +3,5 @@ ebin/
 var/log/
 var/pid/
 old_log/
+include/mj_pb.hrl
 __build.log
