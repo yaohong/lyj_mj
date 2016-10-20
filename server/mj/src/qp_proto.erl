@@ -16,37 +16,47 @@
 -export([encode_qp_packet/1]).
 
 decode_qp_packet(Bin) ->
-    #qp_packet{cmd = Cmd, body = Body} = world_server_pb:decode_qp_packet(Bin),
+    #qp_packet{cmd = Cmd, serialized = Body} = world_server_pb:decode_qp_packet(Bin),
     decode_qp_packet(Cmd, Body).
 
 
-decode_qp_packet(?WS_CMD_CMD_DEV_LOGIN_REQ, Body) ->
-    world_server_pb:decode_ws_dev_login_req(Body);
-decode_qp_packet(?WS_CMD_CMD_CW_CREATE_ACTOR_REQ, Body) ->
-    world_server_pb:decode_ws_create_actor_req(Body);
-decode_qp_packet(?WS_CMD_CMD_CW_ENTER_SCENE_REQ, Body) ->
-    world_server_pb:decode_cw_enter_scene_req(Body);
-decode_qp_packet(?WS_CMD_CMD_CW_DELETE_ACTOR_REQ, Body) ->
-    world_server_pb:decode_cw_delete_actor_req(Body);
-decode_qp_packet(?WS_CMD_CMD_OTHER_PLAYER_INFO_REQ, Body) ->
-    world_server_pb:decode_zbpkg_other_player_info_req(Body);
-decode_qp_packet(?WS_CMD_CMD_HJ_LOGIN_REQ, Body) ->
-    world_server_pb:decode_ws_hj_login_req(Body);
-decode_qp_packet(?WS_CMD_CMD_USE_CDK_REQ, Body) ->
-    world_server_pb:decode_zbpkg_use_cdk_req(Body).
+decode_qp_packet(?CMD_QP_LOGIN_REQ, Body) ->
+    world_server_pb:decode_qp_login_req(Body);
+decode_qp_packet(?CMD_QP_CREATE_ROOM_REQ, Body) ->
+    world_server_pb:decode_qp_create_room_req(Body);
+decode_qp_packet(?CMD_QP_JOIN_ROOM_REQ, Body) ->
+    world_server_pb:decode_qp_join_room_req(Body);
+decode_qp_packet(?CMD_QP_READY_REQ, Body) ->
+    world_server_pb:decode_qp_ready_req(Body);
+decode_qp_packet(?CMD_QP_EXIT_ROOM_REQ, Body) ->
+    world_server_pb:decode_qp_exit_room_req(Body);
+decode_qp_packet(?CMD_QP_GAME_DATA, Body) ->
+    world_server_pb:decode_qp_game_data(Body);
+decode_qp_packet(?CMD_QP_PING_REQ, Body) ->
+    world_server_pb:decode_qp_ping_req(Body).
 
 
-encode_qp_packet(Packet) when is_record(Packet, login_rsp) ->
-    encode_qp_packet(?CMD_LOGIN_RSP, world_server_pb:encode_login_rsp(Packet));
-encode_qp_packet(Packet) when is_record(Packet, create_room_rsp) ->
-    encode_qp_packet(?CMD_CREATE_ROOM_RSP, world_server_pb:encode_create_room_rsp(Packet));
-encode_ws_packet(Packet) when is_record(Packet, join_room_rsp) ->
-    encode_qp_packet(?CMD_JOIN_ROOM_RSP, world_server_pb:encode_join_room_rsp(Packet));
-encode_ws_packet(Packet) when is_record(Packet, ready_rsp) ->
-    encode_qp_packet(?CMD_READY_RSP, world_server_pb:encode_ready_rsp(Packet));
-encode_ws_packet(Packet) when is_record(Packet, game_data) ->
-    encode_qp_packet(?CMD_GAME_DATA, world_server_pb:encode_game_data(Packet)).
+encode_qp_packet(Packet) when is_record(Packet, qp_login_rsp) ->
+    encode_qp_packet(?CMD_QP_LOGIN_RSQ, world_server_pb:encode_qp_login_rsp(Packet));
+encode_qp_packet(Packet) when is_record(Packet, qp_create_room_rsp) ->
+    encode_qp_packet(?CMD_QP_CREATE_ROOM_RSP, world_server_pb:encodeqp_qp_create_room_rsp(Packet));
+encode_qp_packet(Packet) when is_record(Packet, qp_join_room_rsp) ->
+    encode_qp_packet(?CMD_QP_JOIN_ROOM_RSP, world_server_pb:encode_qp_join_room_rsp(Packet));
+encode_qp_packet(Packet) when is_record(Packet, qp_join_room_push) ->
+    encode_qp_packet(?CMD_QP_JOIN_ROOM_PUSH, world_server_pb:encode_qp_join_room_push(Packet));
+encode_qp_packet(Packet) when is_record(Packet, qp_ready_rsp) ->
+    encode_qp_packet(?CMD_QP_READY_RSP, world_server_pb:encode_qp_ready_rsp(Packet));
+encode_qp_packet(Packet) when is_record(Packet, qp_ready_push) ->
+    encode_qp_packet(?CMD_QP_READY_PUSH, world_server_pb:encode_qp_ready_push(Packet));
+encode_qp_packet(Packet) when is_record(Packet, qp_exit_room_rsp) ->
+    encode_qp_packet(?CMD_QP_EXIT_ROOM_RSP, world_server_pb:encode_qp_exit_room_rsp(Packet));
+encode_qp_packet(Packet) when is_record(Packet, qp_exit_room_push) ->
+    encode_qp_packet(?CMD_QP_EXIT_ROOM_PUSH, world_server_pb:encode_qp_exit_room_push(Packet));
+encode_qp_packet(Packet) when is_record(Packet, qp_game_data) ->
+    encode_qp_packet(?CMD_QP_GAME_DATA, world_server_pb:encode_qp_game_data(Packet));
+encode_qp_packet(Packet) when is_record(Packet, qp_ping_rsp) ->
+    encode_qp_packet(?CMD_QP_PING_RSP, world_server_pb:encode_qp_ping_rsp(Packet)).
 
 encode_qp_packet(Cmd, Body) ->
-    Packet = #qp_packet{cmd = Cmd, body = Body, seq_id = 0},
+    Packet = #qp_packet{cmd = Cmd, serialized = Body, seq_id = 0},
     world_server_pb:encode_qp_packet(Packet).

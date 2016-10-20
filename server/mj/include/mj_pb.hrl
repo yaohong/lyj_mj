@@ -1,11 +1,19 @@
--record(qp_packet, {cmd, seq_id, body}).
--record(login_req, {acc}).
--record(login_rsp, {state}).
--record(create_room_req, {room_type, ready_state}).
--record(create_room_rsp, {state, room_id}).
--record(join_room_req, {room_id}).
--record(room_user, {seat_id}).
--record(join_room_rsp, {state, users}).
--record(ready_req, {id}).
--record(ready_rsp, {state}).
--record(game_data, {data}).
+-record(qp_packet, {cmd, seq_id, serialized}).
+-record(qp_login_req, {account}).
+-record(qp_user_data, {user_id, gold, avatar_url, nick_name}).
+-record(qp_login_rsp, {state, data}).
+-record(qp_create_room_req, {room_type}).
+-record(qp_create_room_rsp, {state, room_id}).
+-record(qp_join_room_req, {room_id}).
+-record(qp_room_user, {user_data, seat_number, is_ready}).
+-record(qp_join_room_rsp, {result, seat_number, is_ready, room_user}).
+-record(qp_join_room_push, {room_user}).
+-record(qp_ready_req, {ready_state}).
+-record(qp_ready_rsp, {ready_state}).
+-record(qp_ready_push, {seat_number, ready_state}).
+-record(qp_exit_room_req, {seat_number}).
+-record(qp_exit_room_rsp, {result}).
+-record(qp_exit_room_push, {seat_number}).
+-record(qp_game_data, {game_data}).
+-record(qp_ping_req, {seat_number}).
+-record(qp_ping_rsp, {seat_number}).
