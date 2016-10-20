@@ -16,7 +16,6 @@
 -include("qp_proto.hrl").
 -include("../include/mj_pb.hrl").
 %% API
--export([start_link/2]).
 
 %% gen_fsm callbacks
 -export([init/1,
