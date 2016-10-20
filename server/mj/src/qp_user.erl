@@ -11,26 +11,48 @@
 
 -behaviour(gen_fsm).
 
+-include("qp_type.hrl").
+-include("../deps/file_log/include/file_log.hrl").
+-include("qp_proto.hrl").
+-include("../include/mj_pb.hrl").
 %% API
 -export([start_link/0]).
 
 %% gen_fsm callbacks
 -export([init/1,
-         state_name/2,
-         state_name/3,
+         wait_login/2,              %%等待登陆
+         hall/2,                    %%大厅
+         room/2,                    %%房间
+         game/2,                    %%游戏
          handle_event/3,
          handle_sync_event/4,
          handle_info/3,
          terminate/3,
          code_change/4]).
+-export([head_len/2,
+         closed/1,
+         complete_packet/2
+]).
+-export([
 
+]).
 -define(SERVER, ?MODULE).
 
--record(state, {}).
+-record(state, {last_recv_packet_time}).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
+head_len(HeadBin, _HeadLen) when is_binary(HeadBin) ->
+    %%读取头
+    <<PacketSize:?BIG_UINT16>> = HeadBin,
+    PacketSize.
+
+closed(Pid) when is_pid(Pid) ->
+    Pid ! closed.
+
+complete_packet(Pid, Bin) when is_pid(Pid) andalso is_binary(Bin) ->
+    gen_fsm:send_all_state_event(Pid, {complete_packet, Bin}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -43,7 +65,7 @@
 -spec(start_link() ->
     {ok, pid()} | ignore | {error, Reason :: term()}).
 start_link() ->
-    gen_fsm:start_link({local, ?SERVER}, ?MODULE, [], []).
+    gen_fsm:start_link(?MODULE, [], []).
 
 %%%===================================================================
 %%% gen_fsm callbacks
@@ -63,7 +85,7 @@ start_link() ->
     {ok, StateName :: atom(), StateData :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
 init([]) ->
-    {ok, state_name, #state{}}.
+    {ok, wait_login, #state{last_recv_packet_time = qp_util:timestamp()}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -76,12 +98,24 @@ init([]) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(state_name(Event :: term(), State :: #state{}) ->
+-spec(wait_login(Event :: term(), State :: #state{}) ->
     {next_state, NextStateName :: atom(), NextState :: #state{}} |
     {next_state, NextStateName :: atom(), NextState :: #state{},
      timeout() | hibernate} |
     {stop, Reason :: term(), NewState :: #state{}}).
-state_name(_Event, State) ->
+wait_login(_Event, State) ->
+    {next_state, state_name, State}.
+
+
+hall(_Event, State) ->
+    {next_state, state_name, State}.
+
+
+room(_Event, State) ->
+    {next_state, state_name, State}.
+
+
+game(_Event, State) ->
     {next_state, state_name, State}.
 
 %%--------------------------------------------------------------------
@@ -95,20 +129,20 @@ state_name(_Event, State) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(state_name(Event :: term(), From :: {pid(), term()},
-                 State :: #state{}) ->
-                    {next_state, NextStateName :: atom(), NextState :: #state{}} |
-                    {next_state, NextStateName :: atom(), NextState :: #state{},
-                     timeout() | hibernate} |
-                    {reply, Reply, NextStateName :: atom(), NextState :: #state{}} |
-                    {reply, Reply, NextStateName :: atom(), NextState :: #state{},
-                     timeout() | hibernate} |
-                    {stop, Reason :: normal | term(), NewState :: #state{}} |
-                    {stop, Reason :: normal | term(), Reply :: term(),
-                     NewState :: #state{}}).
-state_name(_Event, _From, State) ->
-    Reply = ok,
-    {reply, Reply, state_name, State}.
+%%-spec(state_name(Event :: term(), From :: {pid(), term()},
+%%                 State :: #state{}) ->
+%%                    {next_state, NextStateName :: atom(), NextState :: #state{}} |
+%%                    {next_state, NextStateName :: atom(), NextState :: #state{},
+%%                     timeout() | hibernate} |
+%%                    {reply, Reply, NextStateName :: atom(), NextState :: #state{}} |
+%%                    {reply, Reply, NextStateName :: atom(), NextState :: #state{},
+%%                     timeout() | hibernate} |
+%%                    {stop, Reason :: normal | term(), NewState :: #state{}} |
+%%                    {stop, Reason :: normal | term(), Reply :: term(),
+%%                     NewState :: #state{}}).
+%%state_name(_Event, _From, State) ->
+%%    Reply = ok,
+%%    {reply, Reply, state_name, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -125,6 +159,15 @@ state_name(_Event, _From, State) ->
                       {next_state, NextStateName :: atom(), NewStateData :: #state{},
                        timeout() | hibernate} |
                       {stop, Reason :: term(), NewStateData :: #state{}}).
+handle_event({complete_packet, Bin}, StateName, #state{last_recv_packet_time = OldLastRecvPacketTime} = State) ->
+    Request = qp_proto:decode_qp_packet(Bin),
+    {NewStateName, NewState, IsUpdate} = packet_handle(Request, StateName, State),
+    NewLastRecvPacketTime =
+        if
+            IsUpdate =:= true -> qp_util:timestamp();
+            true -> OldLastRecvPacketTime
+        end,
+    {next_state, NewStateName, NewState#state{last_recv_packet_time = NewLastRecvPacketTime}};
 handle_event(_Event, StateName, State) ->
     {next_state, StateName, State}.
 
@@ -201,3 +244,52 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+packet_handle(#qp_login_req{account = Account}, wait_login, State) ->
+    ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
+    {hall, State, true};
+packet_handle(Request, wait_login, State) ->
+    ?FILE_LOG_WARNING("wait_login request=~p", [Request]),
+    {wait_login, State, false};
+
+
+packet_handle(#qp_create_room_req{room_type = _} = Request, hall, State) ->
+    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    {room, State, true};
+packet_handle(#qp_join_room_req{} = Request, hall, State) ->
+    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    {room, State, true};
+packet_handle(#qp_ping_req{} = Request, hall, State) ->
+    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    {hall, State, true};
+packet_handle(Request, hall, State) ->
+    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    {hall, State, false};
+
+
+packet_handle(#qp_ready_req{}=Request, room, State) ->
+    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    {room, State, true};
+packet_handle(#qp_ping_req{} = Request, room, State) ->
+    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    {room, State, true};
+packet_handle(#qp_exit_room_req{} = Request, room, State) ->
+    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    {hall, State, true};
+packet_handle(Request, room, State) ->
+    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    {room, State, false};
+
+
+packet_handle(#qp_game_data{}=Request, game, State) ->
+    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    {game, State, true};
+packet_handle(#qp_ping_req{} = Request, game, State) ->
+    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    {game, State, true};
+packet_handle(#qp_exit_room_req{} = Request, room, State) ->
+    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    {hall, State, true};
+packet_handle(Request, game, State) ->
+    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    {game, State, false}.

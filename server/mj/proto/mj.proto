@@ -2,91 +2,133 @@
 
 package qp_server;
 
-
-message qp_packet_req {
-    required int32 cmd = 1; // 协议ID
+message qp_packet {
+    required int32 cmd = 1;
     required uint32 seq_id = 2; // 流水号
-    required bytes body = 3; // 包体
+    optional bytes serialized = 3;
 }
 
-message qp_packet_rsp {
-    required int32 cmd = 1; // 协议ID
-    required uint32 seq_id = 2; // 流水号
-    optional bytes body = 3; // 包体
-}
 
 enum ws_cmd {
-    CMD_LOGIN_REQ = 1001; // 登录请求 (ws_login_req)
-    CMD_LOGIN_RSP = 1002; // 登录回复 (ws_login_rsp)
-	
-    CMD_CREATE_ROOM_REQ = 1003; //创建房间
-    CMD_CREATE_ROOM_RSP = 1004; //创建房间的应答
+    CMD_QP_LOGIN_REQ = 1001; // 登录请求 (qp_login_req)
+    CMD_QP_LOGIN_RSQ = 1002; // 登录回复 (qp_login_rsp)
 
+    CMD_QP_CREATE_ROOM_REQ = 1003; //qp_create_room_req
+    CMD_QP_CREATE_ROOM_RSP = 1004; //qp_create_room_rsp
 
-    CMD_JOIN_ROOM_REQ = 1005;   //进入房间
-    CMD_JOIN_ROOM_RSP = 1006;   //进入房间的应答
+    CMD_QP_JOIN_ROOM_REQ = 1005;    //qp_join_room_req
+    CMD_QP_JOIN_ROOM_RSP = 1006;    //qp_join_room_rsp
+    CMD_QP_JOIN_ROOM_PUSH = 1007;   //qp_join_room_push
 
-    CMD_READY_REQ = 1007;   //游戏开始的通知
-    CMD_READY_RSP = 1008;     //游戏结束的通知
+    CMD_QP_READY_REQ = 1008;        // qp_ready_req
+    CMD_QP_READY_RSP = 1009;        // qp_ready_rsp
+    CMD_QP_READY_PUSH = 1010;       // qp_ready_push
 
-    CMD_GAME_DATA = 1009;       //游戏数据的请求
+    CMD_QP_EXIT_ROOM_REQ = 1011;    // qp_exit_room_req
+    CMD_QP_EXIT_ROOM_RSP = 1012;    // qp_exit_room_rsp
+    CMD_QP_EXIT_ROOM_PUSH = 1013;   // qp_exit_room_push
 
+    CMD_QP_GAME_DATA = 1014;        // qp_game_data
+
+    CMD_QP_PING_REQ = 1015;         // qp_ping_req
+    CMD_QP_PING_RSP = 1016;         //qp_ping_rsp
 }
 
 
 
-// 登录请求
-message login_req {
-    required string acc = 1;
+message qp_login_req {
+    required string account = 1;
 }
 
-message login_rsp {
+message qp_user_data {
+    required string user_id = 1;
+    required int64 gold = 2;
+    required string avatar_url = 3;
+    required string nick_name = 4;
+}
+
+message qp_login_rsp {
     required int32 state = 1;
+    optional qp_user_data data = 2;
 }
 
-//创建房间的请求
-message create_room_req {
+
+message qp_create_room_req {
     required int32 room_type = 1;
-    required int32 ready_state = 2;
 }
 
-//创建房间的应答
-message create_room_rsp {
+
+message qp_create_room_rsp {
     required int32 state = 1;
     optional int32 room_id = 2;
 }
 
-//进入房间的请求
-message join_room_req {
-    required int32 room_id = 1;
+
+message qp_join_room_req {
+    required string room_id = 1;
 }
 
-//房间玩家的信息
-message room_user {
-    required int32 seat_id = 1;
-}
-
-//进入房间的应答
-message join_room_rsp {
-    required int32 state = 1;
-    repeated room_user users = 2;
-}
-
-//准备
-message ready_req {
-    required int32 id = 1;
-}
-
-//准备应答
-message ready_rsp {
-    required int32 state = 1;
-}
-
-//游戏开始的通知
-message game_data {
-    required bytes data = 1;
+message qp_room_user {
+    required qp_user_data user_data = 1;
+    required int32 seat_number = 2;
+    required bool is_ready = 3;
 }
 
 
+message qp_join_room_rsp {
+    required int32 result = 1;
+    optional int32 seat_number = 2;
+    optional bool is_ready = 3;
+    repeated qp_room_user room_user = 4;
+}
 
+
+message qp_join_room_push {
+    required qp_room_user room_user = 1;
+}
+
+message qp_ready_req {
+    required int32 ready_state = 1;
+}
+
+
+message qp_ready_rsp {
+    required int32 ready_state = 1;
+}
+
+
+message qp_ready_push {
+    required int32 seat_number = 1;
+    required int32 ready_state = 2;
+}
+
+
+message qp_exit_room_req {
+    required int32 seat_number = 1;
+}
+
+
+message qp_exit_room_rsp {
+    required int32 result = 1;
+}
+
+
+message qp_exit_room_push {
+    required int32 seat_number = 1;
+}
+
+
+message qp_game_data {
+    required bytes game_data = 1; 
+}
+
+
+message qp_ping_req {
+    required int32 seat_number = 1;
+}
+
+
+message qp_ping_rsp {
+    required int32 seat_number = 1;
+}
 
