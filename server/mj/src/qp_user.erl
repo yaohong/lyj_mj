@@ -12,7 +12,9 @@
 -behaviour(gen_fsm).
 
 -include("qp_type.hrl").
-
+-include("../deps/file_log/include/file_log.hrl").
+-include("qp_proto.hrl").
+-include("../include/mj_pb.hrl").
 %% API
 -export([start_link/0]).
 
@@ -36,7 +38,7 @@
 ]).
 -define(SERVER, ?MODULE).
 
--record(state, {}).
+-record(state, {last_recv_packet_time}).
 
 %%%===================================================================
 %%% API
@@ -50,7 +52,7 @@ closed(Pid) when is_pid(Pid) ->
     Pid ! closed.
 
 complete_packet(Pid, Bin) when is_pid(Pid) andalso is_binary(Bin) ->
-    gen_fsm:send_event(Pid, {complete_packet, Bin}).
+    gen_fsm:send_all_state_event(Pid, {complete_packet, Bin}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -83,7 +85,7 @@ start_link() ->
     {ok, StateName :: atom(), StateData :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
 init([]) ->
-    {ok, wait_login, #state{}}.
+    {ok, wait_login, #state{last_recv_packet_time = qp_util:timestamp()}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -157,6 +159,15 @@ game(_Event, State) ->
                       {next_state, NextStateName :: atom(), NewStateData :: #state{},
                        timeout() | hibernate} |
                       {stop, Reason :: term(), NewStateData :: #state{}}).
+handle_event({complete_packet, Bin}, StateName, #state{last_recv_packet_time = OldLastRecvPacketTime} = State) ->
+    Request = qp_proto:decode_qp_packet(Bin),
+    {NewStateName, NewState, IsUpdate} = packet_handle(Request, StateName, State),
+    NewLastRecvPacketTime =
+        if
+            IsUpdate =:= true -> qp_util:timestamp();
+            true -> OldLastRecvPacketTime
+        end,
+    {next_state, NewStateName, NewState#state{last_recv_packet_time = NewLastRecvPacketTime}};
 handle_event(_Event, StateName, State) ->
     {next_state, StateName, State}.
 
@@ -233,3 +244,52 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+packet_handle(#qp_login_req{account = Account}, wait_login, State) ->
+    ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
+    {hall, State, true};
+packet_handle(Request, wait_login, State) ->
+    ?FILE_LOG_WARNING("wait_login request=~p", [Request]),
+    {wait_login, State, false};
+
+
+packet_handle(#qp_create_room_req{room_type = _} = Request, hall, State) ->
+    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    {room, State, true};
+packet_handle(#qp_join_room_req{} = Request, hall, State) ->
+    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    {room, State, true};
+packet_handle(#qp_ping_req{} = Request, hall, State) ->
+    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    {hall, State, true};
+packet_handle(Request, hall, State) ->
+    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    {hall, State, false};
+
+
+packet_handle(#qp_ready_req{}=Request, room, State) ->
+    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    {room, State, true};
+packet_handle(#qp_ping_req{} = Request, room, State) ->
+    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    {room, State, true};
+packet_handle(#qp_exit_room_req{} = Request, room, State) ->
+    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    {hall, State, true};
+packet_handle(Request, room, State) ->
+    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    {room, State, false};
+
+
+packet_handle(#qp_game_data{}=Request, game, State) ->
+    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    {game, State, true};
+packet_handle(#qp_ping_req{} = Request, game, State) ->
+    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    {game, State, true};
+packet_handle(#qp_exit_room_req{} = Request, room, State) ->
+    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    {hall, State, true};
+packet_handle(Request, game, State) ->
+    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    {game, State, false}.
