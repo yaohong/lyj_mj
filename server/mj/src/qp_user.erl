@@ -278,6 +278,7 @@ handle_info(_Info, StateName, State) ->
                 | term(), StateName :: atom(), StateData :: term()) ->
                    term()).
 terminate(_Reason, _StateName, State) ->
+    ?FILE_LOG_DEBUG("qp_user terminate", []),
     (State#state.sockModule):close(State#state.sockData),
     ok.
 
