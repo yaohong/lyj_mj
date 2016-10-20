@@ -41,7 +41,11 @@
 -define(SERVER, ?MODULE).
 -define(TIMER_SPACE, 3).
 -define(RECV_TIMEOUT, 10).
--record(state, {last_recv_packet_time}).
+-record(state, {
+    receiveMonitor,
+    sockModule,
+    sockData,
+    last_recv_packet_time}).
 
 %%%===================================================================
 %%% API
@@ -95,13 +99,28 @@ start_link(SockModule, Socket) ->
     {ok, StateName :: atom(), StateData :: #state{}} |
     {ok, StateName :: atom(), StateData :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
-init([]) ->
-    CurrentTime = qp_util:timestamp(),
-    timer_manager:addDelayTask(
-        CurrentTime,
-        CurrentTime + ?TIMER_SPACE,
-        qp_user, timer_callback, [self()]),
-    {ok, wait_login, #state{last_recv_packet_time = CurrentTime}}.
+init([SockModule, SocketData]) ->
+    ReceiveMonitor = SockModule:monitor(SocketData),
+    case catch SockModule:peername(SocketData) of
+        {ok, _} ->
+            CurrentTime = qp_util:timestamp(),
+            timer_manager:addDelayTask(
+                CurrentTime,
+                CurrentTime + ?TIMER_SPACE,
+                qp_user, timer_callback, [self()]),
+            {ok,
+             wait_login,
+             #state{
+                 receiveMonitor = ReceiveMonitor,
+                 sockModule = SockModule,
+                 sockData = SocketData,
+                 last_recv_packet_time = CurrentTime
+             }};
+        Other ->
+            ?FILE_LOG_ERROR("socket init peername fail reason=[~p]", [Other]),
+            {stop, normal}
+    end.
+
 
 %%--------------------------------------------------------------------
 %% @private
