@@ -13,7 +13,7 @@
 
 
 -define(CMD_QP_LOGIN_REQ, 1001).
--define(CMD_QP_LOGIN_RSQ, 1002).
+-define(CMD_QP_LOGIN_RSP, 1002).
 -define(CMD_QP_CREATE_ROOM_REQ, 1003).
 -define(CMD_QP_CREATE_ROOM_RSP, 1004).
 -define(CMD_QP_JOIN_ROOM_REQ, 1005).

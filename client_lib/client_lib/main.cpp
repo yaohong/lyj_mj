@@ -20,7 +20,75 @@ using namespace client_lib;
 
 void packetHandle( client_lib::Socket &socket_, const char *data, int len)
 {
+    qp_server::qp_packet root;
+    root.ParseFromArray( data, len );
+    switch ((qp_server::ws_cmd)root.cmd())
+    {
+        case qp_server::CMD_QP_LOGIN_RSQ:
+        {
+            qp_server::qp_login_rsp rsp;
+            rsp.ParseFromString(root.serialized());
 
+        }
+            break;
+        case qp_server::CMD_QP_CREATE_ROOM_RSP:
+        {
+            qp_server::qp_create_room_rsp rsp;
+            rsp.ParseFromString( root.serialized() );
+        }
+            break;
+        case qp_server::CMD_QP_JOIN_ROOM_RSP:
+        {
+            qp_server::qp_join_room_rsp rsp;
+            rsp.ParseFromString( root.serialized() );
+        }
+            break;
+        case qp_server::CMD_QP_JOIN_ROOM_PUSH:
+        {
+            qp_server::qp_join_room_push push;
+            push.ParseFromString( root.serialized() );
+        }
+            break;
+        case qp_server::CMD_QP_READY_RSP:
+        {
+            qp_server::qp_ready_rsp rsp;
+            rsp.ParseFromString( root.serialized() );
+        }
+            break;
+        case qp_server::CMD_QP_READY_PUSH:
+        {
+            qp_server::qp_ready_push push;
+            push.ParseFromString( root.serialized() );
+        }
+            break;
+        case qp_server::CMD_QP_EXIT_ROOM_RSP:
+        {
+            qp_server::qp_exit_room_rsp rsp;
+            rsp.ParseFromString( root.serialized() );
+        }
+            break;
+        case qp_server::CMD_QP_EXIT_ROOM_PUSH:
+        {
+            qp_server::qp_exit_room_push push;
+            push.ParseFromString( root.serialized() );
+        }
+            break;
+        case qp_server::CMD_QP_GAME_DATA:
+        {
+            qp_server::qp_game_data data;
+            data.ParseFromString( root.serialized() );
+        }
+            break;
+        case qp_server::CMD_QP_PING_RSP:
+        {
+            qp_server::qp_ping_rsp rsp;
+            rsp.ParseFromString( root.serialized() );
+        }
+            break;
+        default:
+            printf( "unkown cmd:%d\n", root.cmd());
+            socket_.Close();
+    }
 }
 
 void sendPacket( client_lib::Socket &socket, const google::protobuf::Message* msg, unsigned int cmdId );

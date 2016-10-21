@@ -123,7 +123,6 @@ namespace client_lib
 
     bool Socket::Recv()
     {
-        assert( socket_ > 0 );
         int n = buffer_.readFd( socket_ );
         if (n > 0)
         {

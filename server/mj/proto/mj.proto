@@ -11,7 +11,7 @@ message qp_packet {
 
 enum ws_cmd {
     CMD_QP_LOGIN_REQ = 1001; // 登录请求 (qp_login_req)
-    CMD_QP_LOGIN_RSQ = 1002; // 登录回复 (qp_login_rsp)
+    CMD_QP_LOGIN_RSP = 1002; // 登录回复 (qp_login_rsp)
 
     CMD_QP_CREATE_ROOM_REQ = 1003; //qp_create_room_req
     CMD_QP_CREATE_ROOM_RSP = 1004; //qp_create_room_rsp
