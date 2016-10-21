@@ -46,11 +46,12 @@ namespace client_lib
         }
         else
         {
+            int errorCode = NETWORK_ERROR;
 #ifdef WIN32
-            if (WSAGetLastError() == WSAEWOULDBLOCK)
+            if (errorCode == WSAEWOULDBLOCK)
             {
 #else
-            if (errno == EINPROGRESS)
+            if (errorCode == EINPROGRESS)
             {
 #endif
                 //正在进行中，检查
@@ -101,7 +102,7 @@ namespace client_lib
             }
             else
             {
-                printf( "connect failed, errno=%d\n", errno );
+                printf( "connect failed, errno=%d\n", errorCode );
                 return false;
             }
         } 
@@ -143,7 +144,7 @@ namespace client_lib
 					return true;
 				}
 
-                cb_( bufOffset + packet_head_size, packetSize );
+                cb_(*this, bufOffset + packet_head_size, packetSize );
 				buffer_.retrieve(totalLen);
 			}
             return true;

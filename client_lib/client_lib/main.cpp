@@ -28,7 +28,7 @@ void sendPacket( client_lib::Socket &socket, const google::protobuf::Message* ms
 int main( int argc, char* argv[] )
 {
     client_lib::Socket socket_;
-    socket_.SetCompletePackageCallback( std::bind( packetHandle, socket_, std::placeholders::_1, std::placeholders::_2 ) );
+    socket_.SetCompletePackageCallback( std::bind( packetHandle, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
     bool nRet = socket_.Connect( "106.75.30.194", 18751, 3000 );
     if (!nRet)
     {
@@ -41,7 +41,10 @@ int main( int argc, char* argv[] )
     while (true)
     {
         Sleep( 100 );
-        socket_.Recv();
+        if (!socket_.Recv())
+        {
+            break;
+        }
     }
 
     return 0;
