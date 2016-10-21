@@ -301,7 +301,7 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 
 packet_handle(#qp_login_req{account = Account}, wait_login, State) ->
     ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
-    UserData = #qp_user_data{user_id = 10000, gold = 1500, avatar_url = "http://www.baidu.com", nick_name = "stgg"},
+    UserData = #qp_user_data{user_id = "10000", gold = 1500, avatar_url = "http://www.baidu.com", nick_name = "stgg"},
     Rsp = #qp_login_rsp{state = 0, data = UserData},
     RspBin = qp_proto:encode_qp_packet(Rsp),
     (State#state.sockModule):send(State#state.sockData, RspBin),
