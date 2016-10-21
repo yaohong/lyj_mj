@@ -24,7 +24,7 @@ void packetHandle( client_lib::Socket &socket_, const char *data, int len)
     root.ParseFromArray( data, len );
     switch ((qp_server::ws_cmd)root.cmd())
     {
-        case qp_server::CMD_QP_LOGIN_RSQ:
+        case qp_server::CMD_QP_LOGIN_RSP:
         {
             qp_server::qp_login_rsp rsp;
             rsp.ParseFromString(root.serialized());
