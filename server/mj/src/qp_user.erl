@@ -324,7 +324,7 @@ send_bin(State, Bin) ->
     (State#state.sockModule):send(State#state.sockData, Bin).
 
 
-packet_handle(#qp_login_req{account = Account}, wait_login, State) ->
+packet_handle(#qp_login_req{account = Account}, wait_login, #state{room_data = undefined} = State) ->
     ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
     {success, {UserId, Gold, NickName, AvatarUrl}} = qp_db:load_user_data_by_acc(Account),
     UserData = #qp_user_data{user_id = UserId, gold = Gold, avatar_url = AvatarUrl, nick_name = NickName},
@@ -363,10 +363,10 @@ packet_handle(#qp_create_room_req{room_type = RoomType} = Request, hall, #state{
             send_bin(State, qp_packet_util:create_room_failed_bin(-1)),
             {hall, State, true}
     end;
-packet_handle(#qp_join_room_req{} = Request, hall, State) ->
+packet_handle(#qp_join_room_req{} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
     ?FILE_LOG_WARNING("hall request=~p", [Request]),
     {room, State, true};
-packet_handle(#qp_ping_req{} = Request, hall, State) ->
+packet_handle(#qp_ping_req{} = Request, hall, #state{room_data = undefined} = State) ->
     ?FILE_LOG_WARNING("hall request=~p", [Request]),
     {hall, State, true};
 packet_handle(Request, hall, State) ->
