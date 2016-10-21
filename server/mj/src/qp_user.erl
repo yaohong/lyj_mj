@@ -251,7 +251,7 @@ handle_info(timeout_check, StateName, #state{last_recv_packet_time = LastRecvPac
     SpacheTime = CurrentTime - LastRecvPackTime,
     if
         SpacheTime > ?RECV_TIMEOUT ->
-            ?FILE_LOG_DEBUG("timeout_check true , exit.", []),
+            ?FILE_LOG_DEBUG("timeout_check true state_name=~p, exit.", [StateName]),
             {stop,normal,State};
         true ->
             ?FILE_LOG_DEBUG("timeout_check space_time=~p , not timeout.", [SpacheTime]),
@@ -301,6 +301,10 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 
 packet_handle(#qp_login_req{account = Account}, wait_login, State) ->
     ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
+    UserData = #qp_user_data{user_id = 10000, gold = 1500, avatar_url = "http://www.baidu.com", nick_name = "stgg"},
+    Rsp = #qp_login_rsp{state = 0, data = UserData},
+    RspBin = qp_proto:encode_qp_packet(Rsp),
+    (State#state.sockModule):send(State#state.sockData, RspBin),
     {hall, State, true};
 packet_handle(Request, wait_login, State) ->
     ?FILE_LOG_WARNING("wait_login request=~p", [Request]),

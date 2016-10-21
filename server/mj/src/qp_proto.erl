@@ -10,6 +10,7 @@
 -author("yaohong").
 -include("../include/mj_pb.hrl").
 -include("qp_proto.hrl").
+-include("qp_type.hrl").
 %% API
 
 -export([decode_qp_packet/1]).
@@ -59,4 +60,6 @@ encode_qp_packet(Packet) when is_record(Packet, qp_ping_rsp) ->
 
 encode_qp_packet(Cmd, Body) ->
     Packet = #qp_packet{cmd = Cmd, serialized = Body, seq_id = 0},
-    world_server_pb:encode_qp_packet(Packet).
+    Bin = world_server_pb:encode_qp_packet(Packet),
+    Len = size(Bin),
+    <<Len:?BIG_UINT16, Bin/binary>>.
