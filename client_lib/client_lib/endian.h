@@ -15,6 +15,15 @@ namespace client_lib
 #endif
 		}
 
+        inline unsigned int hostToNetwork32( unsigned int host32 )
+        {
+#ifndef WIN32
+            return htobe32( host32 );
+#else 
+            return htonl( host32 );
+#endif
+        }
+
 
 		inline unsigned short networkToHost16(unsigned short net16)
 		{
@@ -24,6 +33,15 @@ namespace client_lib
 			return ntohs(net16);
 #endif
 		}
+
+        inline unsigned int networkToHost32( unsigned int net32 )
+        {
+#ifndef WIN32
+            return be32toh( net32 );
+#else 
+            return ntohl( net32 );
+#endif
+        }
 	}
 
 

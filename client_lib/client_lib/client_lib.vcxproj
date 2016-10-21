@@ -52,6 +52,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\lib\protobuf\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -82,6 +83,7 @@
     <ClInclude Include="buffer.h" />
     <ClInclude Include="client_lib.h" />
     <ClInclude Include="endian.h" />
+    <ClInclude Include="mj.pb.h" />
     <ClInclude Include="sockets.h" />
     <ClInclude Include="sysdefine.h" />
   </ItemGroup>
@@ -89,6 +91,7 @@
     <ClCompile Include="buffer.cpp" />
     <ClCompile Include="client_lib.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mj.pb.cc" />
     <ClCompile Include="sockets.cpp" />
   </ItemGroup>
   <ItemGroup>

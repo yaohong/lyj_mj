@@ -33,6 +33,9 @@
     <ClInclude Include="endian.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="mj.pb.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client_lib.cpp">
@@ -45,6 +48,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="buffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mj.pb.cc">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
