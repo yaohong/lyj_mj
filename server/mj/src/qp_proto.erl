@@ -38,7 +38,7 @@ decode_qp_packet(?CMD_QP_PING_REQ, Body) ->
 
 
 encode_qp_packet(Packet) when is_record(Packet, qp_login_rsp) ->
-    encode_qp_packet(?CMD_QP_CREATE_ROOM_RSP, mj_pb:encode_qp_login_rsp(Packet));
+    encode_qp_packet(?CMD_QP_LOGIN_RSP, mj_pb:encode_qp_login_rsp(Packet));
 encode_qp_packet(Packet) when is_record(Packet, qp_create_room_rsp) ->
     encode_qp_packet(?CMD_QP_CREATE_ROOM_RSP, mj_pb:encodeqp_qp_create_room_rsp(Packet));
 encode_qp_packet(Packet) when is_record(Packet, qp_join_room_rsp) ->

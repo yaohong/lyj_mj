@@ -61,6 +61,7 @@ message qp_create_room_req {
 message qp_create_room_rsp {
     required int32 state = 1;
     optional int32 room_id = 2;
+    optional int32 seat_id = 3;
 }
 
 

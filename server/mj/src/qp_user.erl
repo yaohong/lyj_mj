@@ -40,11 +40,16 @@
 -define(SERVER, ?MODULE).
 -define(TIMER_SPACE, 3).
 -define(RECV_TIMEOUT, 10).
+-record(user_data, {user_id, gold, nickname, avatar_url}).
+-record(room_data, {room_id, seat_num, room_pid}).
 -record(state, {
     receiveMonitor,
     sockModule,
     sockData,
-    last_recv_packet_time}).
+    last_recv_packet_time,
+    user_data=undefined,
+    room_data=undefined
+    }).
 
 %%%===================================================================
 %%% API
@@ -194,16 +199,32 @@ game(_Event, State) ->
                        timeout() | hibernate} |
                       {stop, Reason :: term(), NewStateData :: #state{}}).
 handle_event({complete_packet, Bin}, StateName, #state{last_recv_packet_time = OldLastRecvPacketTime} = State) ->
-    Request = qp_proto:decode_qp_packet(Bin),
-    {NewStateName, NewState, IsUpdate} = packet_handle(Request, StateName, State),
-    NewLastRecvPacketTime =
-        if
-            IsUpdate =:= true -> qp_util:timestamp();
-            true -> OldLastRecvPacketTime
-        end,
-    {next_state, NewStateName, NewState#state{last_recv_packet_time = NewLastRecvPacketTime}};
+    try
+        Request = qp_proto:decode_qp_packet(Bin),
+        {NewStateName, NewState, IsUpdate} = packet_handle(Request, StateName, State),
+        true = is_record(NewState, state),
+        true = (IsUpdate =:= true orelse IsUpdate =:= false),
+        state_name_check(NewStateName),
+
+        NewLastRecvPacketTime =
+            if
+                IsUpdate =:= true -> qp_util:timestamp();
+                true -> OldLastRecvPacketTime
+            end,
+        {next_state, NewStateName, NewState#state{last_recv_packet_time = NewLastRecvPacketTime}}
+    catch
+        What:Type ->
+            ?FILE_LOG_ERROR("~p, ~p, ~p", [What, Type, erlang:get_stacktrace()]),
+            {stop, normal, State}
+    end;
 handle_event(_Event, StateName, State) ->
     {next_state, StateName, State}.
+
+
+state_name_check(wait_login) -> ok;
+state_name_check(hall) -> ok;
+state_name_check(room) -> ok;
+state_name_check(game) -> ok.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -299,21 +320,49 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
+send_bin(State, Bin) ->
+    (State#state.sockModule):send(State#state.sockData, Bin).
+
+
 packet_handle(#qp_login_req{account = Account}, wait_login, State) ->
     ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
-    UserData = #qp_user_data{user_id = "10000", gold = 1500, avatar_url = "http://www.baidu.com", nick_name = "stgg"},
+    {success, {UserId, Gold, NickName, AvatarUrl}} = qp_db:load_user_data_by_acc(Account),
+    UserData = #qp_user_data{user_id = UserId, gold = Gold, avatar_url = AvatarUrl, nick_name = NickName},
     Rsp = #qp_login_rsp{state = 0, data = UserData},
     RspBin = qp_proto:encode_qp_packet(Rsp),
     (State#state.sockModule):send(State#state.sockData, RspBin),
-    {hall, State, true};
+    UserData = #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl},
+    {hall, State#state{user_data = UserData}, true};
 packet_handle(Request, wait_login, State) ->
     ?FILE_LOG_WARNING("wait_login request=~p", [Request]),
     {wait_login, State, false};
 
 
-packet_handle(#qp_create_room_req{room_type = _} = Request, hall, State) ->
+packet_handle(#qp_create_room_req{room_type = RoomType} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
     ?FILE_LOG_WARNING("hall request=~p", [Request]),
-    {room, State, true};
+    #user_data{user_id = UserId} = UserData,
+    case qp_room_manager:create_room(UserId, RoomType) of
+        {success, {RoomId, RoomPid}} ->
+            case qp_room:join(RoomPid, user_key:new(UserId, self())) of
+                {success, {SeatNum, _IsReady, []}} ->
+                    Rsp = #qp_create_room_rsp{state = 0, room_id = RoomId, seat_id = SeatNum},
+                    RspBin = qp_proto:encode_qp_packet(Rsp),
+                    (State#state.sockModule):send(State#state.sockData, RspBin),
+                    ?FILE_LOG_WARNING("user_id=~p, create_room success, room_id=~p, seat_num=~p", [UserId, RoomId, SeatNum]),
+                    RoomData = #room_data{room_id = RoomId, seat_num = SeatNum, room_pid = RoomPid},
+                    {room, State#state{room_data = RoomData}, true};
+                failed ->
+                    %%进入失败
+                    ?FILE_LOG_WARNING("user_id=~p, create_room success, join failed", [UserId]),
+                    send_bin(State, qp_packet_util:create_room_failed_bin(-2)),
+                    {hall, State, true}
+            end;
+        failed ->
+            %%创建房间失败
+            ?FILE_LOG_WARNING("user_id=~p, create_room failed", [UserId]),
+            send_bin(State, qp_packet_util:create_room_failed_bin(-1)),
+            {hall, State, true}
+    end;
 packet_handle(#qp_join_room_req{} = Request, hall, State) ->
     ?FILE_LOG_WARNING("hall request=~p", [Request]),
     {room, State, true};
@@ -351,3 +400,7 @@ packet_handle(#qp_exit_room_req{} = Request, room, State) ->
 packet_handle(Request, game, State) ->
     ?FILE_LOG_WARNING("game request=~p", [Request]),
     {game, State, false}.
+
+
+
+
