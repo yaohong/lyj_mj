@@ -170,9 +170,10 @@ void protobuf_AssignDesc_mj_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(qp_create_room_req));
   qp_create_room_rsp_descriptor_ = file->message_type(5);
-  static const int qp_create_room_rsp_offsets_[2] = {
+  static const int qp_create_room_rsp_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(qp_create_room_rsp, state_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(qp_create_room_rsp, room_id_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(qp_create_room_rsp, seat_id_),
   };
   qp_create_room_rsp_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -496,36 +497,36 @@ void protobuf_AddDesc_mj_2eproto() {
     "\002(\003\022\022\n\navatar_url\030\003 \002(\t\022\021\n\tnick_name\030\004 \002"
     "(\t\"D\n\014qp_login_rsp\022\r\n\005state\030\001 \002(\005\022%\n\004dat"
     "a\030\002 \001(\0132\027.qp_server.qp_user_data\"\'\n\022qp_c"
-    "reate_room_req\022\021\n\troom_type\030\001 \002(\005\"4\n\022qp_"
+    "reate_room_req\022\021\n\troom_type\030\001 \002(\005\"E\n\022qp_"
     "create_room_rsp\022\r\n\005state\030\001 \002(\005\022\017\n\007room_i"
-    "d\030\002 \001(\005\"#\n\020qp_join_room_req\022\017\n\007room_id\030\001"
-    " \002(\t\"a\n\014qp_room_user\022*\n\tuser_data\030\001 \002(\0132"
-    "\027.qp_server.qp_user_data\022\023\n\013seat_number\030"
-    "\002 \002(\005\022\020\n\010is_ready\030\003 \002(\010\"u\n\020qp_join_room_"
-    "rsp\022\016\n\006result\030\001 \002(\005\022\023\n\013seat_number\030\002 \001(\005"
-    "\022\020\n\010is_ready\030\003 \001(\010\022*\n\troom_user\030\004 \003(\0132\027."
-    "qp_server.qp_room_user\"\?\n\021qp_join_room_p"
-    "ush\022*\n\troom_user\030\001 \002(\0132\027.qp_server.qp_ro"
-    "om_user\"#\n\014qp_ready_req\022\023\n\013ready_state\030\001"
-    " \002(\005\"#\n\014qp_ready_rsp\022\023\n\013ready_state\030\001 \002("
-    "\005\"9\n\rqp_ready_push\022\023\n\013seat_number\030\001 \002(\005\022"
-    "\023\n\013ready_state\030\002 \002(\005\"\'\n\020qp_exit_room_req"
-    "\022\023\n\013seat_number\030\001 \002(\005\"\"\n\020qp_exit_room_rs"
-    "p\022\016\n\006result\030\001 \002(\005\"(\n\021qp_exit_room_push\022\023"
-    "\n\013seat_number\030\001 \002(\005\"!\n\014qp_game_data\022\021\n\tg"
-    "ame_data\030\001 \002(\014\"\"\n\013qp_ping_req\022\023\n\013seat_nu"
-    "mber\030\001 \002(\005\"\"\n\013qp_ping_rsp\022\023\n\013seat_number"
-    "\030\001 \002(\005*\235\003\n\006ws_cmd\022\025\n\020CMD_QP_LOGIN_REQ\020\351\007"
-    "\022\025\n\020CMD_QP_LOGIN_RSP\020\352\007\022\033\n\026CMD_QP_CREATE"
-    "_ROOM_REQ\020\353\007\022\033\n\026CMD_QP_CREATE_ROOM_RSP\020\354"
-    "\007\022\031\n\024CMD_QP_JOIN_ROOM_REQ\020\355\007\022\031\n\024CMD_QP_J"
-    "OIN_ROOM_RSP\020\356\007\022\032\n\025CMD_QP_JOIN_ROOM_PUSH"
-    "\020\357\007\022\025\n\020CMD_QP_READY_REQ\020\360\007\022\025\n\020CMD_QP_REA"
-    "DY_RSP\020\361\007\022\026\n\021CMD_QP_READY_PUSH\020\362\007\022\031\n\024CMD"
-    "_QP_EXIT_ROOM_REQ\020\363\007\022\031\n\024CMD_QP_EXIT_ROOM"
-    "_RSP\020\364\007\022\032\n\025CMD_QP_EXIT_ROOM_PUSH\020\365\007\022\025\n\020C"
-    "MD_QP_GAME_DATA\020\366\007\022\024\n\017CMD_QP_PING_REQ\020\367\007"
-    "\022\024\n\017CMD_QP_PING_RSP\020\370\007", 1462);
+    "d\030\002 \001(\005\022\017\n\007seat_id\030\003 \001(\005\"#\n\020qp_join_room"
+    "_req\022\017\n\007room_id\030\001 \002(\t\"a\n\014qp_room_user\022*\n"
+    "\tuser_data\030\001 \002(\0132\027.qp_server.qp_user_dat"
+    "a\022\023\n\013seat_number\030\002 \002(\005\022\020\n\010is_ready\030\003 \002(\010"
+    "\"u\n\020qp_join_room_rsp\022\016\n\006result\030\001 \002(\005\022\023\n\013"
+    "seat_number\030\002 \001(\005\022\020\n\010is_ready\030\003 \001(\010\022*\n\tr"
+    "oom_user\030\004 \003(\0132\027.qp_server.qp_room_user\""
+    "\?\n\021qp_join_room_push\022*\n\troom_user\030\001 \002(\0132"
+    "\027.qp_server.qp_room_user\"#\n\014qp_ready_req"
+    "\022\023\n\013ready_state\030\001 \002(\005\"#\n\014qp_ready_rsp\022\023\n"
+    "\013ready_state\030\001 \002(\005\"9\n\rqp_ready_push\022\023\n\013s"
+    "eat_number\030\001 \002(\005\022\023\n\013ready_state\030\002 \002(\005\"\'\n"
+    "\020qp_exit_room_req\022\023\n\013seat_number\030\001 \002(\005\"\""
+    "\n\020qp_exit_room_rsp\022\016\n\006result\030\001 \002(\005\"(\n\021qp"
+    "_exit_room_push\022\023\n\013seat_number\030\001 \002(\005\"!\n\014"
+    "qp_game_data\022\021\n\tgame_data\030\001 \002(\014\"\"\n\013qp_pi"
+    "ng_req\022\023\n\013seat_number\030\001 \002(\005\"\"\n\013qp_ping_r"
+    "sp\022\023\n\013seat_number\030\001 \002(\005*\235\003\n\006ws_cmd\022\025\n\020CM"
+    "D_QP_LOGIN_REQ\020\351\007\022\025\n\020CMD_QP_LOGIN_RSP\020\352\007"
+    "\022\033\n\026CMD_QP_CREATE_ROOM_REQ\020\353\007\022\033\n\026CMD_QP_"
+    "CREATE_ROOM_RSP\020\354\007\022\031\n\024CMD_QP_JOIN_ROOM_R"
+    "EQ\020\355\007\022\031\n\024CMD_QP_JOIN_ROOM_RSP\020\356\007\022\032\n\025CMD_"
+    "QP_JOIN_ROOM_PUSH\020\357\007\022\025\n\020CMD_QP_READY_REQ"
+    "\020\360\007\022\025\n\020CMD_QP_READY_RSP\020\361\007\022\026\n\021CMD_QP_REA"
+    "DY_PUSH\020\362\007\022\031\n\024CMD_QP_EXIT_ROOM_REQ\020\363\007\022\031\n"
+    "\024CMD_QP_EXIT_ROOM_RSP\020\364\007\022\032\n\025CMD_QP_EXIT_"
+    "ROOM_PUSH\020\365\007\022\025\n\020CMD_QP_GAME_DATA\020\366\007\022\024\n\017C"
+    "MD_QP_PING_REQ\020\367\007\022\024\n\017CMD_QP_PING_RSP\020\370\007", 1479);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "mj.proto", &protobuf_RegisterTypes);
   qp_packet::default_instance_ = new qp_packet();
@@ -1978,6 +1979,7 @@ void qp_create_room_req::Swap(qp_create_room_req* other) {
 #ifndef _MSC_VER
 const int qp_create_room_rsp::kStateFieldNumber;
 const int qp_create_room_rsp::kRoomIdFieldNumber;
+const int qp_create_room_rsp::kSeatIdFieldNumber;
 #endif  // !_MSC_VER
 
 qp_create_room_rsp::qp_create_room_rsp()
@@ -1998,6 +2000,7 @@ void qp_create_room_rsp::SharedCtor() {
   _cached_size_ = 0;
   state_ = 0;
   room_id_ = 0;
+  seat_id_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -2035,6 +2038,7 @@ void qp_create_room_rsp::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     state_ = 0;
     room_id_ = 0;
+    seat_id_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -2073,6 +2077,22 @@ bool qp_create_room_rsp::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(24)) goto parse_seat_id;
+        break;
+      }
+
+      // optional int32 seat_id = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_seat_id:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &seat_id_)));
+          set_has_seat_id();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -2105,6 +2125,11 @@ void qp_create_room_rsp::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->room_id(), output);
   }
 
+  // optional int32 seat_id = 3;
+  if (has_seat_id()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->seat_id(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2121,6 +2146,11 @@ void qp_create_room_rsp::SerializeWithCachedSizes(
   // optional int32 room_id = 2;
   if (has_room_id()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->room_id(), target);
+  }
+
+  // optional int32 seat_id = 3;
+  if (has_seat_id()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->seat_id(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -2146,6 +2176,13 @@ int qp_create_room_rsp::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->room_id());
+    }
+
+    // optional int32 seat_id = 3;
+    if (has_seat_id()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->seat_id());
     }
 
   }
@@ -2181,6 +2218,9 @@ void qp_create_room_rsp::MergeFrom(const qp_create_room_rsp& from) {
     if (from.has_room_id()) {
       set_room_id(from.room_id());
     }
+    if (from.has_seat_id()) {
+      set_seat_id(from.seat_id());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2207,6 +2247,7 @@ void qp_create_room_rsp::Swap(qp_create_room_rsp* other) {
   if (other != this) {
     std::swap(state_, other->state_);
     std::swap(room_id_, other->room_id_);
+    std::swap(seat_id_, other->seat_id_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

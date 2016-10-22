@@ -654,20 +654,30 @@ class qp_create_room_rsp : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 room_id() const;
   inline void set_room_id(::google::protobuf::int32 value);
 
+  // optional int32 seat_id = 3;
+  inline bool has_seat_id() const;
+  inline void clear_seat_id();
+  static const int kSeatIdFieldNumber = 3;
+  inline ::google::protobuf::int32 seat_id() const;
+  inline void set_seat_id(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:qp_server.qp_create_room_rsp)
  private:
   inline void set_has_state();
   inline void clear_has_state();
   inline void set_has_room_id();
   inline void clear_has_room_id();
+  inline void set_has_seat_id();
+  inline void clear_has_seat_id();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::int32 state_;
   ::google::protobuf::int32 room_id_;
+  ::google::protobuf::int32 seat_id_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
 
   friend void  protobuf_AddDesc_mj_2eproto();
   friend void protobuf_AssignDesc_mj_2eproto();
@@ -2386,6 +2396,28 @@ inline ::google::protobuf::int32 qp_create_room_rsp::room_id() const {
 inline void qp_create_room_rsp::set_room_id(::google::protobuf::int32 value) {
   set_has_room_id();
   room_id_ = value;
+}
+
+// optional int32 seat_id = 3;
+inline bool qp_create_room_rsp::has_seat_id() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void qp_create_room_rsp::set_has_seat_id() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void qp_create_room_rsp::clear_has_seat_id() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void qp_create_room_rsp::clear_seat_id() {
+  seat_id_ = 0;
+  clear_has_seat_id();
+}
+inline ::google::protobuf::int32 qp_create_room_rsp::seat_id() const {
+  return seat_id_;
+}
+inline void qp_create_room_rsp::set_seat_id(::google::protobuf::int32 value) {
+  set_has_seat_id();
+  seat_id_ = value;
 }
 
 // -------------------------------------------------------------------
