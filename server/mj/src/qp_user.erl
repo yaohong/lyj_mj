@@ -285,10 +285,8 @@ handle_info(timeout_check, StateName, #state{last_recv_packet_time = LastRecvPac
   SpacheTime = CurrentTime - LastRecvPackTime,
   if
     SpacheTime > ?RECV_TIMEOUT ->
-      ?FILE_LOG_DEBUG("timeout_check true state_name=~p, exit.", [StateName]),
       {stop,normal,State};
     true ->
-      ?FILE_LOG_DEBUG("timeout_check space_time=~p , not timeout.", [SpacheTime]),
       timer_manager:addDelayTask(
         CurrentTime,
         CurrentTime + ?TIMER_SPACE,

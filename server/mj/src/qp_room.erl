@@ -26,7 +26,7 @@
     handle_info/3,
     terminate/3,
     code_change/4]).
--export([join/2]).
+-export([join/2, ready/2]).
 -define(SERVER, ?MODULE).
 
 -record(state, {
@@ -44,6 +44,10 @@
 %%%===================================================================
 join(RoomPid, UserData) ->
     gen_fsm:sync_send_event(RoomPid, {join, UserData}).
+
+
+ready(RoomPid, ReadyState) when is_boolean(ReadyState) ->
+    gen_fsm:sync_send_event(RoomPid, {ready, ReadyState}).
 %%--------------------------------------------------------------------
 %% @doc
 %% Creates a gen_fsm process which calls Module:init/1 to
@@ -199,14 +203,16 @@ idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join 
                     {reply, {success, {IdleSeatNum, false, RoomUsers}}, idle, State#state{seat_tree = NewSeatTree}}
             end
     end;
+idle({ready, _ReadyState}, _From, State) ->
+    {reply, ok, idle, State};
 idle(_Event, _From, State) ->
     Reply = ok,
-    {reply, Reply, state_name, State}.
+    {reply, Reply, idle, State}.
 
 
 game(_Event, _From, State) ->
     Reply = ok,
-    {reply, Reply, state_name, State}.
+    {reply, Reply, game, State}.
 
 %%--------------------------------------------------------------------
 %% @private
