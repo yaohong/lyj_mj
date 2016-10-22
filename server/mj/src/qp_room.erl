@@ -14,17 +14,18 @@
 %% API
 -export([start_link/3]).
 -include("../deps/file_log/include/file_log.hrl").
+-include("../include/mj_pb.hrl").
 %% gen_fsm callbacks
 -export([init/1,
 %%         idle/2,
 %%         game/2,
-         idle/3,
-         game/3,
-         handle_event/3,
-         handle_sync_event/4,
-         handle_info/3,
-         terminate/3,
-         code_change/4]).
+    idle/3,
+    game/3,
+    handle_event/3,
+    handle_sync_event/4,
+    handle_info/3,
+    terminate/3,
+    code_change/4]).
 -export([join/2]).
 -define(SERVER, ?MODULE).
 
@@ -140,16 +141,16 @@ extract_room_users([SeatNum|T], SeatTree, Users) ->
     end.
 
 -spec(idle(Event :: term(), From :: {pid(), term()},
-           State :: #state{}) ->
-              {next_state, NextStateName :: atom(), NextState :: #state{}} |
-              {next_state, NextStateName :: atom(), NextState :: #state{},
-               timeout() | hibernate} |
-              {reply, Reply, NextStateName :: atom(), NextState :: #state{}} |
-              {reply, Reply, NextStateName :: atom(), NextState :: #state{},
-               timeout() | hibernate} |
-              {stop, Reason :: normal | term(), NewState :: #state{}} |
-              {stop, Reason :: normal | term(), Reply :: term(),
-               NewState :: #state{}}).
+    State :: #state{}) ->
+    {next_state, NextStateName :: atom(), NextState :: #state{}} |
+    {next_state, NextStateName :: atom(), NextState :: #state{},
+        timeout() | hibernate} |
+    {reply, Reply, NextStateName :: atom(), NextState :: #state{}} |
+    {reply, Reply, NextStateName :: atom(), NextState :: #state{},
+        timeout() | hibernate} |
+    {stop, Reason :: normal | term(), NewState :: #state{}} |
+    {stop, Reason :: normal | term(), Reply :: term(),
+        NewState :: #state{}}).
 idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join = OwnerIsJoin, room_id = RoomId, seat_tree = SeatTree} = State) ->
     JoinUserId = UserData:get(user_id),
     if
@@ -175,6 +176,24 @@ idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join 
                     %%找到座位号了
                     %%获取其他位置的玩家信息
                     RoomUsers = extract_room_users(SeatTree),
+                    %%编码进入房间的消息广播给房间里的其他用户
+                    Push = #qp_join_room_push{
+                        room_user = #qp_room_user{
+                            user_data = #qp_user_data{
+                                user_id = UserData:get(user_id),
+                                gold = UserData:get(gold),
+                                avatar_url = UserData:get(avatar_url),
+                                nick_name = UserData:get(nick_name)
+                            },
+                            seat_number = IdleSeatNum,
+                            is_ready = false
+                        }
+                    },
+                    PushBin = qp_proto:encode_qp_packet(Push),
+                    lists:foreach(
+                        fun({RoomUserData, _, _}) ->
+                            RoomUserData:send_room_bin_msg(PushBin)
+                        end, RoomUsers),
                     NewSeatTree = gb_trees:update(IdleSeatNum, #seat_data{user_data = UserData}, SeatTree),
                     ?FILE_LOG_WARNING("join room[~p] success, owner_user_id=~p, join_user_id=~p", [RoomId, OwnerUserId, JoinUserId]),
                     {reply, {success, {IdleSeatNum, false, RoomUsers}}, idle, State#state{seat_tree = NewSeatTree}}
@@ -199,11 +218,11 @@ game(_Event, _From, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_event(Event :: term(), StateName :: atom(),
-                   StateData :: #state{}) ->
-                      {next_state, NextStateName :: atom(), NewStateData :: #state{}} |
-                      {next_state, NextStateName :: atom(), NewStateData :: #state{},
-                       timeout() | hibernate} |
-                      {stop, Reason :: term(), NewStateData :: #state{}}).
+    StateData :: #state{}) ->
+    {next_state, NextStateName :: atom(), NewStateData :: #state{}} |
+    {next_state, NextStateName :: atom(), NewStateData :: #state{},
+        timeout() | hibernate} |
+    {stop, Reason :: term(), NewStateData :: #state{}}).
 handle_event(_Event, StateName, State) ->
     {next_state, StateName, State}.
 
@@ -217,15 +236,15 @@ handle_event(_Event, StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_sync_event(Event :: term(), From :: {pid(), Tag :: term()},
-                        StateName :: atom(), StateData :: term()) ->
-                           {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term()} |
-                           {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term(),
-                            timeout() | hibernate} |
-                           {next_state, NextStateName :: atom(), NewStateData :: term()} |
-                           {next_state, NextStateName :: atom(), NewStateData :: term(),
-                            timeout() | hibernate} |
-                           {stop, Reason :: term(), Reply :: term(), NewStateData :: term()} |
-                           {stop, Reason :: term(), NewStateData :: term()}).
+    StateName :: atom(), StateData :: term()) ->
+    {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term()} |
+    {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term(),
+        timeout() | hibernate} |
+    {next_state, NextStateName :: atom(), NewStateData :: term()} |
+    {next_state, NextStateName :: atom(), NewStateData :: term(),
+        timeout() | hibernate} |
+    {stop, Reason :: term(), Reply :: term(), NewStateData :: term()} |
+    {stop, Reason :: term(), NewStateData :: term()}).
 handle_sync_event(_Event, _From, StateName, State) ->
     Reply = ok,
     {reply, Reply, StateName, State}.
@@ -240,11 +259,11 @@ handle_sync_event(_Event, _From, StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_info(Info :: term(), StateName :: atom(),
-                  StateData :: term()) ->
-                     {next_state, NextStateName :: atom(), NewStateData :: term()} |
-                     {next_state, NextStateName :: atom(), NewStateData :: term(),
-                      timeout() | hibernate} |
-                     {stop, Reason :: normal | term(), NewStateData :: term()}).
+    StateData :: term()) ->
+    {next_state, NextStateName :: atom(), NewStateData :: term()} |
+    {next_state, NextStateName :: atom(), NewStateData :: term(),
+        timeout() | hibernate} |
+    {stop, Reason :: normal | term(), NewStateData :: term()}).
 handle_info(_Info, StateName, State) ->
     {next_state, StateName, State}.
 
@@ -259,8 +278,8 @@ handle_info(_Info, StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate(Reason :: normal | shutdown | {shutdown, term()}
-                | term(), StateName :: atom(), StateData :: term()) ->
-                   term()).
+| term(), StateName :: atom(), StateData :: term()) ->
+    term()).
 terminate(_Reason, _StateName, _State) ->
     ok.
 
@@ -272,8 +291,8 @@ terminate(_Reason, _StateName, _State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(code_change(OldVsn :: term() | {down, term()}, StateName :: atom(),
-                  StateData :: #state{}, Extra :: term()) ->
-                     {ok, NextStateName :: atom(), NewStateData :: #state{}}).
+    StateData :: #state{}, Extra :: term()) ->
+    {ok, NextStateName :: atom(), NewStateData :: #state{}}).
 code_change(_OldVsn, StateName, State, _Extra) ->
     {ok, StateName, State}.
 

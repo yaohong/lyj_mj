@@ -145,20 +145,30 @@ init([SockModule, SocketData]) ->
   {next_state, NextStateName :: atom(), NextState :: #state{},
     timeout() | hibernate} |
   {stop, Reason :: term(), NewState :: #state{}}).
-wait_login(_Event, State) ->
-  {next_state, state_name, State}.
+wait_login(Event, State) ->
+  ?FILE_LOG_WARNING("~p", [Event]),
+  {next_state, wait_login, State}.
 
 
-hall(_Event, State) ->
-  {next_state, state_name, State}.
+hall(Event, State) ->
+  ?FILE_LOG_WARNING("~p", [Event]),
+  {next_state, hall, State}.
 
 
-room(_Event, State) ->
-  {next_state, state_name, State}.
+room({room_bin_msg, Bin}, State) ->
+  send_bin(State, Bin),
+  {next_state, room, State};
+room(Event, State) ->
+  ?FILE_LOG_WARNING("~p", [Event]),
+  {next_state, room, State}.
 
 
-game(_Event, State) ->
-  {next_state, state_name, State}.
+game({room_bin_msg, Bin}, State) ->
+  send_bin(State, Bin),
+  {next_state, game, State};
+game(Event, State) ->
+  ?FILE_LOG_WARNING("~p", [Event]),
+  {next_state, game, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -372,7 +382,7 @@ packet_handle(#qp_join_room_req{room_id = RoomId} = Request, hall, #state{user_d
   case qp_room_manager:get_room_pid(RoomId) of
     failed ->
       ?FILE_LOG_WARNING("user_id=~p, join_room[~p] failed.", [UserId, RoomId]),
-      {room, State, true};
+      {hall, State, true};
     {success, RoomPid} ->
       case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
         {success, {SeatNum, false, RoomUsers}} ->
