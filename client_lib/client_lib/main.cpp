@@ -29,9 +29,9 @@ void packetHandle( client_lib::Socket &socket_, const char *data, int len)
             qp_server::qp_login_rsp rsp;
             rsp.ParseFromString(root.serialized());
 
-            qp_server::qp_ping_req req;
-            req.set_seat_number( 0 );
-            sendPacket( socket_, &req, qp_server::CMD_QP_PING_REQ );
+            qp_server::qp_create_room_req req;
+            req.set_room_type(1);
+            sendPacket( socket_, &req, qp_server::CMD_QP_CREATE_ROOM_REQ );
         }
             break;
         case qp_server::CMD_QP_CREATE_ROOM_RSP:
