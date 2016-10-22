@@ -342,21 +342,21 @@ packet_handle(Request, wait_login, State) ->
 
 
 packet_handle(#qp_create_room_req{room_type = RoomType} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
-    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    ?FILE_LOG_DEBUG("hall request=~p", [Request]),
     #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl} = UserData,
     case qp_room_manager:create_room(UserId, RoomType) of
         {success, {RoomId, RoomPid}} ->
+            ?FILE_LOG_DEBUG("user_id=~p, create_room success, room_id=~p, room_pid=~p", [UserId, RoomId, RoomPid]),
             case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
                 {success, {SeatNum, _IsReady, []}} ->
                     Rsp = #qp_create_room_rsp{state = 0, room_id = RoomId, seat_id = SeatNum},
                     RspBin = qp_proto:encode_qp_packet(Rsp),
                     (State#state.sockModule):send(State#state.sockData, RspBin),
-                    ?FILE_LOG_WARNING("user_id=~p, create_room success, room_id=~p, seat_num=~p", [UserId, RoomId, SeatNum]),
                     RoomData = #room_data{room_id = RoomId, seat_num = SeatNum, room_pid = RoomPid},
                     {room, State#state{room_data = RoomData}, true};
                 failed ->
                     %%进入失败
-                    ?FILE_LOG_WARNING("user_id=~p, create_room success, join failed", [UserId]),
+                    ?FILE_LOG_DEBUG("user_id=~p, create_room success, join failed", [UserId]),
                     send_bin(State, qp_packet_util:create_room_failed_bin(-2)),
                     {hall, State, true}
             end;
@@ -367,44 +367,44 @@ packet_handle(#qp_create_room_req{room_type = RoomType} = Request, hall, #state{
             {hall, State, true}
     end;
 packet_handle(#qp_join_room_req{room_id = RoomId} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
-    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    ?FILE_LOG_DEBUG("hall request=~p", [Request]),
     {room, State, true};
 packet_handle(#qp_ping_req{} = Request, hall, #state{room_data = undefined} = State) ->
-    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    ?FILE_LOG_DEBUG("hall request=~p", [Request]),
     send_bin(State, qp_packet_util:create_ping_rsp_bin()),
     {hall, State, true};
 packet_handle(Request, hall, State) ->
-    ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    ?FILE_LOG_DEBUG("hall request=~p", [Request]),
     {hall, State, false};
 
 
 packet_handle(#qp_ready_req{}=Request, room, State) ->
-    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    ?FILE_LOG_DEBUG("room request=~p", [Request]),
     {room, State, true};
 packet_handle(#qp_ping_req{} = Request, room, State) ->
-    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    ?FILE_LOG_DEBUG("room request=~p", [Request]),
     send_bin(State, qp_packet_util:create_ping_rsp_bin()),
     {room, State, true};
 packet_handle(#qp_exit_room_req{} = Request, room, State) ->
-    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    ?FILE_LOG_DEBUG("room request=~p", [Request]),
     {hall, State, true};
 packet_handle(Request, room, State) ->
-    ?FILE_LOG_WARNING("room request=~p", [Request]),
+    ?FILE_LOG_DEBUG("room request=~p", [Request]),
     {room, State, false};
 
 
 packet_handle(#qp_game_data{}=Request, game, State) ->
-    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    ?FILE_LOG_DEBUG("game request=~p", [Request]),
     {game, State, true};
 packet_handle(#qp_ping_req{} = Request, game, State) ->
-    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    ?FILE_LOG_DEBUG("game request=~p", [Request]),
     send_bin(State, qp_packet_util:create_ping_rsp_bin()),
     {game, State, true};
 packet_handle(#qp_exit_room_req{} = Request, game, State) ->
-    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    ?FILE_LOG_DEBUG("game request=~p", [Request]),
     {hall, State, true};
 packet_handle(Request, game, State) ->
-    ?FILE_LOG_WARNING("game request=~p", [Request]),
+    ?FILE_LOG_DEBUG("game request=~p", [Request]),
     {game, State, false}.
 
 
