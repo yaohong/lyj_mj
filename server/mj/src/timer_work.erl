@@ -81,7 +81,6 @@ init([]) ->
 	                 {stop, Reason :: term(), Reply :: term(), NewState :: #state{}} |
 	                 {stop, Reason :: term(), NewState :: #state{}}).
 handle_call({addDelayTask, {DelayTime, Mod, Func, Args}}, _From, #state{tableId = TableId} = State) ->
-	?FILE_LOG_DEBUG("addDelayTask [~p, ~p, ~p, ~p].", [DelayTime, Mod, Func, Args]),
 	Ref = make_ref(),
 	case ets:lookup(TableId, DelayTime) of
 		[] ->

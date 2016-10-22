@@ -412,7 +412,6 @@ packet_handle(#qp_join_room_req{room_id = RoomId} = Request, hall, #state{user_d
       end
   end;
 packet_handle(#qp_ping_req{} = Request, hall, #state{room_data = undefined} = State) ->
-  ?FILE_LOG_DEBUG("hall request=~p", [Request]),
   send_bin(State, qp_packet_util:create_ping_rsp_bin()),
   {hall, State, true};
 packet_handle(Request, hall, State) ->
@@ -423,8 +422,7 @@ packet_handle(Request, hall, State) ->
 packet_handle(#qp_ready_req{}=Request, room, State) ->
   ?FILE_LOG_DEBUG("room request=~p", [Request]),
   {room, State, true};
-packet_handle(#qp_ping_req{} = Request, room, State) ->
-  ?FILE_LOG_DEBUG("room request=~p", [Request]),
+packet_handle(#qp_ping_req{}, room, State) ->
   send_bin(State, qp_packet_util:create_ping_rsp_bin()),
   {room, State, true};
 packet_handle(#qp_exit_room_req{} = Request, room, State) ->
@@ -438,8 +436,7 @@ packet_handle(Request, room, State) ->
 packet_handle(#qp_game_data{}=Request, game, State) ->
   ?FILE_LOG_DEBUG("game request=~p", [Request]),
   {game, State, true};
-packet_handle(#qp_ping_req{} = Request, game, State) ->
-  ?FILE_LOG_DEBUG("game request=~p", [Request]),
+packet_handle(#qp_ping_req{}, game, State) ->
   send_bin(State, qp_packet_util:create_ping_rsp_bin()),
   {game, State, true};
 packet_handle(#qp_exit_room_req{} = Request, game, State) ->
