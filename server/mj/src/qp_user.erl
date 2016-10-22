@@ -19,23 +19,23 @@
 
 %% gen_fsm callbacks
 -export([init/1,
-         wait_login/2,              %%等待登陆
-         hall/2,                    %%大厅
-         room/2,                    %%房间
-         game/2,                    %%游戏
-         handle_event/3,
-         handle_sync_event/4,
-         handle_info/3,
-         terminate/3,
-         code_change/4]).
+  wait_login/2,              %%等待登陆
+  hall/2,                    %%大厅
+  room/2,                    %%房间
+  game/2,                    %%游戏
+  handle_event/3,
+  handle_sync_event/4,
+  handle_info/3,
+  terminate/3,
+  code_change/4]).
 -export([head_len/2,
-         closed/1,
-         complete_packet/2,
-         timer_callback/2
+  closed/1,
+  complete_packet/2,
+  timer_callback/2
 ]).
 -export([
-    start/3,
-    start_link/2
+  start/3,
+  start_link/2
 ]).
 -define(SERVER, ?MODULE).
 -define(TIMER_SPACE, 3).
@@ -43,30 +43,30 @@
 -record(user_data, {user_id, gold, nickname, avatar_url}).
 -record(room_data, {room_id, seat_num, room_pid}).
 -record(state, {
-    receiveMonitor,
-    sockModule,
-    sockData,
-    last_recv_packet_time,
-    user_data=undefined,
-    room_data=undefined
-    }).
+  receiveMonitor,
+  sockModule,
+  sockData,
+  last_recv_packet_time,
+  user_data=undefined,
+  room_data=undefined
+}).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 head_len(HeadBin, _HeadLen) when is_binary(HeadBin) ->
-    %%读取头
-    <<PacketSize:?BIG_UINT32>> = HeadBin,
-    PacketSize.
+  %%读取头
+  <<PacketSize:?BIG_UINT32>> = HeadBin,
+  PacketSize.
 
 closed(Pid) when is_pid(Pid) ->
-    Pid ! closed.
+  Pid ! closed.
 
 complete_packet(Pid, Bin) when is_pid(Pid) andalso is_binary(Bin) ->
-    gen_fsm:send_all_state_event(Pid, {complete_packet, Bin}).
+  gen_fsm:send_all_state_event(Pid, {complete_packet, Bin}).
 
 timer_callback(_Ref, Pid) ->
-    Pid ! timeout_check.
+  Pid ! timeout_check.
 
 
 
@@ -82,12 +82,12 @@ timer_callback(_Ref, Pid) ->
 
 
 -spec start(UserSup :: atom(), SockModule :: module(), Socket :: tcp_socket:socket()) ->
-    {ok, pid()}.
+  {ok, pid()}.
 start(UserSup, SockModule, SocketData) ->
-    supervisor:start_child(UserSup, [SockModule, SocketData]).
+  supervisor:start_child(UserSup, [SockModule, SocketData]).
 
 start_link(SockModule, Socket) ->
-    gen_fsm:start_link(?MODULE, [SockModule, Socket], []).
+  gen_fsm:start_link(?MODULE, [SockModule, Socket], []).
 
 %%%===================================================================
 %%% gen_fsm callbacks
@@ -103,30 +103,30 @@ start_link(SockModule, Socket) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(init(Args :: term()) ->
-    {ok, StateName :: atom(), StateData :: #state{}} |
-    {ok, StateName :: atom(), StateData :: #state{}, timeout() | hibernate} |
-    {stop, Reason :: term()} | ignore).
+  {ok, StateName :: atom(), StateData :: #state{}} |
+  {ok, StateName :: atom(), StateData :: #state{}, timeout() | hibernate} |
+  {stop, Reason :: term()} | ignore).
 init([SockModule, SocketData]) ->
-    ReceiveMonitor = SockModule:monitor(SocketData),
-    case catch SockModule:peername(SocketData) of
-        {ok, _} ->
-            CurrentTime = qp_util:timestamp(),
-            timer_manager:addDelayTask(
-                CurrentTime,
-                CurrentTime + ?TIMER_SPACE,
-                qp_user, timer_callback, [self()]),
-            {ok,
-             wait_login,
-             #state{
-                 receiveMonitor = ReceiveMonitor,
-                 sockModule = SockModule,
-                 sockData = SocketData,
-                 last_recv_packet_time = CurrentTime
-             }};
-        Other ->
-            ?FILE_LOG_ERROR("socket init peername fail reason=[~p]", [Other]),
-            {stop, normal}
-    end.
+  ReceiveMonitor = SockModule:monitor(SocketData),
+  case catch SockModule:peername(SocketData) of
+    {ok, _} ->
+      CurrentTime = qp_util:timestamp(),
+      timer_manager:addDelayTask(
+        CurrentTime,
+        CurrentTime + ?TIMER_SPACE,
+        qp_user, timer_callback, [self()]),
+      {ok,
+        wait_login,
+        #state{
+          receiveMonitor = ReceiveMonitor,
+          sockModule = SockModule,
+          sockData = SocketData,
+          last_recv_packet_time = CurrentTime
+        }};
+    Other ->
+      ?FILE_LOG_ERROR("socket init peername fail reason=[~p]", [Other]),
+      {stop, normal}
+  end.
 
 
 %%--------------------------------------------------------------------
@@ -141,24 +141,24 @@ init([SockModule, SocketData]) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(wait_login(Event :: term(), State :: #state{}) ->
-    {next_state, NextStateName :: atom(), NextState :: #state{}} |
-    {next_state, NextStateName :: atom(), NextState :: #state{},
-     timeout() | hibernate} |
-    {stop, Reason :: term(), NewState :: #state{}}).
+  {next_state, NextStateName :: atom(), NextState :: #state{}} |
+  {next_state, NextStateName :: atom(), NextState :: #state{},
+    timeout() | hibernate} |
+  {stop, Reason :: term(), NewState :: #state{}}).
 wait_login(_Event, State) ->
-    {next_state, state_name, State}.
+  {next_state, state_name, State}.
 
 
 hall(_Event, State) ->
-    {next_state, state_name, State}.
+  {next_state, state_name, State}.
 
 
 room(_Event, State) ->
-    {next_state, state_name, State}.
+  {next_state, state_name, State}.
 
 
 game(_Event, State) ->
-    {next_state, state_name, State}.
+  {next_state, state_name, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -196,32 +196,32 @@ game(_Event, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_event(Event :: term(), StateName :: atom(),
-                   StateData :: #state{}) ->
-                      {next_state, NextStateName :: atom(), NewStateData :: #state{}} |
-                      {next_state, NextStateName :: atom(), NewStateData :: #state{},
-                       timeout() | hibernate} |
-                      {stop, Reason :: term(), NewStateData :: #state{}}).
+    StateData :: #state{}) ->
+  {next_state, NextStateName :: atom(), NewStateData :: #state{}} |
+  {next_state, NextStateName :: atom(), NewStateData :: #state{},
+    timeout() | hibernate} |
+  {stop, Reason :: term(), NewStateData :: #state{}}).
 handle_event({complete_packet, Bin}, StateName, #state{last_recv_packet_time = OldLastRecvPacketTime} = State) ->
-    try
-        Request = qp_proto:decode_qp_packet(Bin),
-        {NewStateName, NewState, IsUpdate} = packet_handle(Request, StateName, State),
-        true = is_record(NewState, state),
-        true = (IsUpdate =:= true orelse IsUpdate =:= false),
-        state_name_check(NewStateName),
+  try
+    Request = qp_proto:decode_qp_packet(Bin),
+    {NewStateName, NewState, IsUpdate} = packet_handle(Request, StateName, State),
+    true = is_record(NewState, state),
+    true = (IsUpdate =:= true orelse IsUpdate =:= false),
+    state_name_check(NewStateName),
 
-        NewLastRecvPacketTime =
-            if
-                IsUpdate =:= true -> qp_util:timestamp();
-                true -> OldLastRecvPacketTime
-            end,
-        {next_state, NewStateName, NewState#state{last_recv_packet_time = NewLastRecvPacketTime}}
-    catch
-        What:Type ->
-            ?FILE_LOG_ERROR("~p, ~p, ~p", [What, Type, erlang:get_stacktrace()]),
-            {stop, normal, State}
-    end;
+    NewLastRecvPacketTime =
+      if
+        IsUpdate =:= true -> qp_util:timestamp();
+        true -> OldLastRecvPacketTime
+      end,
+    {next_state, NewStateName, NewState#state{last_recv_packet_time = NewLastRecvPacketTime}}
+  catch
+    What:Type ->
+      ?FILE_LOG_ERROR("~p, ~p, ~p", [What, Type, erlang:get_stacktrace()]),
+      {stop, normal, State}
+  end;
 handle_event(_Event, StateName, State) ->
-    {next_state, StateName, State}.
+  {next_state, StateName, State}.
 
 
 state_name_check(wait_login) -> ok;
@@ -239,18 +239,18 @@ state_name_check(game) -> ok.
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_sync_event(Event :: term(), From :: {pid(), Tag :: term()},
-                        StateName :: atom(), StateData :: term()) ->
-                           {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term()} |
-                           {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term(),
-                            timeout() | hibernate} |
-                           {next_state, NextStateName :: atom(), NewStateData :: term()} |
-                           {next_state, NextStateName :: atom(), NewStateData :: term(),
-                            timeout() | hibernate} |
-                           {stop, Reason :: term(), Reply :: term(), NewStateData :: term()} |
-                           {stop, Reason :: term(), NewStateData :: term()}).
+    StateName :: atom(), StateData :: term()) ->
+  {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term()} |
+  {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term(),
+    timeout() | hibernate} |
+  {next_state, NextStateName :: atom(), NewStateData :: term()} |
+  {next_state, NextStateName :: atom(), NewStateData :: term(),
+    timeout() | hibernate} |
+  {stop, Reason :: term(), Reply :: term(), NewStateData :: term()} |
+  {stop, Reason :: term(), NewStateData :: term()}).
 handle_sync_event(_Event, _From, StateName, State) ->
-    Reply = ok,
-    {reply, Reply, StateName, State}.
+  Reply = ok,
+  {reply, Reply, StateName, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -262,31 +262,31 @@ handle_sync_event(_Event, _From, StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_info(Info :: term(), StateName :: atom(),
-                  StateData :: term()) ->
-                     {next_state, NextStateName :: atom(), NewStateData :: term()} |
-                     {next_state, NextStateName :: atom(), NewStateData :: term(),
-                      timeout() | hibernate} |
-                     {stop, Reason :: normal | term(), NewStateData :: term()}).
+    StateData :: term()) ->
+  {next_state, NextStateName :: atom(), NewStateData :: term()} |
+  {next_state, NextStateName :: atom(), NewStateData :: term(),
+    timeout() | hibernate} |
+  {stop, Reason :: normal | term(), NewStateData :: term()}).
 handle_info(closed, _StateName, State) ->
-    ?FILE_LOG_DEBUG("qp_user socket close", []),
-    {stop, normal, State};
+  ?FILE_LOG_DEBUG("qp_user socket close", []),
+  {stop, normal, State};
 handle_info(timeout_check, StateName, #state{last_recv_packet_time = LastRecvPackTime} = State) ->
-    CurrentTime = qp_util:timestamp(),
-    SpacheTime = CurrentTime - LastRecvPackTime,
-    if
-        SpacheTime > ?RECV_TIMEOUT ->
-            ?FILE_LOG_DEBUG("timeout_check true state_name=~p, exit.", [StateName]),
-            {stop,normal,State};
-        true ->
-            ?FILE_LOG_DEBUG("timeout_check space_time=~p , not timeout.", [SpacheTime]),
-            timer_manager:addDelayTask(
-                CurrentTime,
-                CurrentTime + ?TIMER_SPACE,
-                qp_user, timer_callback, [self()]),
-            {next_state, StateName, State}
-    end;
+  CurrentTime = qp_util:timestamp(),
+  SpacheTime = CurrentTime - LastRecvPackTime,
+  if
+    SpacheTime > ?RECV_TIMEOUT ->
+      ?FILE_LOG_DEBUG("timeout_check true state_name=~p, exit.", [StateName]),
+      {stop,normal,State};
+    true ->
+      ?FILE_LOG_DEBUG("timeout_check space_time=~p , not timeout.", [SpacheTime]),
+      timer_manager:addDelayTask(
+        CurrentTime,
+        CurrentTime + ?TIMER_SPACE,
+        qp_user, timer_callback, [self()]),
+      {next_state, StateName, State}
+  end;
 handle_info(_Info, StateName, State) ->
-    {next_state, StateName, State}.
+  {next_state, StateName, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -299,12 +299,12 @@ handle_info(_Info, StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate(Reason :: normal | shutdown | {shutdown, term()}
-                | term(), StateName :: atom(), StateData :: term()) ->
-                   term()).
+| term(), StateName :: atom(), StateData :: term()) ->
+  term()).
 terminate(_Reason, _StateName, State) ->
-    ?FILE_LOG_DEBUG("qp_user terminate", []),
-    (State#state.sockModule):close(State#state.sockData),
-    ok.
+  ?FILE_LOG_DEBUG("qp_user terminate", []),
+  (State#state.sockModule):close(State#state.sockData),
+  ok.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -314,98 +314,132 @@ terminate(_Reason, _StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(code_change(OldVsn :: term() | {down, term()}, StateName :: atom(),
-                  StateData :: #state{}, Extra :: term()) ->
-                     {ok, NextStateName :: atom(), NewStateData :: #state{}}).
+    StateData :: #state{}, Extra :: term()) ->
+  {ok, NextStateName :: atom(), NewStateData :: #state{}}).
 code_change(_OldVsn, StateName, State, _Extra) ->
-    {ok, StateName, State}.
+  {ok, StateName, State}.
 
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
 
 send_bin(State, Bin) ->
-    (State#state.sockModule):send(State#state.sockData, Bin).
+  (State#state.sockModule):send(State#state.sockData, Bin).
 
 
 packet_handle(#qp_login_req{account = Account}, wait_login, #state{room_data = undefined} = State) ->
-    ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
-    {success, {UserId, Gold, NickName, AvatarUrl}} = qp_db:load_user_data_by_acc(Account),
-    ProtoUserData = #qp_user_data{user_id = UserId, gold = Gold, avatar_url = AvatarUrl, nick_name = NickName},
-    Rsp = #qp_login_rsp{state = 0, data = ProtoUserData},
-    RspBin = qp_proto:encode_qp_packet(Rsp),
-    (State#state.sockModule):send(State#state.sockData, RspBin),
-    StateUserData = #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl},
-    {hall, State#state{user_data = StateUserData}, true};
+  ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
+  {success, {UserId, Gold, NickName, AvatarUrl}} = qp_db:load_user_data_by_acc(Account),
+  ProtoUserData = #qp_user_data{user_id = UserId, gold = Gold, avatar_url = AvatarUrl, nick_name = NickName},
+  Rsp = #qp_login_rsp{state = 0, data = ProtoUserData},
+  RspBin = qp_proto:encode_qp_packet(Rsp),
+  (State#state.sockModule):send(State#state.sockData, RspBin),
+  StateUserData = #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl},
+  {hall, State#state{user_data = StateUserData}, true};
 packet_handle(Request, wait_login, State) ->
-    ?FILE_LOG_WARNING("wait_login request=~p", [Request]),
-    {wait_login, State, false};
+  ?FILE_LOG_WARNING("wait_login request=~p", [Request]),
+  {wait_login, State, false};
 
 
 packet_handle(#qp_create_room_req{room_type = RoomType} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
-    ?FILE_LOG_DEBUG("hall request=~p", [Request]),
-    #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl} = UserData,
-    case qp_room_manager:create_room(UserId, RoomType) of
-        {success, {RoomId, RoomPid}} ->
-            ?FILE_LOG_DEBUG("user_id=~p, create_room success, room_id=~p, room_pid=~p", [UserId, RoomId, RoomPid]),
-            case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
-                {success, {SeatNum, _IsReady, []}} ->
-                    Rsp = #qp_create_room_rsp{state = 0, room_id = RoomId, seat_id = SeatNum},
-                    RspBin = qp_proto:encode_qp_packet(Rsp),
-                    (State#state.sockModule):send(State#state.sockData, RspBin),
-                    RoomData = #room_data{room_id = RoomId, seat_num = SeatNum, room_pid = RoomPid},
-                    {room, State#state{room_data = RoomData}, true};
-                failed ->
-                    %%进入失败
-                    ?FILE_LOG_DEBUG("user_id=~p, create_room success, join failed", [UserId]),
-                    send_bin(State, qp_packet_util:create_room_failed_bin(-2)),
-                    {hall, State, true}
-            end;
+  ?FILE_LOG_DEBUG("hall request=~p", [Request]),
+  #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl} = UserData,
+  case qp_room_manager:create_room(UserId, RoomType) of
+    {success, {RoomId, RoomPid}} ->
+      ?FILE_LOG_DEBUG("user_id=~p, create_room success, room_id=~p, room_pid=~p", [UserId, RoomId, RoomPid]),
+      case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
+        {success, {SeatNum, false, []}} ->
+          Rsp = #qp_create_room_rsp{state = 0, room_id = RoomId, seat_id = SeatNum},
+          RspBin = qp_proto:encode_qp_packet(Rsp),
+          (State#state.sockModule):send(State#state.sockData, RspBin),
+          RoomData = #room_data{room_id = RoomId, seat_num = SeatNum, room_pid = RoomPid},
+          {room, State#state{room_data = RoomData}, true};
         failed ->
-            %%创建房间失败
-            ?FILE_LOG_WARNING("user_id=~p, create_room failed", [UserId]),
-            send_bin(State, qp_packet_util:create_room_failed_bin(-1)),
-            {hall, State, true}
-    end;
+          %%进入失败
+          ?FILE_LOG_DEBUG("user_id=~p, create_room success, join failed", [UserId]),
+          send_bin(State, qp_packet_util:create_room_failed_bin(-2)),
+          {hall, State, true}
+      end;
+    failed ->
+      %%创建房间失败
+      ?FILE_LOG_WARNING("user_id=~p, create_room failed", [UserId]),
+      send_bin(State, qp_packet_util:create_room_failed_bin(-1)),
+      {hall, State, true}
+  end;
 packet_handle(#qp_join_room_req{room_id = RoomId} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
-    ?FILE_LOG_DEBUG("hall request=~p", [Request]),
-    {room, State, true};
+  ?FILE_LOG_DEBUG("hall request=~p", [Request]),
+  #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl} = UserData,
+  case qp_room_manager:get_room_pid(RoomId) of
+    failed ->
+      ?FILE_LOG_WARNING("user_id=~p, join_room[~p] failed.", [UserId, RoomId]),
+      {room, State, true};
+    {success, RoomPid} ->
+      case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
+        {success, {SeatNum, false, RoomUsers}} ->
+          PbRoomUsers=
+            lists:map(
+              fun(RoomUser) ->
+                {RoomUserData, RoomUserSeatNum, IsReady} = RoomUser,
+                #qp_room_user{
+                  user_data =
+                  #qp_user_data{
+                    user_id = RoomUserData:get(user_id),
+                    gold = RoomUserData:get(gold),
+                    avatar_url = RoomUserData:get(avatar_url),
+                    nick_name = RoomUserData:get(nick_name)},
+                  seat_number = RoomUserSeatNum,
+                  is_ready = IsReady
+                }
+              end, RoomUsers),
+          Rsp = #qp_join_room_rsp{result = 0, seat_number = SeatNum, is_ready = false, room_user = PbRoomUsers},
+          RspBin = qp_proto:encode_qp_packet(Rsp),
+          (State#state.sockModule):send(State#state.sockData, RspBin),
+          RoomData = #room_data{room_id = RoomId, seat_num = SeatNum, room_pid = RoomPid},
+          {room, State#state{room_data = RoomData}, true};
+        failed ->
+          %%进入失败
+          ?FILE_LOG_DEBUG("user_id=~p, get_room_pid[~p] failed", [UserId, RoomId]),
+          send_bin(State, qp_packet_util:create_room_failed_bin(-1)),
+          {hall, State, true}
+      end
+  end;
 packet_handle(#qp_ping_req{} = Request, hall, #state{room_data = undefined} = State) ->
-    ?FILE_LOG_DEBUG("hall request=~p", [Request]),
-    send_bin(State, qp_packet_util:create_ping_rsp_bin()),
-    {hall, State, true};
+  ?FILE_LOG_DEBUG("hall request=~p", [Request]),
+  send_bin(State, qp_packet_util:create_ping_rsp_bin()),
+  {hall, State, true};
 packet_handle(Request, hall, State) ->
-    ?FILE_LOG_DEBUG("hall request=~p", [Request]),
-    {hall, State, false};
+  ?FILE_LOG_DEBUG("hall request=~p", [Request]),
+  {hall, State, false};
 
 
 packet_handle(#qp_ready_req{}=Request, room, State) ->
-    ?FILE_LOG_DEBUG("room request=~p", [Request]),
-    {room, State, true};
+  ?FILE_LOG_DEBUG("room request=~p", [Request]),
+  {room, State, true};
 packet_handle(#qp_ping_req{} = Request, room, State) ->
-    ?FILE_LOG_DEBUG("room request=~p", [Request]),
-    send_bin(State, qp_packet_util:create_ping_rsp_bin()),
-    {room, State, true};
+  ?FILE_LOG_DEBUG("room request=~p", [Request]),
+  send_bin(State, qp_packet_util:create_ping_rsp_bin()),
+  {room, State, true};
 packet_handle(#qp_exit_room_req{} = Request, room, State) ->
-    ?FILE_LOG_DEBUG("room request=~p", [Request]),
-    {hall, State, true};
+  ?FILE_LOG_DEBUG("room request=~p", [Request]),
+  {hall, State, true};
 packet_handle(Request, room, State) ->
-    ?FILE_LOG_DEBUG("room request=~p", [Request]),
-    {room, State, false};
+  ?FILE_LOG_DEBUG("room request=~p", [Request]),
+  {room, State, false};
 
 
 packet_handle(#qp_game_data{}=Request, game, State) ->
-    ?FILE_LOG_DEBUG("game request=~p", [Request]),
-    {game, State, true};
+  ?FILE_LOG_DEBUG("game request=~p", [Request]),
+  {game, State, true};
 packet_handle(#qp_ping_req{} = Request, game, State) ->
-    ?FILE_LOG_DEBUG("game request=~p", [Request]),
-    send_bin(State, qp_packet_util:create_ping_rsp_bin()),
-    {game, State, true};
+  ?FILE_LOG_DEBUG("game request=~p", [Request]),
+  send_bin(State, qp_packet_util:create_ping_rsp_bin()),
+  {game, State, true};
 packet_handle(#qp_exit_room_req{} = Request, game, State) ->
-    ?FILE_LOG_DEBUG("game request=~p", [Request]),
-    {hall, State, true};
+  ?FILE_LOG_DEBUG("game request=~p", [Request]),
+  {hall, State, true};
 packet_handle(Request, game, State) ->
-    ?FILE_LOG_DEBUG("game request=~p", [Request]),
-    {game, State, false}.
+  ?FILE_LOG_DEBUG("game request=~p", [Request]),
+  {game, State, false}.
 
 
 
