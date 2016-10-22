@@ -135,7 +135,7 @@ namespace client_lib
 					return true;
 				}
 				const char *bufOffset = buffer_.peek();
-				unsigned short packetSize = endian::networkToHost16(*(unsigned short *)bufOffset);
+				unsigned short packetSize = endian::networkToHost32(*(unsigned short *)bufOffset);
 
                 int totalLen = packetSize + packet_head_size;
 				if (readableBbyte < totalLen)

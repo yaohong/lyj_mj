@@ -131,9 +131,9 @@ void sendPacket( client_lib::Socket &socket, const google::protobuf::Message* ms
     root.set_seq_id( 0 );
 
     int rootSize = root.ByteSize();
-    root.SerializeToArray( msgBuf + 2, DEFAULT_BUFF_SIZE );
-    *((unsigned short *)msgBuf) = endian::hostToNetwork16( rootSize );
+    root.SerializeToArray( msgBuf + 4, DEFAULT_BUFF_SIZE );
+    *((unsigned int *)msgBuf) = endian::hostToNetwork32( rootSize );
     
-    socket.Send( msgBuf, rootSize + 2 );
+    socket.Send( msgBuf, rootSize + 4 );
 }
 

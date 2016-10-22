@@ -41,7 +41,7 @@ message qp_login_req {
 }
 
 message qp_user_data {
-    required string user_id = 1;
+    required uint32 user_id = 1;
     required int64 gold = 2;
     required string avatar_url = 3;
     required string nick_name = 4;
