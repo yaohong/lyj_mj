@@ -12,12 +12,12 @@
 -behaviour(gen_fsm).
 
 %% API
--export([start_link/2]).
-
+-export([start_link/3]).
+-include("../deps/file_log/include/file_log.hrl").
 %% gen_fsm callbacks
 -export([init/1,
-         idle/2,
-         game/2,
+%%         idle/2,
+%%         game/2,
          idle/3,
          game/3,
          handle_event/3,
@@ -28,13 +28,21 @@
 -export([join/2]).
 -define(SERVER, ?MODULE).
 
--record(state, {}).
+-record(state, {
+    owner_user_id :: integer(),         %%房间管理员的ID
+    owner_is_join :: boolean(),         %%管理员是否进入
+    room_id :: integer(),               %%房间ID
+    room_type :: integer(),             %%房间类型(麻将玩法类型)
+    seat_tree :: gb_trees:tree()        %%描述四个座位
+}).
+
+-record(seat_data, {user_data=undefined, is_ready=false}).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
-join(RoomPid, UserKey) ->
-    gen_fsm:sync_send_event(RoomPid, {join, UserKey}).
+join(RoomPid, UserData) ->
+    gen_fsm:sync_send_event(RoomPid, {join, UserData}).
 %%--------------------------------------------------------------------
 %% @doc
 %% Creates a gen_fsm process which calls Module:init/1 to
@@ -43,10 +51,10 @@ join(RoomPid, UserKey) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(start_link(OwnerUserId :: integer(), RoomType :: integer()) ->
+-spec(start_link(OwnerUserId :: integer(), RoomId :: integer(), RoomType :: integer()) ->
     {ok, pid()} | ignore | {error, Reason :: term()}).
-start_link(OwnerUserId, RoomType) ->
-    gen_fsm:start_link(?MODULE, [OwnerUserId, RoomType], []).
+start_link(OwnerUserId, RoomId, RoomType) ->
+    gen_fsm:start_link(?MODULE, [OwnerUserId, RoomId, RoomType], []).
 
 %%%===================================================================
 %%% gen_fsm callbacks
@@ -65,8 +73,13 @@ start_link(OwnerUserId, RoomType) ->
     {ok, StateName :: atom(), StateData :: #state{}} |
     {ok, StateName :: atom(), StateData :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
-init([]) ->
-    {ok, state_name, #state{}}.
+init([OwnerUserId, RoomId, RoomType]) ->
+    EmptyTree = gb_trees:empty(),
+    Tree0 = gb_trees:insert(0, #seat_data{}, EmptyTree),
+    Tree1 = gb_trees:insert(1, #seat_data{}, Tree0),
+    Tree2 = gb_trees:insert(2, #seat_data{}, Tree1),
+    Tree3 = gb_trees:insert(3, #seat_data{}, Tree2),
+    {ok, idle, #state{owner_user_id = OwnerUserId, owner_is_join = false, room_id = RoomId,room_type = RoomType, seat_tree = Tree3}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -79,17 +92,17 @@ init([]) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(idle(Event :: term(), State :: #state{}) ->
-    {next_state, NextStateName :: atom(), NextState :: #state{}} |
-    {next_state, NextStateName :: atom(), NextState :: #state{},
-     timeout() | hibernate} |
-    {stop, Reason :: term(), NewState :: #state{}}).
-idle(_Event, State) ->
-    {next_state, state_name, State}.
-
-
-game(_Event, State) ->
-    {next_state, state_name, State}.
+%%-spec(idle(Event :: term(), State :: #state{}) ->
+%%    {next_state, NextStateName :: atom(), NextState :: #state{}} |
+%%    {next_state, NextStateName :: atom(), NextState :: #state{},
+%%     timeout() | hibernate} |
+%%    {stop, Reason :: term(), NewState :: #state{}}).
+%%idle(_Event, State) ->
+%%    {next_state, state_name, State}.
+%%
+%%
+%%game(_Event, State) ->
+%%    {next_state, state_name, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -102,6 +115,30 @@ game(_Event, State) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
+find_idle_seat([], _SeatTree) ->
+    false;
+find_idle_seat([SeatNumer|T], SeatTree) ->
+    {value, SeatData} = gb_trees:lookup(SeatNumer, SeatTree),
+    if
+        SeatData#seat_data.user_data =:= undefined -> {true, SeatNumer};
+        true -> find_idle_seat(T, SeatTree)
+    end.
+
+%%提取房间里的所有玩家
+extract_room_users(SeatTree) ->
+    extract_room_users([0,1,2,3], SeatTree, []).
+extract_room_users([], _,  Users) -> Users;
+extract_room_users([SeatNum|T], SeatTree, Users) ->
+    {value, SeatData} = gb_trees:get(SeatNum, SeatTree),
+    if
+        SeatData#seat_data.user_data =:= undefined ->
+            %%座位上没有人
+            extract_room_users(T, SeatTree, Users);
+        true ->
+            RoomUser = {SeatData#seat_data.user_data, SeatNum, SeatData#seat_data.is_ready},
+            extract_room_users(T, SeatTree, [RoomUser|Users])
+    end.
+
 -spec(idle(Event :: term(), From :: {pid(), term()},
            State :: #state{}) ->
               {next_state, NextStateName :: atom(), NextState :: #state{}} |
@@ -113,8 +150,37 @@ game(_Event, State) ->
               {stop, Reason :: normal | term(), NewState :: #state{}} |
               {stop, Reason :: normal | term(), Reply :: term(),
                NewState :: #state{}}).
-idle({join, UserKey}, _From, State) ->
-    ok;
+idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join = OwnerIsJoin, room_id = RoomId, seat_tree = SeatTree} = State) ->
+    JoinUserId = UserData:get(user_id),
+    if
+        OwnerIsJoin =:= false andalso JoinUserId =/= OwnerUserId ->
+            %%管理员还没有进入，进入失败
+            ?FILE_LOG_WARNING("join room[~p] failed, owner_is_join=~p, owner_user_id=~p, join_user_id=~p", [RoomId, OwnerIsJoin, OwnerUserId, JoinUserId]),
+            {reply, failed, idle, State};
+        OwnerIsJoin =:= false andalso JoinUserId =:= OwnerUserId ->
+            %%管理员进入,进入0号位置
+            SeatData = gb_trees:get(0, SeatTree),
+            true = SeatData#seat_data.user_data =:= undefined,
+            true = SeatData#seat_data.is_ready =:= false,
+            NewSeatTree = gb_trees:update(0, SeatData#seat_data{user_data = UserData}, SeatTree),
+            ?FILE_LOG_WARNING("join room[~p] success, owner_user_id=~p, join_user_id=~p", [RoomId, OwnerUserId, JoinUserId]),
+            {reply, {success, {0, false, []}}, idle, State#state{owner_is_join = true, seat_tree = NewSeatTree}};
+        true ->
+            %%普通玩家进入
+            case find_idle_seat([1,2,3], SeatTree) of
+                false ->
+                    %%没有空闲座位了
+                    ?FILE_LOG_WARNING("join room[~p] failed, not idle seat, join_user_id=~p", [RoomId, JoinUserId]),
+                    {reply, failed, idle, State};
+                {true, SeatNum} ->
+                    %%找到座位号了
+                    %%获取其他位置的玩家信息
+                    RoomUsers = extract_room_users(SeatTree),
+                    NewSeatTree = gb_trees:update(SeatNum, SeatData#seat_data{user_data = UserData, is_ready = false}, SeatTree),
+                    ?FILE_LOG_WARNING("join room[~p] success, owner_user_id=~p, join_user_id=~p", [RoomId, OwnerUserId, JoinUserId]),
+                    {reply, {success, {SeatNum, false, RoomUsers}}, idle, State#state{seat_tree = NewSeatTree}}
+            end
+    end;
 idle(_Event, _From, State) ->
     Reply = ok,
     {reply, Reply, state_name, State}.

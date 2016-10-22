@@ -95,7 +95,7 @@ handle_call({create_room, {OwnerUserId, RoomType}}, _From, State) ->
         case create_room() of
             failed -> failed;
             {success, RoomId} ->
-                case qp_room:start_link(OwnerUserId, RoomType) of
+                case qp_room:start_link(OwnerUserId, RoomId, RoomType) of
                     {ok, RoomPid} ->
                         ets:insert(
                             room_data,
@@ -151,7 +151,9 @@ handle_cast(_Request, State) ->
     {noreply, NewState :: #state{}} |
     {noreply, NewState :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term(), NewState :: #state{}}).
-handle_info(_Info, State) ->
+
+handle_info(Info, State) ->
+    ?FILE_LOG_DEBUG("~p", [Info]),
     {noreply, State}.
 
 %%--------------------------------------------------------------------

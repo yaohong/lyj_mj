@@ -68,6 +68,9 @@ complete_packet(Pid, Bin) when is_pid(Pid) andalso is_binary(Bin) ->
 timer_callback(_Ref, Pid) ->
     Pid ! timeout_check.
 
+
+
+
 %%--------------------------------------------------------------------
 %% @doc
 %% Creates a gen_fsm process which calls Module:init/1 to
@@ -340,10 +343,10 @@ packet_handle(Request, wait_login, State) ->
 
 packet_handle(#qp_create_room_req{room_type = RoomType} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
     ?FILE_LOG_WARNING("hall request=~p", [Request]),
-    #user_data{user_id = UserId} = UserData,
+    #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl} = UserData,
     case qp_room_manager:create_room(UserId, RoomType) of
         {success, {RoomId, RoomPid}} ->
-            case qp_room:join(RoomPid, user_key:new(UserId, self())) of
+            case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
                 {success, {SeatNum, _IsReady, []}} ->
                     Rsp = #qp_create_room_rsp{state = 0, room_id = RoomId, seat_id = SeatNum},
                     RspBin = qp_proto:encode_qp_packet(Rsp),
@@ -363,7 +366,7 @@ packet_handle(#qp_create_room_req{room_type = RoomType} = Request, hall, #state{
             send_bin(State, qp_packet_util:create_room_failed_bin(-1)),
             {hall, State, true}
     end;
-packet_handle(#qp_join_room_req{} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
+packet_handle(#qp_join_room_req{room_id = RoomId} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
     ?FILE_LOG_WARNING("hall request=~p", [Request]),
     {room, State, true};
 packet_handle(#qp_ping_req{} = Request, hall, #state{room_data = undefined} = State) ->
