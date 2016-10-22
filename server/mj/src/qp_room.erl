@@ -123,7 +123,7 @@ init([OwnerUserId, RoomId, RoomType]) ->
 find_idle_seat([], _SeatTree) ->
     false;
 find_idle_seat([SeatNumer|T], SeatTree) ->
-    {value, SeatData} = gb_trees:lookup(SeatNumer, SeatTree),
+    SeatData = gb_trees:get(SeatNumer, SeatTree),
     if
         SeatData =:= undefined -> {true, SeatNumer};
         true -> find_idle_seat(T, SeatTree)
@@ -134,7 +134,7 @@ extract_room_users(SeatTree) ->
     extract_room_users([0,1,2,3], SeatTree, []).
 extract_room_users([], _,  Users) -> Users;
 extract_room_users([SeatNum|T], SeatTree, Users) ->
-    {value, SeatData} = gb_trees:get(SeatNum, SeatTree),
+    SeatData = gb_trees:get(SeatNum, SeatTree),
     if
         SeatData =:= undefined ->
             %%座位上没有人
