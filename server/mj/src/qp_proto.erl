@@ -62,4 +62,4 @@ encode_qp_packet(Cmd, Body) ->
     Packet = #qp_packet{cmd = Cmd, serialized = Body, seq_id = 0},
     Bin = mj_pb:encode_qp_packet(Packet),
     Len = size(Bin),
-    <<Len:?BIG_UINT16, Bin/binary>>.
+    <<Len:?BIG_UINT32, Bin/binary>>.

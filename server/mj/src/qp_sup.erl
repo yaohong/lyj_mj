@@ -50,7 +50,7 @@ init([]) ->
 	QpServer =
 		{
 			qp_server,
-		 	{tcp_server, start_link, [qp_util:ipstr_to_v4(ListenIp), ListenPort, qp_server, qp_user, 2, qp_user_sup, qp_receiver_sup, 256 * 1024]},
+		 	{tcp_server, start_link, [qp_util:ipstr_to_v4(ListenIp), ListenPort, qp_server, qp_user, 4, qp_user_sup, qp_receiver_sup, 256 * 1024]},
 			transient,
 		 	brutal_kill,
 		 	supervisor,

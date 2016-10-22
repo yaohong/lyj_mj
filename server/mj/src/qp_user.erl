@@ -56,7 +56,7 @@
 %%%===================================================================
 head_len(HeadBin, _HeadLen) when is_binary(HeadBin) ->
     %%读取头
-    <<PacketSize:?BIG_UINT16>> = HeadBin,
+    <<PacketSize:?BIG_UINT32>> = HeadBin,
     PacketSize.
 
 closed(Pid) when is_pid(Pid) ->
