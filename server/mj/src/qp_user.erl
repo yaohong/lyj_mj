@@ -327,12 +327,12 @@ send_bin(State, Bin) ->
 packet_handle(#qp_login_req{account = Account}, wait_login, #state{room_data = undefined} = State) ->
     ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
     {success, {UserId, Gold, NickName, AvatarUrl}} = qp_db:load_user_data_by_acc(Account),
-    UserData = #qp_user_data{user_id = UserId, gold = Gold, avatar_url = AvatarUrl, nick_name = NickName},
-    Rsp = #qp_login_rsp{state = 0, data = UserData},
+    ProtoUserData = #qp_user_data{user_id = UserId, gold = Gold, avatar_url = AvatarUrl, nick_name = NickName},
+    Rsp = #qp_login_rsp{state = 0, data = ProtoUserData},
     RspBin = qp_proto:encode_qp_packet(Rsp),
     (State#state.sockModule):send(State#state.sockData, RspBin),
-    UserData = #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl},
-    {hall, State#state{user_data = UserData}, true};
+    StateUserData = #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl},
+    {hall, State#state{user_data = StateUserData}, true};
 packet_handle(Request, wait_login, State) ->
     ?FILE_LOG_WARNING("wait_login request=~p", [Request]),
     {wait_login, State, false};
