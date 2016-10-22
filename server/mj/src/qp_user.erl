@@ -368,6 +368,7 @@ packet_handle(#qp_join_room_req{} = Request, hall, #state{user_data = UserData, 
     {room, State, true};
 packet_handle(#qp_ping_req{} = Request, hall, #state{room_data = undefined} = State) ->
     ?FILE_LOG_WARNING("hall request=~p", [Request]),
+    send_bin(State, qp_packet_util:create_ping_rsp_bin()),
     {hall, State, true};
 packet_handle(Request, hall, State) ->
     ?FILE_LOG_WARNING("hall request=~p", [Request]),
@@ -379,6 +380,7 @@ packet_handle(#qp_ready_req{}=Request, room, State) ->
     {room, State, true};
 packet_handle(#qp_ping_req{} = Request, room, State) ->
     ?FILE_LOG_WARNING("room request=~p", [Request]),
+    send_bin(State, qp_packet_util:create_ping_rsp_bin()),
     {room, State, true};
 packet_handle(#qp_exit_room_req{} = Request, room, State) ->
     ?FILE_LOG_WARNING("room request=~p", [Request]),
@@ -393,8 +395,9 @@ packet_handle(#qp_game_data{}=Request, game, State) ->
     {game, State, true};
 packet_handle(#qp_ping_req{} = Request, game, State) ->
     ?FILE_LOG_WARNING("game request=~p", [Request]),
+    send_bin(State, qp_packet_util:create_ping_rsp_bin()),
     {game, State, true};
-packet_handle(#qp_exit_room_req{} = Request, room, State) ->
+packet_handle(#qp_exit_room_req{} = Request, game, State) ->
     ?FILE_LOG_WARNING("game request=~p", [Request]),
     {hall, State, true};
 packet_handle(Request, game, State) ->
