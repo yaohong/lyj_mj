@@ -493,7 +493,7 @@ void protobuf_AddDesc_mj_2eproto() {
     "\n\010mj.proto\022\tqp_server\"<\n\tqp_packet\022\013\n\003cm"
     "d\030\001 \002(\005\022\016\n\006seq_id\030\002 \002(\r\022\022\n\nserialized\030\003 "
     "\001(\014\"\037\n\014qp_login_req\022\017\n\007account\030\001 \002(\t\"T\n\014"
-    "qp_user_data\022\017\n\007user_id\030\001 \002(\t\022\014\n\004gold\030\002 "
+    "qp_user_data\022\017\n\007user_id\030\001 \002(\r\022\014\n\004gold\030\002 "
     "\002(\003\022\022\n\navatar_url\030\003 \002(\t\022\021\n\tnick_name\030\004 \002"
     "(\t\"D\n\014qp_login_rsp\022\r\n\005state\030\001 \002(\005\022%\n\004dat"
     "a\030\002 \001(\0132\027.qp_server.qp_user_data\"\'\n\022qp_c"
@@ -1153,7 +1153,7 @@ qp_user_data::qp_user_data(const qp_user_data& from)
 
 void qp_user_data::SharedCtor() {
   _cached_size_ = 0;
-  user_id_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  user_id_ = 0u;
   gold_ = GOOGLE_LONGLONG(0);
   avatar_url_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   nick_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
@@ -1165,9 +1165,6 @@ qp_user_data::~qp_user_data() {
 }
 
 void qp_user_data::SharedDtor() {
-  if (user_id_ != &::google::protobuf::internal::kEmptyString) {
-    delete user_id_;
-  }
   if (avatar_url_ != &::google::protobuf::internal::kEmptyString) {
     delete avatar_url_;
   }
@@ -1201,11 +1198,7 @@ qp_user_data* qp_user_data::New() const {
 
 void qp_user_data::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (has_user_id()) {
-      if (user_id_ != &::google::protobuf::internal::kEmptyString) {
-        user_id_->clear();
-      }
-    }
+    user_id_ = 0u;
     gold_ = GOOGLE_LONGLONG(0);
     if (has_avatar_url()) {
       if (avatar_url_ != &::google::protobuf::internal::kEmptyString) {
@@ -1228,15 +1221,14 @@ bool qp_user_data::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required string user_id = 1;
+      // required uint32 user_id = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_user_id()));
-          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
-            this->user_id().data(), this->user_id().length(),
-            ::google::protobuf::internal::WireFormat::PARSE);
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &user_id_)));
+          set_has_user_id();
         } else {
           goto handle_uninterpreted;
         }
@@ -1312,13 +1304,9 @@ bool qp_user_data::MergePartialFromCodedStream(
 
 void qp_user_data::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required string user_id = 1;
+  // required uint32 user_id = 1;
   if (has_user_id()) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
-      this->user_id().data(), this->user_id().length(),
-      ::google::protobuf::internal::WireFormat::SERIALIZE);
-    ::google::protobuf::internal::WireFormatLite::WriteString(
-      1, this->user_id(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->user_id(), output);
   }
 
   // required int64 gold = 2;
@@ -1352,14 +1340,9 @@ void qp_user_data::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* qp_user_data::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // required string user_id = 1;
+  // required uint32 user_id = 1;
   if (has_user_id()) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
-      this->user_id().data(), this->user_id().length(),
-      ::google::protobuf::internal::WireFormat::SERIALIZE);
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->user_id(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->user_id(), target);
   }
 
   // required int64 gold = 2;
@@ -1398,10 +1381,10 @@ int qp_user_data::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required string user_id = 1;
+    // required uint32 user_id = 1;
     if (has_user_id()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::StringSize(
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
           this->user_id());
     }
 

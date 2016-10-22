@@ -337,17 +337,12 @@ class qp_user_data : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required string user_id = 1;
+  // required uint32 user_id = 1;
   inline bool has_user_id() const;
   inline void clear_user_id();
   static const int kUserIdFieldNumber = 1;
-  inline const ::std::string& user_id() const;
-  inline void set_user_id(const ::std::string& value);
-  inline void set_user_id(const char* value);
-  inline void set_user_id(const char* value, size_t size);
-  inline ::std::string* mutable_user_id();
-  inline ::std::string* release_user_id();
-  inline void set_allocated_user_id(::std::string* user_id);
+  inline ::google::protobuf::uint32 user_id() const;
+  inline void set_user_id(::google::protobuf::uint32 value);
 
   // required int64 gold = 2;
   inline bool has_gold() const;
@@ -393,10 +388,10 @@ class qp_user_data : public ::google::protobuf::Message {
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::std::string* user_id_;
   ::google::protobuf::int64 gold_;
   ::std::string* avatar_url_;
   ::std::string* nick_name_;
+  ::google::protobuf::uint32 user_id_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
@@ -2028,7 +2023,7 @@ inline void qp_login_req::set_allocated_account(::std::string* account) {
 
 // qp_user_data
 
-// required string user_id = 1;
+// required uint32 user_id = 1;
 inline bool qp_user_data::has_user_id() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -2039,63 +2034,15 @@ inline void qp_user_data::clear_has_user_id() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void qp_user_data::clear_user_id() {
-  if (user_id_ != &::google::protobuf::internal::kEmptyString) {
-    user_id_->clear();
-  }
+  user_id_ = 0u;
   clear_has_user_id();
 }
-inline const ::std::string& qp_user_data::user_id() const {
-  return *user_id_;
-}
-inline void qp_user_data::set_user_id(const ::std::string& value) {
-  set_has_user_id();
-  if (user_id_ == &::google::protobuf::internal::kEmptyString) {
-    user_id_ = new ::std::string;
-  }
-  user_id_->assign(value);
-}
-inline void qp_user_data::set_user_id(const char* value) {
-  set_has_user_id();
-  if (user_id_ == &::google::protobuf::internal::kEmptyString) {
-    user_id_ = new ::std::string;
-  }
-  user_id_->assign(value);
-}
-inline void qp_user_data::set_user_id(const char* value, size_t size) {
-  set_has_user_id();
-  if (user_id_ == &::google::protobuf::internal::kEmptyString) {
-    user_id_ = new ::std::string;
-  }
-  user_id_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* qp_user_data::mutable_user_id() {
-  set_has_user_id();
-  if (user_id_ == &::google::protobuf::internal::kEmptyString) {
-    user_id_ = new ::std::string;
-  }
+inline ::google::protobuf::uint32 qp_user_data::user_id() const {
   return user_id_;
 }
-inline ::std::string* qp_user_data::release_user_id() {
-  clear_has_user_id();
-  if (user_id_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = user_id_;
-    user_id_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void qp_user_data::set_allocated_user_id(::std::string* user_id) {
-  if (user_id_ != &::google::protobuf::internal::kEmptyString) {
-    delete user_id_;
-  }
-  if (user_id) {
-    set_has_user_id();
-    user_id_ = user_id;
-  } else {
-    clear_has_user_id();
-    user_id_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
+inline void qp_user_data::set_user_id(::google::protobuf::uint32 value) {
+  set_has_user_id();
+  user_id_ = value;
 }
 
 // required int64 gold = 2;
