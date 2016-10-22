@@ -75,10 +75,10 @@ start_link(OwnerUserId, RoomId, RoomType) ->
     {stop, Reason :: term()} | ignore).
 init([OwnerUserId, RoomId, RoomType]) ->
     EmptyTree = gb_trees:empty(),
-    Tree0 = gb_trees:insert(0, #seat_data{}, EmptyTree),
-    Tree1 = gb_trees:insert(1, #seat_data{}, Tree0),
-    Tree2 = gb_trees:insert(2, #seat_data{}, Tree1),
-    Tree3 = gb_trees:insert(3, #seat_data{}, Tree2),
+    Tree0 = gb_trees:insert(0, undefined, EmptyTree),
+    Tree1 = gb_trees:insert(1, undefined, Tree0),
+    Tree2 = gb_trees:insert(2, undefined, Tree1),
+    Tree3 = gb_trees:insert(3, undefined, Tree2),
     {ok, idle, #state{owner_user_id = OwnerUserId, owner_is_join = false, room_id = RoomId,room_type = RoomType, seat_tree = Tree3}}.
 
 %%--------------------------------------------------------------------
@@ -120,7 +120,7 @@ find_idle_seat([], _SeatTree) ->
 find_idle_seat([SeatNumer|T], SeatTree) ->
     {value, SeatData} = gb_trees:lookup(SeatNumer, SeatTree),
     if
-        SeatData#seat_data.user_data =:= undefined -> {true, SeatNumer};
+        SeatData =:= undefined -> {true, SeatNumer};
         true -> find_idle_seat(T, SeatTree)
     end.
 
@@ -131,7 +131,7 @@ extract_room_users([], _,  Users) -> Users;
 extract_room_users([SeatNum|T], SeatTree, Users) ->
     {value, SeatData} = gb_trees:get(SeatNum, SeatTree),
     if
-        SeatData#seat_data.user_data =:= undefined ->
+        SeatData =:= undefined ->
             %%座位上没有人
             extract_room_users(T, SeatTree, Users);
         true ->
@@ -160,9 +160,8 @@ idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join 
         OwnerIsJoin =:= false andalso JoinUserId =:= OwnerUserId ->
             %%管理员进入,进入0号位置
             SeatData = gb_trees:get(0, SeatTree),
-            true = SeatData#seat_data.user_data =:= undefined,
-            true = SeatData#seat_data.is_ready =:= false,
-            NewSeatTree = gb_trees:update(0, SeatData#seat_data{user_data = UserData}, SeatTree),
+            true = (SeatData =:= undefined),
+            NewSeatTree = gb_trees:update(0, #seat_data{user_data = UserData}, SeatTree),
             ?FILE_LOG_WARNING("join room[~p] success, owner_user_id=~p, join_user_id=~p", [RoomId, OwnerUserId, JoinUserId]),
             {reply, {success, {0, false, []}}, idle, State#state{owner_is_join = true, seat_tree = NewSeatTree}};
         true ->
@@ -172,13 +171,13 @@ idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join 
                     %%没有空闲座位了
                     ?FILE_LOG_WARNING("join room[~p] failed, not idle seat, join_user_id=~p", [RoomId, JoinUserId]),
                     {reply, failed, idle, State};
-                {true, SeatNum} ->
+                {true, IdleSeatNum} ->
                     %%找到座位号了
                     %%获取其他位置的玩家信息
                     RoomUsers = extract_room_users(SeatTree),
-                    NewSeatTree = gb_trees:update(SeatNum, SeatData#seat_data{user_data = UserData, is_ready = false}, SeatTree),
+                    NewSeatTree = gb_trees:update(IdleSeatNum, #seat_data{user_data = UserData}, SeatTree),
                     ?FILE_LOG_WARNING("join room[~p] success, owner_user_id=~p, join_user_id=~p", [RoomId, OwnerUserId, JoinUserId]),
-                    {reply, {success, {SeatNum, false, RoomUsers}}, idle, State#state{seat_tree = NewSeatTree}}
+                    {reply, {success, {IdleSeatNum, false, RoomUsers}}, idle, State#state{seat_tree = NewSeatTree}}
             end
     end;
 idle(_Event, _From, State) ->
