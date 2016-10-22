@@ -31,6 +31,14 @@ init([]) ->
 		 worker,
 		 [timer_manager]},
 
+	QpRoomManager =
+		{qp_room_manager,
+		 {qp_room_manager, start_link, []},
+		 permanent,
+		 5000,
+		 worker,
+		 [qp_room_manager]},
+
 	{success, {ListenIp, ListenPort}} = qp_config:get_cfg(listen_addr),
 
 	QpReceiverSupervisor =
@@ -62,6 +70,7 @@ init([]) ->
     		{one_for_one, 10, 10},
 			[
 				TimerManager,
+				QpRoomManager,
 				QpReceiverSupervisor,
 				QpUserSupervisor,
 				QpServer

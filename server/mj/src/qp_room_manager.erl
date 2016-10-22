@@ -71,6 +71,7 @@ start_link() ->
     {ok, State :: #state{}} | {ok, State :: #state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
 init([]) ->
+    erlang:process_flag(trap_exit, true),
     random:seed(qp_util:timestamp()),
     ets:new(room_data, [set, protected, named_table, {keypos, #room_data.room_id}]),
     {ok, #state{}}.
