@@ -101,7 +101,7 @@ message qp_ready_rsp {
 
 message qp_ready_push {
     required int32 seat_number = 1;
-    required int32 ready_state = 2;
+    required bool ready_state = 2;
 }
 
 
