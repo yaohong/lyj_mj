@@ -23,6 +23,7 @@
          code_change/3]).
 -export([create_room/2,
          get_room_pid/1]).
+-export([destroy_room/1]).
 -define(SERVER, ?MODULE).
 
 -record(state, {}).
@@ -41,6 +42,11 @@ create_room(OwnerUserId, RoomType) ->
 
 get_room_pid(RoomId) ->
     gen_server:call(?MODULE, {get_room_pid, RoomId}).
+
+
+destroy_room(RoomId) ->
+    gen_server:call(?MODULE, {destroy_room, RoomId}).
+
 %%--------------------------------------------------------------------
 %% @doc
 %% Starts the server
@@ -121,6 +127,10 @@ handle_call({get_room_pid, RoomId}, _From, State) ->
                 {success, RoomPid}
         end,
     {reply, Reply, State};
+handle_call({destroy_room, RoomId}, _From, State) ->
+    ?FILE_LOG_DEBUG("destory_room [~p]", [RoomId]),
+    ets:delete(room_data, RoomId),
+    {reply ,success, State};
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 

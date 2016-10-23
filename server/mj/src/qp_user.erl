@@ -156,7 +156,7 @@ hall(Event, State) ->
 
 
 room({room_bin_msg, Bin}, State) ->
-  send_bin(State, Bin),
+  send_bin(Bin, State),
   {next_state, room, State};
 room(Event, State) ->
   ?FILE_LOG_WARNING("~p", [Event]),
@@ -164,7 +164,7 @@ room(Event, State) ->
 
 
 game({room_bin_msg, Bin}, State) ->
-  send_bin(State, Bin),
+  send_bin(Bin, State),
   {next_state, game, State};
 game(Event, State) ->
   ?FILE_LOG_WARNING("~p", [Event]),
@@ -339,7 +339,7 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 send_packet(Packet, State) when is_record(State, state) ->
   RspBin = qp_proto:encode_qp_packet(Packet),
   send_bin(RspBin, State).
-send_bin(Bin, State) ->
+send_bin(Bin, State) when is_binary(Bin) andalso is_record(State, state)->
   (State#state.sockModule):send(State#state.sockData, Bin).
 
 packet_handle(#qp_login_req{account = Account}, wait_login, #state{user_data = undefined, room_data = undefined} = State) ->
@@ -371,6 +371,8 @@ packet_handle(#qp_create_room_req{room_type = RoomType}, hall, #state{user_data 
         failed ->
           %%进入失败
           ?FILE_LOG_DEBUG("user_id=~p [hall] create_room success, join failed", [UserId]),
+          %%这个时候让房间退出
+          qp_room:dismiss(RoomPid),
           send_packet(#qp_create_room_rsp{state = -2}, State),
           {hall, State, true}
       end;
@@ -448,6 +450,7 @@ packet_handle(#qp_ping_req{seat_number = SeatNumber}, room, State) ->
   {room, State, true};
 packet_handle(#qp_exit_room_req{} = Request, room, State) ->
   ?FILE_LOG_DEBUG("room request=~p", [Request]),
+
   {hall, State, true};
 packet_handle(Request, room, State) ->
   ?FILE_LOG_DEBUG("room request=~p", [Request]),

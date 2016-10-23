@@ -17,7 +17,7 @@
 -include("../include/mj_pb.hrl").
 %% gen_fsm callbacks
 -export([init/1,
-%%         idle/2,
+    idle/2,
 %%         game/2,
     idle/3,
     game/3,
@@ -27,6 +27,7 @@
     terminate/3,
     code_change/4]).
 -export([join/2, ready/4]).
+-export([dismiss/1]).
 -define(SERVER, ?MODULE).
 
 -record(state, {
@@ -48,6 +49,10 @@ join(RoomPid, UserData) ->
 
 ready(RoomPid, UserKey, SeatNum, ReadyState) when is_boolean(ReadyState) ->
     gen_fsm:sync_send_event(RoomPid, {ready, {UserKey, SeatNum, ReadyState}}).
+
+%%解散房间
+dismiss(RoomPid) ->
+    gen_fsm:send_event(RoomPid, dis_miss).
 %%--------------------------------------------------------------------
 %% @doc
 %% Creates a gen_fsm process which calls Module:init/1 to
@@ -102,8 +107,12 @@ init([OwnerUserId, RoomId, RoomType]) ->
 %%    {next_state, NextStateName :: atom(), NextState :: #state{},
 %%     timeout() | hibernate} |
 %%    {stop, Reason :: term(), NewState :: #state{}}).
-%%idle(_Event, State) ->
-%%    {next_state, state_name, State}.
+idle(dis_miss, #state{seat_tree = SeatTree} = State) ->
+    %%这个时候房间不应该有人
+    [] = extract_room_users(SeatTree),
+    {stop, normal, State};
+idle(_Event, State) ->
+    {next_state, state_name, State}.
 %%
 %%
 %%game(_Event, State) ->
@@ -322,7 +331,9 @@ handle_info(_Info, StateName, State) ->
 -spec(terminate(Reason :: normal | shutdown | {shutdown, term()}
 | term(), StateName :: atom(), StateData :: term()) ->
     term()).
-terminate(_Reason, _StateName, _State) ->
+terminate(_Reason, _StateName, #state{room_id = RoomId}) ->
+    ?FILE_LOG_DEBUG("room_id[~p] [~p] terminate", [RoomId, _StateName]),
+    qp_room_manager:destroy_room(RoomId),
     ok.
 
 %%--------------------------------------------------------------------
