@@ -333,8 +333,9 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 
 send_packet(Packet, State) when is_record(State, state) ->
   RspBin = qp_proto:encode_qp_packet(Packet),
-  (State#state.sockModule):send(State#state.sockData, RspBin).
-
+  send_bin(RspBin, State).
+send_bin(Bin, State) ->
+  (State#state.sockModule):send(State#state.sockData, Bin).
 
 packet_handle(#qp_login_req{account = Account}, wait_login, #state{room_data = undefined} = State) ->
   ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
