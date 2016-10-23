@@ -213,28 +213,26 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
             SeatUserIsReady  =SeatData#seat_data.is_ready,
             case UserKey:compare(SeatUserData) of
                 true ->
-                    NewReadyState =
-                        if
-                            ReadyState =:= SeatUserIsReady ->
-                                %%状态相同不做转发通知了
-                                ReadyState;
-                            true ->
-                                %%转发消息
-                                ReadyPush = #qp_ready_push{seat_number = SeatNum, ready_state = ReadyState},
-                                PushBin = qp_proto:encode_qp_packet(ReadyPush),
-                                RoomUsers = extract_room_users(SeatTree),
-                                lists:foreach(
-                                    fun({RoomUserData, _, _}) ->
-                                        case UserKey:compare(SeatUserData) of
-                                            true -> ok; %%自己不转发
-                                            false -> RoomUserData:send_room_bin_msg(PushBin)
-                                        end
-                                    end, RoomUsers),
-                                ReadyState
-                        end,
-                    NewSeatData = SeatData#seat_data{is_ready = NewReadyState},
+                    if
+                        ReadyState =:= SeatUserIsReady ->
+                            %%状态相同不做转发通知了
+                            ok;
+                        true ->
+                            %%转发消息
+                            ReadyPush = #qp_ready_push{seat_number = SeatNum, ready_state = ReadyState},
+                            PushBin = qp_proto:encode_qp_packet(ReadyPush),
+                            RoomUsers = extract_room_users(SeatTree),
+                            lists:foreach(
+                                fun({RoomUserData, _, _}) ->
+                                    case UserKey:compare(SeatUserData) of
+                                        true -> ok; %%自己不转发
+                                        false -> RoomUserData:send_room_bin_msg(PushBin)
+                                    end
+                                end, RoomUsers)
+                    end,
+                    NewSeatData = SeatData#seat_data{is_ready = ReadyState},
                     NewSeatTree = gb_trees:update(SeatNum, NewSeatData, SeatTree),
-                    {reply, {success, NewReadyState}, idle, State#state{seat_tree = NewSeatTree}};
+                    {reply, {success, ReadyState}, idle, State#state{seat_tree = NewSeatTree}};
                 false ->
                     %%不是同一个人
                     ?FILE_LOG_WARNING(

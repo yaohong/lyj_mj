@@ -338,9 +338,10 @@ send_bin(Bin, State) ->
   (State#state.sockModule):send(State#state.sockData, Bin).
 
 packet_handle(#qp_login_req{account = Account}, wait_login, #state{room_data = undefined} = State) ->
-  ?FILE_LOG_DEBUG("login_request, acc=~p", [Account]),
+  ?FILE_LOG_DEBUG("acc=~p qp_login_req", [Account]),
   {success, {UserId, Gold, NickName, AvatarUrl}} = qp_db:load_user_data_by_acc(Account),
   ProtoUserData = #qp_user_data{user_id = UserId, gold = Gold, avatar_url = AvatarUrl, nick_name = NickName},
+  ?FILE_LOG_DEBUG("login_success, acc=~p user_id=~p", [Account, UserId]),
   Rsp = #qp_login_rsp{state = 0, data = ProtoUserData},
   send_packet(Rsp, State),
   StateUserData = #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl},
@@ -350,12 +351,12 @@ packet_handle(Request, wait_login, State) ->
   {wait_login, State, false};
 
 
-packet_handle(#qp_create_room_req{room_type = RoomType} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
-  ?FILE_LOG_DEBUG("hall request=~p", [Request]),
+packet_handle(#qp_create_room_req{room_type = RoomType}, hall, #state{user_data = UserData, room_data = undefined} = State) ->
   #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl} = UserData,
+  ?FILE_LOG_DEBUG("user_id[~p] [hall] qp_create_room_req", [UserId]),
   case qp_room_manager:create_room(UserId, RoomType) of
     {success, {RoomId, RoomPid}} ->
-      ?FILE_LOG_DEBUG("user_id=~p, create_room success, room_id=~p, room_pid=~p", [UserId, RoomId, RoomPid]),
+      ?FILE_LOG_DEBUG("user_id[~p] [hall] create_room success, room_id=~p, room_pid=~p", [UserId, RoomId, RoomPid]),
       case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
         {success, {SeatNum, false, []}} ->
           Rsp = #qp_create_room_rsp{state = 0, room_id = RoomId, seat_id = SeatNum},
@@ -364,22 +365,22 @@ packet_handle(#qp_create_room_req{room_type = RoomType} = Request, hall, #state{
           {room, State#state{room_data = RoomData}, true};
         failed ->
           %%进入失败
-          ?FILE_LOG_DEBUG("user_id=~p, create_room success, join failed", [UserId]),
+          ?FILE_LOG_DEBUG("user_id=~p [hall] create_room success, join failed", [UserId]),
           send_packet(#qp_create_room_rsp{state = -2}, State),
           {hall, State, true}
       end;
     failed ->
       %%创建房间失败
-      ?FILE_LOG_WARNING("user_id=~p, create_room failed", [UserId]),
+      ?FILE_LOG_WARNING("user_id[~p] [hall] create_room failed", [UserId]),
       send_packet(#qp_create_room_rsp{state = -1}, State),
       {hall, State, true}
   end;
-packet_handle(#qp_join_room_req{room_id = RoomId} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
-  ?FILE_LOG_DEBUG("hall request=~p", [Request]),
+packet_handle(#qp_join_room_req{room_id = RoomId}, hall, #state{user_data = UserData, room_data = undefined} = State) ->
   #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl} = UserData,
+  ?FILE_LOG_DEBUG("user_id[~p] [hall] qp_join_room_req", [UserId]),
   case qp_room_manager:get_room_pid(RoomId) of
     failed ->
-      ?FILE_LOG_WARNING("user_id=~p, join_room[~p] failed.", [UserId, RoomId]),
+      ?FILE_LOG_WARNING("user_id[~p] [hall] join_room[~p] failed.", [UserId, RoomId]),
       {hall, State, true};
     {success, RoomPid} ->
       case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
@@ -402,10 +403,11 @@ packet_handle(#qp_join_room_req{room_id = RoomId} = Request, hall, #state{user_d
           Rsp = #qp_join_room_rsp{result = 0, seat_number = SeatNum, is_ready = false, room_user = PbRoomUsers},
           send_packet(Rsp, State),
           RoomData = #room_data{room_id = RoomId, seat_num = SeatNum, room_pid = RoomPid},
+          ?FILE_LOG_WARNING("user_id[~p] [hall] join_room[~p] success, seat_num=~p.", [UserId, RoomId, SeatNum]),
           {room, State#state{room_data = RoomData}, true};
         failed ->
           %%进入失败
-          ?FILE_LOG_DEBUG("user_id=~p, get_room_pid[~p] failed", [UserId, RoomId]),
+          ?FILE_LOG_DEBUG("user_id[~p] [hall] get_room_pid[~p] failed", [UserId, RoomId]),
           send_packet(#qp_join_room_rsp{result = -1}, State),
           {hall, State, true}
       end
@@ -413,22 +415,25 @@ packet_handle(#qp_join_room_req{room_id = RoomId} = Request, hall, #state{user_d
 packet_handle(#qp_ping_req{seat_number = SeatNumber}, hall, #state{room_data = undefined} = State) ->
   send_packet(#qp_ping_rsp{seat_number = SeatNumber}, State),
   {hall, State, true};
-packet_handle(Request, hall, State) ->
-  ?FILE_LOG_DEBUG("hall request=~p", [Request]),
+packet_handle(Request, hall, #state{user_data = UserData} = State) ->
+  #user_data{user_id = UserId} = UserData,
+  ?FILE_LOG_DEBUG("user_id[~p] [hall] request=~p", [UserId, Request]),
   {hall, State, false};
 
 
 packet_handle(#qp_ready_req{ready_state = ReadyState}=Request, room, #state{room_data = RoomData, user_data = UserData} = State) ->
   #room_data{room_id = _, seat_num = SeatNum, room_pid = RoomPid} = RoomData,
   #user_data{user_id = UserId} = UserData,
-  ?FILE_LOG_DEBUG("user_id[~p] [room] request=~p", [UserId, Request]),
+  ?FILE_LOG_DEBUG("user_id[~p] [room] qp_ready_req", [UserId, Request]),
   Rsp =
     case qp_room:ready(RoomPid, qp_user_key:new(UserId, self()), SeatNum, ReadyState) of
       {success, ReadyState} ->
         %%成功了
+        ?FILE_LOG_DEBUG("user_id[~p] [room] ready success readyStae=~p", [UserId, ReadyState]),
         #qp_ready_rsp{state = 0, ready_state = ReadyState};
       failed ->
         %%失败了
+        ?FILE_LOG_DEBUG("user_id[~p] [room] ready failed", [UserId]),
         #qp_ready_rsp{state = -1}
     end,
   send_packet(Rsp, State),
