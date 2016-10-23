@@ -217,6 +217,9 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
         {value, undefined} ->
             ?FILE_LOG_WARNING("user_id[~p] ready seat_num[~p] undefined", [UserKey:get(user_id), SeatNum]),
             {reply, failed, idle, State};
+        none ->
+            ?FILE_LOG_WARNING("user_id[~p] ready seat_num[~p] none", [UserKey:get(user_id), SeatNum]),
+            {reply, failed, idle, State};
         {value, SeatData} when is_record(SeatData,seat_data) ->
             SeatUserData = SeatData#seat_data.user_data,
             SeatUserIsReady  =SeatData#seat_data.is_ready,
@@ -234,7 +237,7 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
                             RoomUsers = extract_room_users(SeatTree),
                             lists:foreach(
                                 fun({RoomUserData, _, _}) ->
-                                    case UserKey:compare(SeatUserData) of
+                                    case UserKey:compare(RoomUserData) of
                                         true -> ok; %%自己不转发
                                         false ->
                                             ?FILE_LOG_DEBUG("user_id[~p] ready_state=~p forward ready to user_id[~p]", [UserKey:get(user_id), RoomUserData:get(user_id)]),
