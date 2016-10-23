@@ -14,6 +14,9 @@
          get/2,
     send_room_bin_msg/2]).
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 new(UserId, UserPid, Gold, Nickname, AvatarUrl) when is_integer(UserId) andalso is_pid(UserPid) ->
     {?MODULE, [UserId, UserPid, Gold, Nickname, AvatarUrl]}.
 
@@ -26,3 +29,4 @@ get(avatar_url, {?MODULE, [_UserId, _UserPid, _Gold, _Nickname, AvatarUrl]}) -> 
 
 send_room_bin_msg(Bin, {?MODULE, [_UserId, UserPid, _Gold, _Nickname, _AvatarUrl]}) ->
     gen_fsm:send_event(UserPid, {room_bin_msg, Bin}).
+

@@ -89,12 +89,13 @@ message qp_join_room_push {
 }
 
 message qp_ready_req {
-    required int32 ready_state = 1;
+    required bool ready_state = 1;
 }
 
 
 message qp_ready_rsp {
-    required int32 ready_state = 1;
+    required int32 state = 1;
+    optional bool ready_state = 2;
 }
 
 

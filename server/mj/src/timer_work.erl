@@ -16,11 +16,11 @@
 
 %% gen_server callbacks
 -export([init/1,
-         handle_call/3,
-         handle_cast/2,
-         handle_info/2,
-         terminate/2,
-         code_change/3]).
+	handle_call/3,
+	handle_cast/2,
+	handle_info/2,
+	terminate/2,
+	code_change/3]).
 -export([addDelayTask/5]).
 -define(SERVER, ?MODULE).
 
@@ -73,13 +73,13 @@ init([]) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_call(Request :: term(), From :: {pid(), Tag :: term()},
-                  State :: #state{}) ->
-	                 {reply, Reply :: term(), NewState :: #state{}} |
-	                 {reply, Reply :: term(), NewState :: #state{}, timeout() | hibernate} |
-	                 {noreply, NewState :: #state{}} |
-	                 {noreply, NewState :: #state{}, timeout() | hibernate} |
-	                 {stop, Reason :: term(), Reply :: term(), NewState :: #state{}} |
-	                 {stop, Reason :: term(), NewState :: #state{}}).
+	State :: #state{}) ->
+	{reply, Reply :: term(), NewState :: #state{}} |
+	{reply, Reply :: term(), NewState :: #state{}, timeout() | hibernate} |
+	{noreply, NewState :: #state{}} |
+	{noreply, NewState :: #state{}, timeout() | hibernate} |
+	{stop, Reason :: term(), Reply :: term(), NewState :: #state{}} |
+	{stop, Reason :: term(), NewState :: #state{}}).
 handle_call({addDelayTask, {DelayTime, Mod, Func, Args}}, _From, #state{tableId = TableId} = State) ->
 	Ref = make_ref(),
 	case ets:lookup(TableId, DelayTime) of
@@ -136,7 +136,7 @@ handle_info({timeout, _TimerRef, 'timerTask'}, #state{tableId = TableId} = State
 			[#task{taskDataList = TaskList}] = ets:lookup(TableId, TaskKey),
 			lists:foreach(
 				fun({Mod, Func, Args}) ->
-					catch apply(Mod, Func, Args)
+						catch apply(Mod, Func, Args)
 				end, TaskList),
 			ets:delete(TableId, TaskKey)
 		end, TaskKeyList),
@@ -166,8 +166,8 @@ task_extract(TableId, Key, CurrentTime, TaskKeyList) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
-                State :: #state{}) ->
-	               term()).
+	State :: #state{}) ->
+	term()).
 terminate(_Reason, _State) ->
 	ok.
 
@@ -180,8 +180,8 @@ terminate(_Reason, _State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(code_change(OldVsn :: term() | {down, term()}, State :: #state{},
-                  Extra :: term()) ->
-	                 {ok, NewState :: #state{}} | {error, Reason :: term()}).
+	Extra :: term()) ->
+	{ok, NewState :: #state{}} | {error, Reason :: term()}).
 code_change(_OldVsn, State, _Extra) ->
 	{ok, State}.
 

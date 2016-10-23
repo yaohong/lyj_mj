@@ -26,7 +26,7 @@
     handle_info/3,
     terminate/3,
     code_change/4]).
--export([join/2, ready/2]).
+-export([join/2, ready/4]).
 -define(SERVER, ?MODULE).
 
 -record(state, {
@@ -46,8 +46,8 @@ join(RoomPid, UserData) ->
     gen_fsm:sync_send_event(RoomPid, {join, UserData}).
 
 
-ready(RoomPid, ReadyState) when is_boolean(ReadyState) ->
-    gen_fsm:sync_send_event(RoomPid, {ready, ReadyState}).
+ready(RoomPid, UserKey, SeatNum, ReadyState) when is_boolean(ReadyState) ->
+    gen_fsm:sync_send_event(RoomPid, {ready, {UserKey, SeatNum, ReadyState}}).
 %%--------------------------------------------------------------------
 %% @doc
 %% Creates a gen_fsm process which calls Module:init/1 to
@@ -203,8 +203,46 @@ idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join 
                     {reply, {success, {IdleSeatNum, false, RoomUsers}}, idle, State#state{seat_tree = NewSeatTree}}
             end
     end;
-idle({ready, _ReadyState}, _From, State) ->
-    {reply, ok, idle, State};
+idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree} = State) ->
+    case gb_trees:lookup(SeatNum, SeatTree) of
+        {value, undefined} ->
+            ?FILE_LOG_WARNING("user_id[~p] ready seat_num[~p] undefined", [UserKey:get(user_id), SeatNum]),
+            {reply, failed, idle, State};
+        {value, SeatData} when is_record(SeatData,seat_data) ->
+            SeatUserData = SeatData#seat_data.user_data,
+            SeatUserIsReady  =SeatData#seat_data.is_ready,
+            case UserKey:compare(SeatUserData) of
+                true ->
+                    NewReadyState =
+                        if
+                            ReadyState =:= SeatUserIsReady ->
+                                %%状态相同不做转发通知了
+                                ReadyState;
+                            true ->
+                                %%转发消息
+                                ReadyPush = #qp_ready_push{seat_number = SeatNum, ready_state = ReadyState},
+                                PushBin = qp_proto:encode_qp_packet(ReadyPush),
+                                RoomUsers = extract_room_users(SeatTree),
+                                lists:foreach(
+                                    fun({RoomUserData, _, _}) ->
+                                        case UserKey:compare(SeatUserData) of
+                                            true -> ok; %%自己不转发
+                                            false -> RoomUserData:send_room_bin_msg(PushBin)
+                                        end
+                                    end, RoomUsers),
+                                ReadyState
+                        end,
+                    NewSeatData = SeatData#seat_data{is_ready = NewReadyState},
+                    NewSeatTree = gb_trees:update(SeatNum, NewSeatData, SeatTree),
+                    {reply, {success, NewReadyState}, idle, State#state{seat_tree = NewSeatTree}};
+                false ->
+                    %%不是同一个人
+                    ?FILE_LOG_WARNING(
+                        "user[~p, ~p] ready seat_num[~p], ready_user_id[~p,~p]",
+                        [UserKey:get(user_id), UserKey:get(user_pid), SeatNum, SeatUserData:get(user_id), SeatUserData:get(user_pid)]),
+                    {reply, failed, idle, State}
+            end
+    end;
 idle(_Event, _From, State) ->
     Reply = ok,
     {reply, Reply, idle, State}.

@@ -331,8 +331,9 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
-send_bin(State, Bin) ->
-  (State#state.sockModule):send(State#state.sockData, Bin).
+send_packet(Packet, State) when is_record(State, state) ->
+  RspBin = qp_proto:encode_qp_packet(Packet),
+  (State#state.sockModule):send(State#state.sockData, RspBin).
 
 
 packet_handle(#qp_login_req{account = Account}, wait_login, #state{room_data = undefined} = State) ->
@@ -340,8 +341,7 @@ packet_handle(#qp_login_req{account = Account}, wait_login, #state{room_data = u
   {success, {UserId, Gold, NickName, AvatarUrl}} = qp_db:load_user_data_by_acc(Account),
   ProtoUserData = #qp_user_data{user_id = UserId, gold = Gold, avatar_url = AvatarUrl, nick_name = NickName},
   Rsp = #qp_login_rsp{state = 0, data = ProtoUserData},
-  RspBin = qp_proto:encode_qp_packet(Rsp),
-  (State#state.sockModule):send(State#state.sockData, RspBin),
+  send_packet(Rsp, State),
   StateUserData = #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl},
   {hall, State#state{user_data = StateUserData}, true};
 packet_handle(Request, wait_login, State) ->
@@ -358,20 +358,19 @@ packet_handle(#qp_create_room_req{room_type = RoomType} = Request, hall, #state{
       case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
         {success, {SeatNum, false, []}} ->
           Rsp = #qp_create_room_rsp{state = 0, room_id = RoomId, seat_id = SeatNum},
-          RspBin = qp_proto:encode_qp_packet(Rsp),
-          (State#state.sockModule):send(State#state.sockData, RspBin),
+          send_packet(Rsp, State),
           RoomData = #room_data{room_id = RoomId, seat_num = SeatNum, room_pid = RoomPid},
           {room, State#state{room_data = RoomData}, true};
         failed ->
           %%进入失败
           ?FILE_LOG_DEBUG("user_id=~p, create_room success, join failed", [UserId]),
-          send_bin(State, qp_packet_util:create_room_failed_bin(-2)),
+          send_packet(#qp_create_room_rsp{state = -2}, State),
           {hall, State, true}
       end;
     failed ->
       %%创建房间失败
       ?FILE_LOG_WARNING("user_id=~p, create_room failed", [UserId]),
-      send_bin(State, qp_packet_util:create_room_failed_bin(-1)),
+      send_packet(#qp_create_room_rsp{state = -1}, State),
       {hall, State, true}
   end;
 packet_handle(#qp_join_room_req{room_id = RoomId} = Request, hall, #state{user_data = UserData, room_data = undefined} = State) ->
@@ -400,30 +399,41 @@ packet_handle(#qp_join_room_req{room_id = RoomId} = Request, hall, #state{user_d
                 }
               end, RoomUsers),
           Rsp = #qp_join_room_rsp{result = 0, seat_number = SeatNum, is_ready = false, room_user = PbRoomUsers},
-          RspBin = qp_proto:encode_qp_packet(Rsp),
-          (State#state.sockModule):send(State#state.sockData, RspBin),
+          send_packet(Rsp, State),
           RoomData = #room_data{room_id = RoomId, seat_num = SeatNum, room_pid = RoomPid},
           {room, State#state{room_data = RoomData}, true};
         failed ->
           %%进入失败
           ?FILE_LOG_DEBUG("user_id=~p, get_room_pid[~p] failed", [UserId, RoomId]),
-          send_bin(State, qp_packet_util:create_room_failed_bin(-1)),
+          send_packet(#qp_join_room_rsp{result = -1}, State),
           {hall, State, true}
       end
   end;
-packet_handle(#qp_ping_req{} = Request, hall, #state{room_data = undefined} = State) ->
-  send_bin(State, qp_packet_util:create_ping_rsp_bin()),
+packet_handle(#qp_ping_req{seat_number = SeatNumber}, hall, #state{room_data = undefined} = State) ->
+  send_packet(#qp_ping_rsp{seat_number = SeatNumber}, State),
   {hall, State, true};
 packet_handle(Request, hall, State) ->
   ?FILE_LOG_DEBUG("hall request=~p", [Request]),
   {hall, State, false};
 
 
-packet_handle(#qp_ready_req{}=Request, room, State) ->
-  ?FILE_LOG_DEBUG("room request=~p", [Request]),
+packet_handle(#qp_ready_req{ready_state = ReadyState}=Request, room, #state{room_data = RoomData, user_data = UserData} = State) ->
+  #room_data{room_id = _, seat_num = SeatNum, room_pid = RoomPid} = RoomData,
+  #user_data{user_id = UserId} = UserData,
+  ?FILE_LOG_DEBUG("user_id[~p] [room] request=~p", [UserId, Request]),
+  Rsp =
+    case qp_room:ready(RoomPid, qp_user_key:new(UserId, self()), SeatNum, ReadyState) of
+      {success, ReadyState} ->
+        %%成功了
+        #qp_ready_rsp{state = 0, ready_state = ReadyState};
+      failed ->
+        %%失败了
+        #qp_ready_rsp{state = -1}
+    end,
+  send_packet(Rsp, State),
   {room, State, true};
-packet_handle(#qp_ping_req{}, room, State) ->
-  send_bin(State, qp_packet_util:create_ping_rsp_bin()),
+packet_handle(#qp_ping_req{seat_number = SeatNumber}, room, State) ->
+  send_packet(#qp_ping_rsp{seat_number = SeatNumber}, State),
   {room, State, true};
 packet_handle(#qp_exit_room_req{} = Request, room, State) ->
   ?FILE_LOG_DEBUG("room request=~p", [Request]),
@@ -436,8 +446,8 @@ packet_handle(Request, room, State) ->
 packet_handle(#qp_game_data{}=Request, game, State) ->
   ?FILE_LOG_DEBUG("game request=~p", [Request]),
   {game, State, true};
-packet_handle(#qp_ping_req{}, game, State) ->
-  send_bin(State, qp_packet_util:create_ping_rsp_bin()),
+packet_handle(#qp_ping_req{seat_number = SeatNumber}, game, State) ->
+  send_packet(#qp_ping_rsp{seat_number = SeatNumber}, State),
   {game, State, true};
 packet_handle(#qp_exit_room_req{} = Request, game, State) ->
   ?FILE_LOG_DEBUG("game request=~p", [Request]),
