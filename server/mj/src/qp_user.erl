@@ -431,7 +431,7 @@ packet_handle(Request, hall, #state{user_data = UserData} = State) ->
 packet_handle(#qp_ready_req{ready_state = ReadyState}=Request, room, #state{room_data = RoomData, user_data = UserData} = State) ->
   #room_data{room_id = _, seat_num = SeatNum, room_pid = RoomPid} = RoomData,
   #user_data{user_id = UserId} = UserData,
-  ?FILE_LOG_DEBUG("user_id[~p] [room] qp_ready_req", [UserId, Request]),
+  ?FILE_LOG_DEBUG("user_id[~p] [room] qp_ready_req", [UserId]),
   Rsp =
     case qp_room:ready(RoomPid, qp_user_key:new(UserId, self()), SeatNum, ReadyState) of
       {success, ReadyState} ->

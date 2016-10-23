@@ -225,6 +225,7 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
                     if
                         ReadyState =:= SeatUserIsReady ->
                             %%状态相同不做转发通知了
+                            ?FILE_LOG_DEBUG("user_id[~p] ready_state=seat_user_is_ready not Forward", [UserKey:get(user_id)]),
                             ok;
                         true ->
                             %%转发消息
@@ -235,7 +236,9 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
                                 fun({RoomUserData, _, _}) ->
                                     case UserKey:compare(SeatUserData) of
                                         true -> ok; %%自己不转发
-                                        false -> RoomUserData:send_room_bin_msg(PushBin)
+                                        false ->
+                                            ?FILE_LOG_DEBUG("user_id[~p] ready_state=~p forward ready to user_id[~p]", [UserKey:get(user_id), RoomUserData:get(user_id)]),
+                                            RoomUserData:send_room_bin_msg(PushBin)
                                     end
                                 end, RoomUsers)
                     end,
