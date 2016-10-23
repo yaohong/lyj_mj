@@ -309,8 +309,13 @@ handle_info(_Info, StateName, State) ->
 -spec(terminate(Reason :: normal | shutdown | {shutdown, term()}
 | term(), StateName :: atom(), StateData :: term()) ->
   term()).
-terminate(_Reason, _StateName, State) ->
+terminate(_Reason, _StateName, #state{user_data = UserData, room_data = RoomData} = State) ->
   ?FILE_LOG_DEBUG("qp_user terminate", []),
+  if
+    UserData =/= undefined ->
+      ?FILE_LOG_DEBUG("user_id[~p] [~p] terminate.", [UserData#user_data.user_id, _StateName]);
+    true -> ok
+  end,
   (State#state.sockModule):close(State#state.sockData),
   ok.
 
@@ -337,7 +342,7 @@ send_packet(Packet, State) when is_record(State, state) ->
 send_bin(Bin, State) ->
   (State#state.sockModule):send(State#state.sockData, Bin).
 
-packet_handle(#qp_login_req{account = Account}, wait_login, #state{room_data = undefined} = State) ->
+packet_handle(#qp_login_req{account = Account}, wait_login, #state{user_data = undefined, room_data = undefined} = State) ->
   ?FILE_LOG_DEBUG("acc=~p qp_login_req", [Account]),
   {success, {UserId, Gold, NickName, AvatarUrl}} = qp_db:load_user_data_by_acc(Account),
   ProtoUserData = #qp_user_data{user_id = UserId, gold = Gold, avatar_url = AvatarUrl, nick_name = NickName},
