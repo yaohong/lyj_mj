@@ -391,7 +391,7 @@ packet_handle(#qp_create_room_req{room_type = RoomType}, hall, #state{user_data 
       ?FILE_LOG_DEBUG("user_id[~p] [hall] create_room success, room_id=~p, room_pid=~p", [UserId, RoomId, RoomPid]),
       case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
         {success, {SeatNum, false, []}} ->
-          Rsp = #qp_create_room_rsp{state = 0, room_id = RoomId, seat_id = SeatNum},
+          Rsp = #qp_create_room_rsp{state = 0, room_id = RoomId, seat_number = SeatNum},
           send_packet(Rsp, State),
           RoomData = #room_data{room_id = RoomId, seat_num = SeatNum, room_pid = RoomPid},
           {room, State#state{room_data = RoomData}, true};
