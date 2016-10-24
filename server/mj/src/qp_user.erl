@@ -19,19 +19,19 @@
 
 %% gen_fsm callbacks
 -export([init/1,
-  wait_login/2,              %%等待登陆
-  hall/2,                    %%大厅
-  room/2,                    %%房间
-  game/2,                    %%游戏
-  handle_event/3,
-  handle_sync_event/4,
-  handle_info/3,
-  terminate/3,
-  code_change/4]).
+         wait_login/2,              %%等待登陆
+         hall/2,                    %%大厅
+         room/2,                    %%房间
+         game/2,                    %%游戏
+         handle_event/3,
+         handle_sync_event/4,
+         handle_info/3,
+         terminate/3,
+         code_change/4]).
 -export([head_len/2,
-  closed/1,
-  complete_packet/2,
-  timer_callback/2
+         closed/1,
+         complete_packet/2,
+         timer_callback/2
 ]).
 -export([
   start/3,
@@ -116,13 +116,13 @@ init([SockModule, SocketData]) ->
         CurrentTime + ?TIMER_SPACE,
         qp_user, timer_callback, [self()]),
       {ok,
-        wait_login,
-        #state{
-          receiveMonitor = ReceiveMonitor,
-          sockModule = SockModule,
-          sockData = SocketData,
-          last_recv_packet_time = CurrentTime
-        }};
+       wait_login,
+       #state{
+         receiveMonitor = ReceiveMonitor,
+         sockModule = SockModule,
+         sockData = SocketData,
+         last_recv_packet_time = CurrentTime
+       }};
     Other ->
       ?FILE_LOG_ERROR("socket init peername fail reason=[~p]", [Other]),
       {stop, normal}
@@ -143,7 +143,7 @@ init([SockModule, SocketData]) ->
 -spec(wait_login(Event :: term(), State :: #state{}) ->
   {next_state, NextStateName :: atom(), NextState :: #state{}} |
   {next_state, NextStateName :: atom(), NextState :: #state{},
-    timeout() | hibernate} |
+   timeout() | hibernate} |
   {stop, Reason :: term(), NewState :: #state{}}).
 wait_login(Event, State) ->
   ?FILE_LOG_WARNING("~p", [Event]),
@@ -158,6 +158,16 @@ hall(Event, State) ->
 room({room_bin_msg, Bin}, State) ->
   send_bin(Bin, State),
   {next_state, room, State};
+room({room_dismiss, RoomId}, #state{user_data = UserData, room_data = RoomData} = State) ->
+  #user_data{user_id = UserId} = UserData,
+  #room_data{room_id = CurrentRoomId} = RoomData,
+  if
+    RoomId =:= CurrentRoomId ->
+      ?FILE_LOG_DEBUG("user_id[~p] [room] room_dismiss,state_name => hall", [UserId]),
+      send_packet(#qp_room_dismiss_push{room_id = RoomId}, State),
+      {next_state, hall, State#state{room_data = undefined}};
+    true -> {next_state, room, State}
+  end;
 room(Event, State) ->
   ?FILE_LOG_WARNING("~p", [Event]),
   {next_state, room, State}.
@@ -166,6 +176,16 @@ room(Event, State) ->
 game({room_bin_msg, Bin}, State) ->
   send_bin(Bin, State),
   {next_state, game, State};
+game({room_dismiss, RoomId}, #state{user_data = UserData, room_data = RoomData} = State) ->
+  #user_data{user_id = UserId} = UserData,
+  #room_data{room_id = CurrentRoomId} = RoomData,
+  if
+    RoomId =:= CurrentRoomId ->
+      ?FILE_LOG_DEBUG("user_id[~p] [game] room_dismiss,state_name => hall ", [UserId]),
+      send_packet(#qp_room_dismiss_push{room_id = RoomId}, State),
+      {next_state, hall, State#state{room_data = undefined}};
+    true -> {next_state, room, State}
+  end;
 game(Event, State) ->
   ?FILE_LOG_WARNING("~p", [Event]),
   {next_state, game, State}.
@@ -206,11 +226,11 @@ game(Event, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_event(Event :: term(), StateName :: atom(),
-    StateData :: #state{}) ->
-  {next_state, NextStateName :: atom(), NewStateData :: #state{}} |
-  {next_state, NextStateName :: atom(), NewStateData :: #state{},
-    timeout() | hibernate} |
-  {stop, Reason :: term(), NewStateData :: #state{}}).
+                   StateData :: #state{}) ->
+                    {next_state, NextStateName :: atom(), NewStateData :: #state{}} |
+                    {next_state, NextStateName :: atom(), NewStateData :: #state{},
+                     timeout() | hibernate} |
+                    {stop, Reason :: term(), NewStateData :: #state{}}).
 handle_event({complete_packet, Bin}, StateName, #state{last_recv_packet_time = OldLastRecvPacketTime} = State) ->
   try
     Request = qp_proto:decode_qp_packet(Bin),
@@ -249,15 +269,15 @@ state_name_check(game) -> ok.
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_sync_event(Event :: term(), From :: {pid(), Tag :: term()},
-    StateName :: atom(), StateData :: term()) ->
-  {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term()} |
-  {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term(),
-    timeout() | hibernate} |
-  {next_state, NextStateName :: atom(), NewStateData :: term()} |
-  {next_state, NextStateName :: atom(), NewStateData :: term(),
-    timeout() | hibernate} |
-  {stop, Reason :: term(), Reply :: term(), NewStateData :: term()} |
-  {stop, Reason :: term(), NewStateData :: term()}).
+                        StateName :: atom(), StateData :: term()) ->
+                         {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term()} |
+                         {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term(),
+                          timeout() | hibernate} |
+                         {next_state, NextStateName :: atom(), NewStateData :: term()} |
+                         {next_state, NextStateName :: atom(), NewStateData :: term(),
+                          timeout() | hibernate} |
+                         {stop, Reason :: term(), Reply :: term(), NewStateData :: term()} |
+                         {stop, Reason :: term(), NewStateData :: term()}).
 handle_sync_event(_Event, _From, StateName, State) ->
   Reply = ok,
   {reply, Reply, StateName, State}.
@@ -272,11 +292,11 @@ handle_sync_event(_Event, _From, StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_info(Info :: term(), StateName :: atom(),
-    StateData :: term()) ->
-  {next_state, NextStateName :: atom(), NewStateData :: term()} |
-  {next_state, NextStateName :: atom(), NewStateData :: term(),
-    timeout() | hibernate} |
-  {stop, Reason :: normal | term(), NewStateData :: term()}).
+                  StateData :: term()) ->
+                   {next_state, NextStateName :: atom(), NewStateData :: term()} |
+                   {next_state, NextStateName :: atom(), NewStateData :: term(),
+                    timeout() | hibernate} |
+                   {stop, Reason :: normal | term(), NewStateData :: term()}).
 handle_info(closed, _StateName, State) ->
   ?FILE_LOG_DEBUG("qp_user socket close", []),
   {stop, normal, State};
@@ -307,8 +327,8 @@ handle_info(_Info, StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate(Reason :: normal | shutdown | {shutdown, term()}
-| term(), StateName :: atom(), StateData :: term()) ->
-  term()).
+                | term(), StateName :: atom(), StateData :: term()) ->
+                 term()).
 terminate(_Reason, _StateName, #state{user_data = UserData, room_data = RoomData} = State) ->
   ?FILE_LOG_DEBUG("qp_user terminate", []),
   if
@@ -327,8 +347,8 @@ terminate(_Reason, _StateName, #state{user_data = UserData, room_data = RoomData
 %% @end
 %%--------------------------------------------------------------------
 -spec(code_change(OldVsn :: term() | {down, term()}, StateName :: atom(),
-    StateData :: #state{}, Extra :: term()) ->
-  {ok, NextStateName :: atom(), NewStateData :: #state{}}).
+                  StateData :: #state{}, Extra :: term()) ->
+                   {ok, NextStateName :: atom(), NewStateData :: #state{}}).
 code_change(_OldVsn, StateName, State, _Extra) ->
   {ok, StateName, State}.
 
@@ -448,13 +468,18 @@ packet_handle(#qp_ready_req{ready_state = ReadyState}, room, #state{room_data = 
 packet_handle(#qp_ping_req{seat_number = SeatNumber}, room, State) ->
   send_packet(#qp_ping_rsp{seat_number = SeatNumber}, State),
   {room, State, true};
-packet_handle(#qp_exit_room_req{} = Request, room, #state{room_data = RoomData, user_data = UserData} = State) ->
-
+packet_handle(#qp_exit_room_req{seat_number = SeatNum}, room, #state{room_data = RoomData, user_data = UserData} = State) ->
   #room_data{room_id = _, seat_num = SeatNum, room_pid = RoomPid} = RoomData,
   #user_data{user_id = UserId} = UserData,
   ?FILE_LOG_DEBUG("user_id[~p] [room] qp_exit_room_req", [UserId]),
-
-  {hall, State, true};
+  case qp_room:quit(RoomPid, qp_user_key:new(UserId, self()), SeatNum) of
+    success ->
+      ?FILE_LOG_DEBUG("user_id[~p] [room] qp_exit_room success", [UserId]),
+      {hall, State#state{room_data = undefined}, true};
+    failed ->
+      ?FILE_LOG_DEBUG("user_id[~p] [room] qp_exit_room failed", [UserId]),
+      {room, State, true}
+  end;
 packet_handle(Request, room, State) ->
   ?FILE_LOG_DEBUG("room request=~p", [Request]),
   {room, State, false};

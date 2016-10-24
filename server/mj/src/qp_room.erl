@@ -17,15 +17,15 @@
 -include("../include/mj_pb.hrl").
 %% gen_fsm callbacks
 -export([init/1,
-    idle/2,
+         idle/2,
 %%         game/2,
-    idle/3,
-    game/3,
-    handle_event/3,
-    handle_sync_event/4,
-    handle_info/3,
-    terminate/3,
-    code_change/4]).
+         idle/3,
+         game/3,
+         handle_event/3,
+         handle_sync_event/4,
+         handle_info/3,
+         terminate/3,
+         code_change/4]).
 -export([join/2, quit/3, ready/4]).
 -export([dismiss/1]).
 -define(SERVER, ?MODULE).
@@ -53,6 +53,7 @@ quit(RoomPid, UserKey, SeatNum) ->
 ready(RoomPid, UserKey, SeatNum, ReadyState) when is_boolean(ReadyState) ->
     gen_fsm:sync_send_event(RoomPid, {ready, {UserKey, SeatNum, ReadyState}}).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%解散房间
 dismiss(RoomPid) ->
     gen_fsm:send_event(RoomPid, dis_miss).
@@ -157,16 +158,16 @@ extract_room_users([SeatNum|T], SeatTree, Users) ->
     end.
 
 -spec(idle(Event :: term(), From :: {pid(), term()},
-    State :: #state{}) ->
-    {next_state, NextStateName :: atom(), NextState :: #state{}} |
-    {next_state, NextStateName :: atom(), NextState :: #state{},
-        timeout() | hibernate} |
-    {reply, Reply, NextStateName :: atom(), NextState :: #state{}} |
-    {reply, Reply, NextStateName :: atom(), NextState :: #state{},
-        timeout() | hibernate} |
-    {stop, Reason :: normal | term(), NewState :: #state{}} |
-    {stop, Reason :: normal | term(), Reply :: term(),
-        NewState :: #state{}}).
+           State :: #state{}) ->
+              {next_state, NextStateName :: atom(), NextState :: #state{}} |
+              {next_state, NextStateName :: atom(), NextState :: #state{},
+               timeout() | hibernate} |
+              {reply, Reply, NextStateName :: atom(), NextState :: #state{}} |
+              {reply, Reply, NextStateName :: atom(), NextState :: #state{},
+               timeout() | hibernate} |
+              {stop, Reason :: normal | term(), NewState :: #state{}} |
+              {stop, Reason :: normal | term(), Reply :: term(),
+               NewState :: #state{}}).
 idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join = OwnerIsJoin, room_id = RoomId, seat_tree = SeatTree} = State) ->
     JoinUserId = UserData:get(user_id),
     if
@@ -208,7 +209,7 @@ idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join 
                     PushBin = qp_proto:encode_qp_packet(Push),
                     lists:foreach(
                         fun({RoomUserData, _, _}) ->
-                            RoomUserData:send_room_bin_msg(PushBin)
+                            RoomUserData:send_room_msg({room_bin_msg, PushBin})
                         end, RoomUsers),
                     NewSeatTree = gb_trees:update(IdleSeatNum, #seat_data{user_data = UserData}, SeatTree),
                     ?FILE_LOG_WARNING("join room[~p] success, owner_user_id=~p, join_user_id=~p", [RoomId, OwnerUserId, JoinUserId]),
@@ -244,7 +245,7 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
                                         true -> ok; %%自己不转发
                                         false ->
                                             ?FILE_LOG_DEBUG("user_id[~p] ready_state=~p forward ready to user_id[~p]", [UserKey:get(user_id), RoomUserData:get(user_id)]),
-                                            RoomUserData:send_room_bin_msg(PushBin)
+                                            RoomUserData:send_room_msg({room_bin_msg, PushBin})
                                     end
                                 end, RoomUsers)
                     end,
@@ -259,9 +260,40 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
                     {reply, failed, idle, State}
             end
     end;
-idle({quit, {UserKey, SeatNum}}, _From, State) ->
-
-    {reply, ok, idle, State};
+idle({quit, {UserKey, SeatNum}}, _From, #state{seat_tree = SeatTree, room_id = RoomId} = State) ->
+    case local_quit(UserKey, SeatNum, SeatTree) of
+        failed -> {reply, failed, idle, State};
+        {success, NewSeatTree} ->
+            NewState = State#state{seat_tree = NewSeatTree},
+            %%广播给其他人
+            RoomUsers = extract_room_users(NewSeatTree),
+            if
+                length(RoomUsers) =:= 0 ->
+                    %%房间没人了
+                    {stop, normal, success, NewState};
+                true ->
+                    if
+                        SeatNum =:= 0 ->
+                            %%房主退出了，房间解散
+                            %%发送房间解散的消息
+                            lists:foreach(
+                                fun({RoomUserData, _, _}) ->
+                                    false = UserKey:compare(RoomUserData),
+                                    RoomUserData:send_room_msg({room_dismiss, RoomId})
+                                end, RoomUsers),
+                            {stop, normal, success, NewState};
+                        true ->
+                            %%广播其他用户，有人退出房间了
+                            ExitPushBin = qp_proto:encode_qp_packet(#qp_exit_room_push{seat_number = SeatNum}),
+                            lists:foreach(
+                                fun({RoomUserData, _, _}) ->
+                                    false = UserKey:compare(RoomUserData),
+                                    RoomUserData:send_room_msg({room_bin_msg, ExitPushBin})
+                                end, RoomUsers),
+                            {reply, success, idle, NewState}
+                    end
+            end
+    end;
 idle(_Event, _From, State) ->
     Reply = ok,
     {reply, Reply, idle, State}.
@@ -281,11 +313,11 @@ game(_Event, _From, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_event(Event :: term(), StateName :: atom(),
-    StateData :: #state{}) ->
-    {next_state, NextStateName :: atom(), NewStateData :: #state{}} |
-    {next_state, NextStateName :: atom(), NewStateData :: #state{},
-        timeout() | hibernate} |
-    {stop, Reason :: term(), NewStateData :: #state{}}).
+                   StateData :: #state{}) ->
+                      {next_state, NextStateName :: atom(), NewStateData :: #state{}} |
+                      {next_state, NextStateName :: atom(), NewStateData :: #state{},
+                       timeout() | hibernate} |
+                      {stop, Reason :: term(), NewStateData :: #state{}}).
 handle_event(_Event, StateName, State) ->
     {next_state, StateName, State}.
 
@@ -299,15 +331,15 @@ handle_event(_Event, StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_sync_event(Event :: term(), From :: {pid(), Tag :: term()},
-    StateName :: atom(), StateData :: term()) ->
-    {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term()} |
-    {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term(),
-        timeout() | hibernate} |
-    {next_state, NextStateName :: atom(), NewStateData :: term()} |
-    {next_state, NextStateName :: atom(), NewStateData :: term(),
-        timeout() | hibernate} |
-    {stop, Reason :: term(), Reply :: term(), NewStateData :: term()} |
-    {stop, Reason :: term(), NewStateData :: term()}).
+                        StateName :: atom(), StateData :: term()) ->
+                           {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term()} |
+                           {reply, Reply :: term(), NextStateName :: atom(), NewStateData :: term(),
+                            timeout() | hibernate} |
+                           {next_state, NextStateName :: atom(), NewStateData :: term()} |
+                           {next_state, NextStateName :: atom(), NewStateData :: term(),
+                            timeout() | hibernate} |
+                           {stop, Reason :: term(), Reply :: term(), NewStateData :: term()} |
+                           {stop, Reason :: term(), NewStateData :: term()}).
 handle_sync_event(_Event, _From, StateName, State) ->
     Reply = ok,
     {reply, Reply, StateName, State}.
@@ -322,11 +354,11 @@ handle_sync_event(_Event, _From, StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_info(Info :: term(), StateName :: atom(),
-    StateData :: term()) ->
-    {next_state, NextStateName :: atom(), NewStateData :: term()} |
-    {next_state, NextStateName :: atom(), NewStateData :: term(),
-        timeout() | hibernate} |
-    {stop, Reason :: normal | term(), NewStateData :: term()}).
+                  StateData :: term()) ->
+                     {next_state, NextStateName :: atom(), NewStateData :: term()} |
+                     {next_state, NextStateName :: atom(), NewStateData :: term(),
+                      timeout() | hibernate} |
+                     {stop, Reason :: normal | term(), NewStateData :: term()}).
 handle_info(_Info, StateName, State) ->
     {next_state, StateName, State}.
 
@@ -341,8 +373,8 @@ handle_info(_Info, StateName, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate(Reason :: normal | shutdown | {shutdown, term()}
-| term(), StateName :: atom(), StateData :: term()) ->
-    term()).
+                | term(), StateName :: atom(), StateData :: term()) ->
+                   term()).
 terminate(_Reason, _StateName, #state{room_id = RoomId}) ->
     ?FILE_LOG_DEBUG("room_id[~p] [~p] terminate", [RoomId, _StateName]),
     qp_room_manager:destroy_room(RoomId),
@@ -356,8 +388,8 @@ terminate(_Reason, _StateName, #state{room_id = RoomId}) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(code_change(OldVsn :: term() | {down, term()}, StateName :: atom(),
-    StateData :: #state{}, Extra :: term()) ->
-    {ok, NextStateName :: atom(), NewStateData :: #state{}}).
+                  StateData :: #state{}, Extra :: term()) ->
+                     {ok, NextStateName :: atom(), NewStateData :: #state{}}).
 code_change(_OldVsn, StateName, State, _Extra) ->
     {ok, StateName, State}.
 
@@ -371,6 +403,8 @@ local_quit(UserKey, SeatNum, SeatTree) ->
         {value, SeatData} ->
             case UserKey:compare(SeatData#seat_data.user_data) of
                 false -> failed;
-                true -> 
+                true ->
+                    %%可以退出了,将位置置为空
+                    {success, gb_trees:update(SeatNum, undefined, SeatTree)}
             end
     end.

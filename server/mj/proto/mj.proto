@@ -27,11 +27,12 @@ enum ws_cmd {
     CMD_QP_EXIT_ROOM_REQ = 1011;    // qp_exit_room_req
     CMD_QP_EXIT_ROOM_RSP = 1012;    // qp_exit_room_rsp
     CMD_QP_EXIT_ROOM_PUSH = 1013;   // qp_exit_room_push
+    CMD_QP_ROOM_DISSMISS_PUSH = 1014;   //qp_room_dismiss_push
 
-    CMD_QP_GAME_DATA = 1014;        // qp_game_data
+    CMD_QP_GAME_DATA = 1015;        // qp_game_data
 
-    CMD_QP_PING_REQ = 1015;         // qp_ping_req
-    CMD_QP_PING_RSP = 1016;         //qp_ping_rsp
+    CMD_QP_PING_REQ = 1016;         // qp_ping_req
+    CMD_QP_PING_RSP = 1017;         //qp_ping_rsp
 }
 
 
@@ -117,6 +118,10 @@ message qp_exit_room_rsp {
 
 message qp_exit_room_push {
     required int32 seat_number = 1;
+}
+
+message qp_room_dismiss_push {
+    required int32 room_id = 1;
 }
 
 

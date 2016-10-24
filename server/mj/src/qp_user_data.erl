@@ -12,7 +12,7 @@
 %% API
 -export([new/5,
          get/2,
-    send_room_bin_msg/2]).
+         send_room_msg/2]).
 
 
 
@@ -27,6 +27,7 @@ get(gold, {?MODULE, [_UserId, _UserPid, Gold, _Nickname, _AvatarUrl]}) -> Gold;
 get(nick_name, {?MODULE, [_UserId, _UserPid, _Gold, Nickname, _AvatarUrl]}) -> Nickname;
 get(avatar_url, {?MODULE, [_UserId, _UserPid, _Gold, _Nickname, AvatarUrl]}) -> AvatarUrl.
 
-send_room_bin_msg(Bin, {?MODULE, [_UserId, UserPid, _Gold, _Nickname, _AvatarUrl]}) ->
-    gen_fsm:send_event(UserPid, {room_bin_msg, Bin}).
 
+
+send_room_msg(Msg, {?MODULE, [_UserId, UserPid, _Gold, _Nickname, _AvatarUrl]}) ->
+    gen_fsm:send_event(UserPid, Msg).
