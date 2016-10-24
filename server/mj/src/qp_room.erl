@@ -270,12 +270,14 @@ idle({quit, {UserKey, SeatNum}}, _From, #state{seat_tree = SeatTree, room_id = R
             if
                 length(RoomUsers) =:= 0 ->
                     %%房间没人了
+                    ?FILE_LOG_DEBUG("room_id[~p] user_id[~p] exit_room, room empty.", [RoomId, UserKey:get(user_id)]),
                     {stop, normal, success, NewState};
                 true ->
                     if
                         SeatNum =:= 0 ->
                             %%房主退出了，房间解散
                             %%发送房间解散的消息
+                            ?FILE_LOG_DEBUG("room_id[~p] banker_user_Id[~p] exit_room, room dismiss.", [RoomId, UserKey:get(user_id)]),
                             lists:foreach(
                                 fun({RoomUserData, _, _}) ->
                                     false = UserKey:compare(RoomUserData),
@@ -284,6 +286,7 @@ idle({quit, {UserKey, SeatNum}}, _From, #state{seat_tree = SeatTree, room_id = R
                             {stop, normal, success, NewState};
                         true ->
                             %%广播其他用户，有人退出房间了
+                            ?FILE_LOG_DEBUG("room_id[~p] user_id[~p] exit_room.", [RoomId, UserKey:get(user_id)]),
                             ExitPushBin = qp_proto:encode_qp_packet(#qp_exit_room_push{seat_number = SeatNum}),
                             lists:foreach(
                                 fun({RoomUserData, _, _}) ->
