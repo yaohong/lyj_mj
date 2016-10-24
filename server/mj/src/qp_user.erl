@@ -428,7 +428,7 @@ packet_handle(Request, hall, #state{user_data = UserData} = State) ->
   {hall, State, false};
 
 
-packet_handle(#qp_ready_req{ready_state = ReadyState}=Request, room, #state{room_data = RoomData, user_data = UserData} = State) ->
+packet_handle(#qp_ready_req{ready_state = ReadyState}, room, #state{room_data = RoomData, user_data = UserData} = State) ->
   #room_data{room_id = _, seat_num = SeatNum, room_pid = RoomPid} = RoomData,
   #user_data{user_id = UserId} = UserData,
   ?FILE_LOG_DEBUG("user_id[~p] [room] qp_ready_req", [UserId]),
@@ -448,8 +448,11 @@ packet_handle(#qp_ready_req{ready_state = ReadyState}=Request, room, #state{room
 packet_handle(#qp_ping_req{seat_number = SeatNumber}, room, State) ->
   send_packet(#qp_ping_rsp{seat_number = SeatNumber}, State),
   {room, State, true};
-packet_handle(#qp_exit_room_req{} = Request, room, State) ->
-  ?FILE_LOG_DEBUG("room request=~p", [Request]),
+packet_handle(#qp_exit_room_req{} = Request, room, #state{room_data = RoomData, user_data = UserData} = State) ->
+
+  #room_data{room_id = _, seat_num = SeatNum, room_pid = RoomPid} = RoomData,
+  #user_data{user_id = UserId} = UserData,
+  ?FILE_LOG_DEBUG("user_id[~p] [room] qp_exit_room_req", [UserId]),
 
   {hall, State, true};
 packet_handle(Request, room, State) ->

@@ -26,7 +26,7 @@
     handle_info/3,
     terminate/3,
     code_change/4]).
--export([join/2, ready/4]).
+-export([join/2, quit/3, ready/4]).
 -export([dismiss/1]).
 -define(SERVER, ?MODULE).
 
@@ -45,6 +45,9 @@
 %%%===================================================================
 join(RoomPid, UserData) ->
     gen_fsm:sync_send_event(RoomPid, {join, UserData}).
+
+quit(RoomPid, UserKey, SeatNum) ->
+    gen_fsm:sync_send_event(RoomPid, {quit, {UserKey, SeatNum}}).
 
 
 ready(RoomPid, UserKey, SeatNum, ReadyState) when is_boolean(ReadyState) ->
@@ -256,6 +259,9 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
                     {reply, failed, idle, State}
             end
     end;
+idle({quit, {UserKey, SeatNum}}, _From, State) ->
+
+    {reply, ok, idle, State};
 idle(_Event, _From, State) ->
     Reply = ok,
     {reply, Reply, idle, State}.
@@ -358,3 +364,13 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+local_quit(UserKey, SeatNum, SeatTree) ->
+    case gb_trees:lookup(SeatNum, SeatTree) of
+        none -> failed;
+        {value, undefined} -> failed;
+        {value, SeatData} ->
+            case UserKey:compare(SeatData#seat_data.user_data) of
+                false -> failed;
+                true -> 
+            end
+    end.
