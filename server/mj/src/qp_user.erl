@@ -482,6 +482,7 @@ packet_handle(#qp_exit_room_req{seat_number = SeatNum}, room, #state{room_data =
   case qp_room:quit(RoomPid, qp_user_key:new(UserId, self()), SeatNum) of
     success ->
       ?FILE_LOG_DEBUG("user_id[~p] [room] qp_exit_room success", [UserId]),
+      send_packet(#qp_exit_room_rsp{result = 0}, State),
       {hall, State#state{room_data = undefined}, true};
     failed ->
       ?FILE_LOG_DEBUG("user_id[~p] [room] qp_exit_room failed", [UserId]),
