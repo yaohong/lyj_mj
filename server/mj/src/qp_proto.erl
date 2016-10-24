@@ -53,6 +53,8 @@ encode_qp_packet(Packet) when is_record(Packet, qp_exit_room_rsp) ->
     encode_qp_packet(?CMD_QP_EXIT_ROOM_RSP, mj_pb:encode_qp_exit_room_rsp(Packet));
 encode_qp_packet(Packet) when is_record(Packet, qp_exit_room_push) ->
     encode_qp_packet(?CMD_QP_EXIT_ROOM_PUSH, mj_pb:encode_qp_exit_room_push(Packet));
+encode_qp_packet(Packet) when is_record(Packet, qp_room_dismiss_push) ->
+    encode_qp_packet(?CMD_QP_ROOM_DISSMISS_PUSH, mj_pb:encode_qp_room_dismiss_push(Packet));
 encode_qp_packet(Packet) when is_record(Packet, qp_game_data) ->
     encode_qp_packet(?CMD_QP_GAME_DATA, mj_pb:encode_qp_game_data(Packet));
 encode_qp_packet(Packet) when is_record(Packet, qp_ping_rsp) ->

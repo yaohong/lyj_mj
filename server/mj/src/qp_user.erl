@@ -333,9 +333,16 @@ terminate(_Reason, _StateName, #state{user_data = UserData, room_data = RoomData
   ?FILE_LOG_DEBUG("qp_user terminate", []),
   if
     UserData =/= undefined ->
-      ?FILE_LOG_DEBUG("user_id[~p] [~p] terminate.", [UserData#user_data.user_id, _StateName]);
+      ?FILE_LOG_DEBUG("user_id[~p] [~p] terminate.", [UserData#user_data.user_id, _StateName]),
+      if
+        RoomData =/= undefined ->
+          #room_data{room_pid = RoomPid, seat_num = SeatNum} = RoomData,
+          qp_room:quit(RoomPid, qp_user_key:new(UserData#user_data.user_id, self()), SeatNum);
+        true -> ok
+      end;
     true -> ok
   end,
+
   (State#state.sockModule):close(State#state.sockData),
   ok.
 

@@ -298,7 +298,10 @@ idle(_Event, _From, State) ->
     Reply = ok,
     {reply, Reply, idle, State}.
 
-
+game({join, _UserData}, _From, State) ->
+    {reply, failed, game, State};
+game({ready, _}, _From, State) ->
+    {reply, failed, game, State};
 game(_Event, _From, State) ->
     Reply = ok,
     {reply, Reply, game, State}.

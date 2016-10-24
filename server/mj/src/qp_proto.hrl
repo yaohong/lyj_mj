@@ -25,9 +25,10 @@
 -define(CMD_QP_EXIT_ROOM_REQ, 1011).
 -define(CMD_QP_EXIT_ROOM_RSP, 1012).
 -define(CMD_QP_EXIT_ROOM_PUSH, 1013).
--define(CMD_QP_GAME_DATA, 1014).
--define(CMD_QP_PING_REQ, 1015).
--define(CMD_QP_PING_RSP, 1016).
+-define(CMD_QP_ROOM_DISSMISS_PUSH, 1014).
+-define(CMD_QP_GAME_DATA, 1015).
+-define(CMD_QP_PING_REQ, 1016).
+-define(CMD_QP_PING_RSP, 1017).
 
 
 
