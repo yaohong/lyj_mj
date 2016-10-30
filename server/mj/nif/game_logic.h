@@ -2,9 +2,11 @@
 #define _game_logic_h__
 #include <string>
 //麻将类型
-#define WAN 1
-#define TIAO 2
-#define TONG 3
+#define WAN 1 //(1-9)
+#define TIAO 2  //(1-9)
+#define TONG 3 //(1-9)
+#define FENG 4  //(东(1) 南(2) 西(3) 北(4))
+#define FA 5 //(中(1) 发(2) 白(3))
 
 #define TYPE(p) (p >> 4)
 #define VALUE(p) (p & 0x0f)
