@@ -9,7 +9,7 @@ static ERL_NIF_TERM test_func(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[
 {
 	ErlNifBinary nifBin;
 	enif_inspect_binary(env, argv[0], &nifBin);
-	MainLogic *foo = (MainLogic *)(nifBin.data);
+	HH_MainLogic *foo = (HH_MainLogic *)(nifBin.data);
 	
 	return enif_make_badarg(env);
 }
