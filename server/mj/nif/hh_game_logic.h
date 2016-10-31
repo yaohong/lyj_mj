@@ -41,7 +41,7 @@ struct Seat
     uint8   opers_;                 //能够进行的操作
 };
 
-struct MainLogic 
+struct HH_MainLogic 
 {
 	uint8	pool_[MAX_COUNT];           //牌池里的牌
 	uint8	poolHeadReadIndex_;			//麻将池的头部读取索引
@@ -53,6 +53,6 @@ struct MainLogic
 
 };
 
-void Init(MainLogic *logic, int8 bankerSeatNumber);
+void Init( HH_MainLogic *logic, int8 bankerSeatNumber );
 std::string getPaiString(uint8 p);
 #endif

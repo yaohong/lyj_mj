@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
-void RandomPool(MainLogic *logic)
+void RandomPool( HH_MainLogic *logic )
 {
     //初始化池里的牌
     uint8 writeOffset = 0;
@@ -34,7 +34,7 @@ void RandomPool(MainLogic *logic)
     }
 }
 
-void CrcPool(MainLogic *logic)
+void CrcPool( HH_MainLogic *logic )
 {
     for (int i=0; i<MAX_COUNT; i++)
     {
@@ -70,9 +70,9 @@ void Sort( uint8 pai[], int8 count )
 
 }
 
-void Init(MainLogic *logic, int8 bankerSeatNumber)
+void Init( HH_MainLogic *logic, int8 bankerSeatNumber )
 {
-	memset(logic, 0, sizeof(MainLogic));
+    memset( logic, 0, sizeof(HH_MainLogic) );
     srand((uint32)time(NULL));
     RandomPool(logic);
     CrcPool(logic);
@@ -155,7 +155,7 @@ std::string getPaiString(uint8 p)
 int main(int argc, const char * argv[]) {
     // insert code here...
     std::cout << "Hello, World!\n";
-    MainLogic logic;
+    HH_MainLogic logic;
     Init(&logic, -1);
     
     return 0;

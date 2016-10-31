@@ -3,7 +3,7 @@
 #include <time.h>
 #include <assert.h>
 #include "erl_nif.h"
-#include "game_logic.h"
+#include "hh_game_logic.h"
 
 static ERL_NIF_TERM test_func(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
@@ -19,9 +19,9 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 {
 	ErlNifBinary nifBin;
 	int brankerNumber = -1;
-	int Ret = enif_alloc_binary(sizeof(MainLogic), &nifBin);
+	int Ret = enif_alloc_binary(sizeof(HH_MainLogic), &nifBin);
 	printf("enif_alloc_binary %d\n", Ret);
-	MainLogic *foo = (MainLogic *)(nifBin.data);
+	HH_MainLogic *foo = (HH_MainLogic *)(nifBin.data);
 	enif_get_int(env, argv[1], &brankerNumber);
 	Init(foo, (int8)brankerNumber);
 	ERL_NIF_TERM binTerm = enif_make_binary(env, &nifBin);
