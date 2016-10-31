@@ -18,12 +18,12 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\game_logic.h">
+    <ClInclude Include="..\hh_game_logic.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\game_logic.cpp">
+    <ClCompile Include="..\hh_game_logic.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

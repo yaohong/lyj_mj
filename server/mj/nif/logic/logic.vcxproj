@@ -79,10 +79,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\game_logic.h" />
+    <ClInclude Include="..\hh_game_logic.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\game_logic.cpp" />
+    <ClCompile Include="..\hh_game_logic.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
