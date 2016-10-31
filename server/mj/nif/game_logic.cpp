@@ -64,6 +64,12 @@ void CrcPool(MainLogic *logic)
     }
 }
 
+void Sort( uint8 pai[], int8 count )
+{
+    //万 条 筒 东 西 南 北 中 发 白
+
+}
+
 void Init(MainLogic *logic, int8 bankerSeatNumber)
 {
 	memset(logic, 0, sizeof(MainLogic));
@@ -111,7 +117,12 @@ void Init(MainLogic *logic, int8 bankerSeatNumber)
     Seat &seat = logic->seats_[logic->bankerSeatNumber_];
     seat.pai_[seat.writeIndex_++] = logic->pool_[logic->poolHeadReadIndex_++];
     
-    
+    //给牌排序
+    for (int i = 0; i < 4; i++)
+    {
+        Seat &seat = logic->seats_[i];
+        Sort(seat.pai_, seat.writeIndex_);
+    }
 }
 
 std::string getPaiString(uint8 p)
