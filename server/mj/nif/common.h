@@ -8,12 +8,12 @@
 #include <iostream>
 
 
-//Âé½«ÀàĞÍ
+//éº»å°†ç±»å‹
 #define WAN 1 //(1-9)
 #define TIAO 2  //(1-9)
 #define TONG 3 //(1-9)
-#define FENG 4  //(¶«(1) ÄÏ(2) Î÷(3) ±±(4))
-#define FA 5 //(ÖĞ(1) ·¢(2) °×(3))
+#define FENG 4  //(ä¸œ(1) å—(2) è¥¿(3) åŒ—(4))
+#define FA 5 //(ä¸­(1) å‘(2) ç™½(3))
 
 #define TYPE(p) (p >> 4)
 #define VALUE(p) (p & 0x0f)
@@ -24,7 +24,7 @@
 #define uint32 unsigned int
 
 
-//ÄÜ¹»½øĞĞµÄ²Ù×÷
+//èƒ½å¤Ÿè¿›è¡Œçš„æ“ä½œ
 #define OP_NONE 0				
 #define OP_CHI 1 				//1 << 0
 #define OP_PENG 2 				//1 << 1

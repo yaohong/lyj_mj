@@ -9,30 +9,30 @@ std::string getPaiString( uint8 p )
     char buff[16] = { 0 };
     if (type == 1)
     {
-        sprintf( buff, "%d-ÕÚ", value);
+        sprintf( buff, "%d-‰∏á", value);
     }
     else if (type == 2)
     {
-        sprintf( buff, "%d-Ãı", value );
+        sprintf( buff, "%d-Êù°", value );
     }
     else if (type == 3)
     {
-        sprintf( buff, "%d-Õ≤", value );
+        sprintf( buff, "%d-Á≠í", value );
     }
     else if (type == 5)
     {
-        //÷–∑¢∞◊
+        //‰∏≠ÂèëÁôΩ
         if (1 == value)
         {
-            sprintf( buff, "∫Ï÷–" );
+            sprintf( buff, "Á∫¢‰∏≠" );
         }
         else if (2 == value)
         {
-            sprintf( buff, "∑¢≤∆" );
+            sprintf( buff, "ÂèëË¥¢" );
         }
         else if (3 == value)
         {
-            sprintf( buff, "∞◊∞Â" );
+            sprintf( buff, "ÁôΩÊùø" );
         }
         else
         {
