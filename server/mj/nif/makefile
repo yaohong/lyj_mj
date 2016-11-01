@@ -1,5 +1,5 @@
 
-flag= -g -DEXE -fPIC -std=c++0x
+flag= -g -DHH_EXE -fPIC -std=c++0x
 
 OBJDIR:=./obj
 
