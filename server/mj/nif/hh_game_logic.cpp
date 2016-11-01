@@ -133,7 +133,7 @@ namespace hh
             printf( "seat_number[%d]:", i );
             for (int j = 0; j < seat.writeIndex_; j++)
             {
-                std::string v = getPaiString( seat.pai_[i] );
+                std::string v = getPaiString( seat.pai_[j] );
                 printf( "%s ", v.c_str() );
             }
             printf( "\n" );
