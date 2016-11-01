@@ -50,12 +50,6 @@ namespace hh
 
     void CrcPool( MainLogic *logic )
     {
-        for (int i = 0; i < HH_MAX_COUNT; i++)
-        {
-            std::string v = getPaiString( logic->pool_[i] );
-            printf( "%s ", v.c_str() );
-        }
-
         std::map<uint8, int> verifyMap;
         for (int i = 0; i < HH_MAX_COUNT; ++i)
         {
@@ -131,10 +125,19 @@ namespace hh
         Seat &seat = logic->seats_[logic->bankerSeatNumber_];
         seat.pai_[seat.writeIndex_++] = logic->pool_[logic->poolHeadReadIndex_++];
 
+        printf( "banker_seat_number=%d\n", logic->bankerSeatNumber_ );
         //给牌排序
         for (int i = 0; i < 4; i++)
         {
             Seat &seat = logic->seats_[i];
+            printf( "seat_number[%d]:", i );
+            for (int j = 0; j < seat.writeIndex_; j++)
+            {
+                std::string v = getPaiString( seat.pai_[i] );
+                printf( "%s ", v.c_str() );
+            }
+            printf( "\n" );
+
             Sort( seat.pai_, seat.writeIndex_ );
         }
     }
