@@ -31,7 +31,9 @@
 #define OP_GANG 4				//1 << 2
 #define OP_HU 8					//1 << 3
 #define OP_CHU 16				//1 << 4
-
-std::string getPaiString( uint8 p );
+namespace common {
+	std::string getPaiString(uint8 p);
+	void Sort(uint8 pai[], int8 count);
+}
 
 #endif

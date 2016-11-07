@@ -72,12 +72,6 @@ namespace hh
         }
     }
 
-    void Sort( uint8 pai[], int8 count )
-    {
-        //万 条 筒 东 西 南 北 中 发 白
-
-    }
-
     void Init( MainLogic *logic, int8 bankerSeatNumber )
     {
         memset( logic, 0, sizeof(MainLogic) );
@@ -124,21 +118,22 @@ namespace hh
         //给庄家在发一张
         Seat &seat = logic->seats_[logic->bankerSeatNumber_];
         seat.pai_[seat.writeIndex_++] = logic->pool_[logic->poolHeadReadIndex_++];
-
         printf( "banker_seat_number=%d\n", logic->bankerSeatNumber_ );
+
         //给牌排序
         for (int i = 0; i < 4; i++)
         {
             Seat &seat = logic->seats_[i];
+			common::Sort(seat.pai_, seat.writeIndex_);
             printf( "seat_number[%d]:", i );
             for (int j = 0; j < seat.writeIndex_; j++)
             {
-                std::string v = getPaiString( seat.pai_[j] );
+                std::string v = common::getPaiString( seat.pai_[j] );
                 printf( "%s ", v.c_str() );
             }
             printf( "\n" );
 
-            Sort( seat.pai_, seat.writeIndex_ );
+            
         }
     }
 }
@@ -148,11 +143,9 @@ namespace hh
 #ifdef HH_EXE
 int main( int argc, const char * argv[] )
 {
-    // insert code here...
-    std::cout << "Hello, World!\n";
-    hh::MainLogic logic;
-    hh::Init( &logic, -1 );
-
+	//insert code here...
+	hh::MainLogic logic;
+	hh::Init(&logic, -1);
     return 0;
 }
 #endif
