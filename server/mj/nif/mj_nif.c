@@ -9,7 +9,7 @@ static ERL_NIF_TERM test_func(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[
 {
 	ErlNifBinary nifBin;
 	enif_inspect_binary(env, argv[0], &nifBin);
-	HH_MainLogic *foo = (HH_MainLogic *)(nifBin.data);
+    hh::MainLogic *foo = (hh::MainLogic *)(nifBin.data);
 	
 	return enif_make_badarg(env);
 }
@@ -21,9 +21,9 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 	int brankerNumber = -1;
 	int Ret = enif_alloc_binary(sizeof(HH_MainLogic), &nifBin);
 	printf("enif_alloc_binary %d\n", Ret);
-	HH_MainLogic *foo = (HH_MainLogic *)(nifBin.data);
+    hh::MainLogic *foo = (hh::MainLogic *)(nifBin.data);
 	enif_get_int(env, argv[1], &brankerNumber);
-	Init(foo, (int8)brankerNumber);
+    hh::Init( foo, (int8)brankerNumber );
 	ERL_NIF_TERM binTerm = enif_make_binary(env, &nifBin);
 	return enif_make_tuple(env, 2, enif_make_atom(env, "success"), binTerm);
 }
