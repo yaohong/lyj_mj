@@ -19,7 +19,7 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 {
 	ErlNifBinary nifBin;
 	int brankerNumber = -1;
-	int Ret = enif_alloc_binary(sizeof(HH_MainLogic), &nifBin);
+	int Ret = enif_alloc_binary(sizeof(hh::MainLogic), &nifBin);
 	printf("enif_alloc_binary %d\n", Ret);
     hh::MainLogic *foo = (hh::MainLogic *)(nifBin.data);
 	enif_get_int(env, argv[1], &brankerNumber);
