@@ -28,36 +28,30 @@ enum ws_cmd {
 	
 }
 
-message oper_data {
-	required int32 seat_id = 1;
-	required uint32 oper_flag = 2; 
-}
-
 message qp_mj_game_start_notify {
     repeated uint32 pai = 1;					//自己的牌
-	required int32 banker_seat_number = 2;		//庄家
-	required oper_data od = 3;					//操作信息
+	required uint32 banker_seat_number = 2;		//庄家
+	optional uint32 oper_flag = 3;					//操作信息(庄家自己才会有效)
 }
 
 message qp_mj_game_end_notify {
     required uint32 a = 1;
 }
 
-message qp_mj_peng_req {
-	required uint32 pai = 1;
+message qp_mj_oper_req {
+	required uint32 type = 1;					//操作类型,（吃，碰，杠， 过， 出，胡）
+	optional uint32 v1 = 2;						//操作对应的值1
+	optional uint32 v2 = 3;						//操作对应的值2
 }
 
-message qp_mj_peng_notify {
-	required int32 seat_numer = 1;
-	required uint32 pai = 2;
+message qp_mj_oper_notify {						//又人操作的通知(所有人都会收到)
+	required uint32 seat_numer = 1;				//做操作的座位号
+	required uint32 type = 2;					//操作类型 （吃，碰，杠，过，出，胡）
+	optional uint32 v1 = 3;						//操作对应的值1
+	optional uint32 v2 = 4;						//操作对应的值和返回的值(比如杠牌是有返回值的)
+
+	optional uint32 next_oper_seat_num = 5;		//下一个操作的座位号
+	optional uint32 next_oper_flag = 6;			//下一个操作的信息
 }
 
-message qp_mj_peng_req {
-	required uint32 pai = 1;
-}
-
-message qp_mj_peng_notify {
-	required int32 seat_numer = 1;
-	required uint32 pai = 2;
-}
 
