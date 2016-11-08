@@ -2,13 +2,7 @@
 
 namespace hh
 {
-    int MAX_TITLE_INDEX = 30;
-    uint8 PAI_ARRAY[30] = {
-        PAI( 1, 1 ), PAI( 1, 2 ), PAI( 1, 3 ), PAI( 1, 4 ), PAI( 1, 5 ), PAI( 1, 6 ), PAI( 1, 7 ), PAI( 1, 8 ), PAI( 1, 9 ),        //万
-        PAI( 2, 1 ), PAI( 2, 2 ), PAI( 2, 3 ), PAI( 2, 4 ), PAI( 2, 5 ), PAI( 2, 6 ), PAI( 2, 7 ), PAI( 2, 8 ), PAI( 2, 9 ),        //条
-        PAI( 3, 1 ), PAI( 3, 2 ), PAI( 3, 3 ), PAI( 3, 4 ), PAI( 3, 5 ), PAI( 3, 6 ), PAI( 3, 7 ), PAI( 3, 8 ), PAI( 3, 9 ),        //筒
-        PAI( 5, 1 ), PAI( 5, 1 ), PAI( 5, 1 )  //中发白         
-    };
+
 
     void RandomPool( MainLogic *logic )
     {
@@ -64,11 +58,13 @@ namespace hh
             }
         }
 
-        for (int i = 0; i < MAX_TITLE_INDEX; ++i)
+        for (int i = 0; i < common::MAX_TITLE_INDEX; ++i)
         {
-            std::map<uint8, int>::iterator p_it = verifyMap.find( logic->pool_[PAI_ARRAY[i]] );
-            assert( p_it != verifyMap.end() );
-            assert( p_it->second == 4 );
+			std::map<uint8, int>::iterator p_it = verifyMap.find(logic->pool_[common::PAI_ARRAY[i]]);
+			if (p_it != verifyMap.end())
+			{
+				assert(p_it->second == 4);
+			}
         }
     }
 
@@ -146,6 +142,13 @@ int main( int argc, const char * argv[] )
 	//insert code here...
 	hh::MainLogic logic;
 	hh::Init(&logic, -1);
+	//uint8 source[14] = {1,2,3,4,3,3,7,8,9,10,11,12,13,14};
+	//uint8 remove[4] = { 3, 7, 1, 13 };
+	//common::RemovePai(source, 14, remove, 3);
+	//for (int8 i = 0; i < 14; i++)
+	//{
+	//	printf("%d ", source[i]);
+	//}
     return 0;
 }
 #endif

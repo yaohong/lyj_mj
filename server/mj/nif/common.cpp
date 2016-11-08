@@ -66,4 +66,54 @@ namespace common {
 
 		}
 	}
+
+	void RemovePai(uint8 source[], int8 sourceLen, uint8 dest[], int8 destLen)
+	{
+		assert(sourceLen <= 14);
+		assert(destLen <= 14);
+		uint8 tmpSource[14];
+		uint8 tmpDest[14];
+		memset(tmpSource, 0, 14 * sizeof(uint8));
+		memset(tmpDest, 0, 14 * sizeof(uint8));
+		memcpy(tmpSource, source, sourceLen * sizeof(uint8));
+		memcpy(tmpDest, dest, destLen * sizeof(uint8));
+
+		memset(source, 0, sourceLen * sizeof(uint8));
+		int8 writeIndex = 0;
+		for (int8 i = 0; i < sourceLen; i++)
+		{
+			if (tmpSource[i] != 0)
+			{
+				bool isRemove = false;
+				for (int8 j = 0; j < destLen; j++)
+				{
+					if (tmpSource[i] == tmpDest[j])
+					{
+						tmpDest[j] = 0;
+						isRemove = true;
+						break;
+					}
+				}
+
+				if (!isRemove)
+				{
+					source[writeIndex++] = tmpSource[i];
+				}
+			}
+		}
+	}
+
+	void CheckBasicHuPai(uint8 source[], int8 sourceLen, std::vector<HuBasicResult> &result)
+	{
+		//看总数是否为3n + 2
+		if (sourceLen == 2)
+		{
+			
+		}
+		if (sourceLen % 3 != 2)
+		{
+			return;
+		}
+		return;
+	}
 }

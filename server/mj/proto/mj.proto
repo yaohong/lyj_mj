@@ -1,141 +1,63 @@
 // Client <-> WorldServer
 
-package qp_server;
+package qp_mj;
 
-message qp_packet {
+message qp_logic {
     required int32 cmd = 1;
-    required uint32 seq_id = 2; // 流水号
     optional bytes serialized = 3;
 }
 
 
 enum ws_cmd {
-    CMD_QP_LOGIN_REQ = 1001; // 登录请求 (qp_login_req)
-    CMD_QP_LOGIN_RSP = 1002; // 登录回复 (qp_login_rsp)
+    CMD_MJ_GAME_START_NOTIFY = 1001; //游戏开始
+    CMD_MJ_GAME_END_NOTIFY = 1002;   //游戏结束
 
-    CMD_QP_CREATE_ROOM_REQ = 1003; //qp_create_room_req
-    CMD_QP_CREATE_ROOM_RSP = 1004; //qp_create_room_rsp
+    CMD_MJ_PENG_REQ = 1003;				//碰牌
+	CMD_MJ_PENG_NOTIFY = 1005;			//碰牌的通知(自己不会收到)
 
-    CMD_QP_JOIN_ROOM_REQ = 1005;    //qp_join_room_req
-    CMD_QP_JOIN_ROOM_RSP = 1006;    //qp_join_room_rsp
-    CMD_QP_JOIN_ROOM_PUSH = 1007;   //qp_join_room_push
-
-    CMD_QP_READY_REQ = 1008;        // qp_ready_req
-    CMD_QP_READY_RSP = 1009;        // qp_ready_rsp
-    CMD_QP_READY_PUSH = 1010;       // qp_ready_push
-
-    CMD_QP_EXIT_ROOM_REQ = 1011;    // qp_exit_room_req
-    CMD_QP_EXIT_ROOM_RSP = 1012;    // qp_exit_room_rsp
-    CMD_QP_EXIT_ROOM_PUSH = 1013;   // qp_exit_room_push
-    CMD_QP_ROOM_DISSMISS_PUSH = 1014;   //qp_room_dismiss_push
-
-    CMD_QP_GAME_DATA = 1015;        // qp_game_data
-
-    CMD_QP_PING_REQ = 1016;         // qp_ping_req
-    CMD_QP_PING_RSP = 1017;         //qp_ping_rsp
+	CMD_MJ_CHI_REQ = 1006;				//吃牌
+	CMD_MJ_CHI_NOTIFY = 1008;			//吃牌的通知(自己不会收到)
+	
+	CMD_MJ_GANG_REQ = 1009;				//杠牌
+	CMD_MJ_GANG_NOTIFY = 1011;			//杠牌的通知
+	
+	CMD_MJ_GUO_REQ = 1012;				//过牌
+	CMD_MJ_GUO_NOTIFY = 1014;			//过牌的通知
+	
+	CMD_MJ_HU_REQ = 1015;				//胡牌的请求
+	
 }
 
-
-
-message qp_login_req {
-    required string account = 1;
+message oper_data {
+	required int32 seat_id = 1;
+	required uint32 oper_flag = 2; 
 }
 
-message qp_user_data {
-    required uint32 user_id = 1;
-    required int64 gold = 2;
-    required string avatar_url = 3;
-    required string nick_name = 4;
+message qp_mj_game_start_notify {
+    repeated uint32 pai = 1;					//自己的牌
+	required int32 banker_seat_number = 2;		//庄家
+	required oper_data od = 3;					//操作信息
 }
 
-message qp_login_rsp {
-    required int32 state = 1;
-    optional qp_user_data data = 2;
+message qp_mj_game_end_notify {
+    required uint32 a = 1;
 }
 
-
-message qp_create_room_req {
-    required int32 room_type = 1;
+message qp_mj_peng_req {
+	required uint32 pai = 1;
 }
 
-
-message qp_create_room_rsp {
-    required int32 state = 1;
-    optional int32 room_id = 2;
-    optional int32 seat_number = 3;
+message qp_mj_peng_notify {
+	required int32 seat_numer = 1;
+	required uint32 pai = 2;
 }
 
-
-message qp_join_room_req {
-    required int32 room_id = 1;
+message qp_mj_peng_req {
+	required uint32 pai = 1;
 }
 
-message qp_room_user {
-    required qp_user_data user_data = 1;
-    required int32 seat_number = 2;
-    required bool is_ready = 3;
-}
-
-
-message qp_join_room_rsp {
-    required int32 result = 1;
-    optional int32 seat_number = 2;
-    optional bool is_ready = 3;
-    repeated qp_room_user room_user = 4;
-}
-
-
-message qp_join_room_push {
-    required qp_room_user room_user = 1;
-}
-
-message qp_ready_req {
-    required bool ready_state = 1;
-}
-
-
-message qp_ready_rsp {
-    required int32 state = 1;
-    optional bool ready_state = 2;
-}
-
-
-message qp_ready_push {
-    required int32 seat_number = 1;
-    required bool ready_state = 2;
-}
-
-
-message qp_exit_room_req {
-    required int32 seat_number = 1;
-}
-
-
-message qp_exit_room_rsp {
-    required int32 result = 1;
-}
-
-
-message qp_exit_room_push {
-    required int32 seat_number = 1;
-}
-
-message qp_room_dismiss_push {
-    required int32 room_id = 1;
-}
-
-
-message qp_game_data {
-    required bytes game_data = 1; 
-}
-
-
-message qp_ping_req {
-    required int32 seat_number = 1;
-}
-
-
-message qp_ping_rsp {
-    required int32 seat_number = 1;
+message qp_mj_peng_notify {
+	required int32 seat_numer = 1;
+	required uint32 pai = 2;
 }
 
