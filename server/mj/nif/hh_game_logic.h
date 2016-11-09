@@ -32,8 +32,6 @@ namespace hh
     };
 
 	void Init(MainLogic *logic, int8 bankerSeatNumber, uint32 randSeed);
-
-	ERL_NIF_TERM GenerateReturnValue(ErlNifEnv *env, MainLogic *logic);
 }
 
 

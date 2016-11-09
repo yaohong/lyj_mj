@@ -2,7 +2,7 @@
 
 namespace hh
 {
-    void RandomPool( MainLogic *logic )
+    void InitPool( MainLogic *logic )
     {
         //初始化池里的牌 (万子 条子 筒子)
         uint8 writeOffset = 0;
@@ -27,17 +27,6 @@ namespace hh
         }
 
         assert( HH_MAX_COUNT == writeOffset );
-
-        //将牌乱序
-        uint8 tmpRandRange = writeOffset;
-		for (uint8 i = 0; i < writeOffset; ++i)
-        {
-            uint8 tmpIndex = rand() % tmpRandRange--;
-            //和最大索引交换值
-            uint8 tmpValue = logic->pool_[tmpIndex];
-            logic->pool_[tmpIndex] = logic->pool_[tmpRandRange];
-            logic->pool_[tmpRandRange] = tmpValue;
-        }
     }
 
     void CrcPool( MainLogic *logic )
@@ -70,8 +59,9 @@ namespace hh
     {
         memset( logic, 0, sizeof(MainLogic) );
 		srand(randSeed);
-        RandomPool( logic );
-        CrcPool( logic );
+		InitPool(logic);
+		common::Random(logic->pool_, HH_MAX_COUNT);
+		common::Crc(logic->pool_, HH_MAX_COUNT);
         //随即一个庄家
         logic->poolHeadReadIndex_ = 0;
         logic->poolTailReadIndex_ = HH_MAX_COUNT - 1;
@@ -128,11 +118,6 @@ namespace hh
             //printf( "\n" );
         }
     }
-
-	ERL_NIF_TERM GenerateReturnValue(ErlNifEnv *env, MainLogic *logic)
-	{
-		return enif_make_int(env, 1);
-	}
 }
 
 

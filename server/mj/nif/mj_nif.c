@@ -55,7 +55,7 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 		}
 		hh::MainLogic *logic = (hh::MainLogic *)(nifBin.data);
 		hh::Init(logic, (int8)brankerNumber, randSeed);
-		ERL_NIF_TERM returnValue = hh::GenerateReturnValue(env, foo);
+		ERL_NIF_TERM returnValue = enif_make_int(env, 1);
 		return MakeSuccess1(env, enif_make_tuple(env, 2, returnValue, enif_make_binary(env, &nifBin)));
 	} else if (1 == gameType) {
 

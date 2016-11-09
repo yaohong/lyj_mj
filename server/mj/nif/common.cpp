@@ -49,10 +49,10 @@ namespace common {
 		return buff;
 	}
 
-	void Sort(uint8 pai[], int8 count)
+	void Sort(uint8 pai[], uint8 count)
 	{
 		//万 条 筒 风 发
-		for (int8 i = count; i>0; i--)
+		for (uint8 i = count; i>0; i--)
 		{
 			for (int8 j = 0; j < i - 1; j++)
 			{
@@ -67,7 +67,46 @@ namespace common {
 		}
 	}
 
-	void RemovePai(uint8 source[], int8 sourceLen, uint8 dest[], int8 destLen)
+	void Random(uint8 pai[], uint8 count)
+	{
+		uint8 tmpRandRange = count;
+		for (uint8 i = 0; i < count; ++i)
+		{
+			uint8 tmpIndex = rand() % tmpRandRange--;
+			//和最大索引交换值
+			uint8 tmpValue = pai[tmpIndex];
+			pai[tmpIndex] = pai[tmpRandRange];
+			pai[tmpRandRange] = tmpValue;
+		}
+	}
+
+	void Crc(uint8 pai[], uint8 count)
+	{
+		std::map<uint8, int> verifyMap;
+		for (int i = 0; i < count; ++i)
+		{
+			std::map<uint8, int>::iterator p_it = verifyMap.find(pai[i]);
+			if (p_it == verifyMap.end())
+			{
+				verifyMap.insert(std::pair<uint8, int>(pai[i], 1));
+			}
+			else
+			{
+				p_it->second++;
+			}
+		}
+
+		for (int i = 0; i < MAX_TITLE_INDEX; ++i)
+		{
+			std::map<uint8, int>::iterator p_it = verifyMap.find(pai[common::PAI_ARRAY[i]]);
+			if (p_it != verifyMap.end())
+			{
+				assert(p_it->second == 4);
+			}
+		}
+	}
+
+	void RemovePai(uint8 source[], uint8 sourceLen, uint8 dest[], uint8 destLen)
 	{
 		assert(sourceLen <= 14);
 		assert(destLen <= 14);
@@ -79,13 +118,13 @@ namespace common {
 		memcpy(tmpDest, dest, destLen * sizeof(uint8));
 
 		memset(source, 0, sourceLen * sizeof(uint8));
-		int8 writeIndex = 0;
-		for (int8 i = 0; i < sourceLen; i++)
+		uint8 writeIndex = 0;
+		for (uint8 i = 0; i < sourceLen; i++)
 		{
 			if (tmpSource[i] != 0)
 			{
 				bool isRemove = false;
-				for (int8 j = 0; j < destLen; j++)
+				for (uint8 j = 0; j < destLen; j++)
 				{
 					if (tmpSource[i] == tmpDest[j])
 					{
