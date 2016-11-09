@@ -14,7 +14,7 @@
 -include("qp_type.hrl").
 -include("../deps/file_log/include/file_log.hrl").
 -include("qp_proto.hrl").
--include("../include/mj_pb.hrl").
+-include("../include/common_pb.hrl").
 %% API
 
 %% gen_fsm callbacks

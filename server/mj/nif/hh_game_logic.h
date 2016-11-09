@@ -12,7 +12,7 @@ namespace hh
         uint8   peng_[4];				//碰的牌
         uint8   gang_[4];				//杠的牌
         uint8   pai_[14];				//手里的牌
-        int8    writeIndex_;            //写入的索引
+        uint8   writeIndex_;            //写入的索引
         uint8   opers_;                 //能够进行的操作
     };
 
@@ -22,13 +22,13 @@ namespace hh
         uint8	poolHeadReadIndex_;			//麻将池的头部读取索引
         uint8   poolTailReadIndex_;         //麻将池的尾部读取索引
         Seat	seats_[4];                  //四个座位
-        int8    bankerSeatNumber_;          //庄家的座位号
-        int8	currentSeatNumber_;         //当前操作的座位
+		int8    bankerSeatNumber_;          //庄家的座位号
+		int8	currentSeatNumber_;         //当前操作的座位
         uint32	lastTime_;                  //开始操作的时间
 
     };
 
-    void Init( MainLogic *logic, int8 bankerSeatNumber );
+	void Init(MainLogic *logic, int8 bankerSeatNumber);
 }
 
 

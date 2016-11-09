@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(qp_proto).
 -author("yaohong").
--include("../include/mj_pb.hrl").
+-include("../include/common_pb.hrl").
 -include("qp_proto.hrl").
 -include("qp_type.hrl").
 %% API

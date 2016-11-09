@@ -64,7 +64,7 @@ namespace common {
 	std::string getPaiString(uint8 p);
 	void Sort(uint8 pai[], int8 count);
 	void RemovePai(uint8 source[], int8 sourceLen, uint8 dest[], int8 destLen);
-	bool CheckBasicHuPai(uint8 source[], int8 sourceLen, std::vector<HuBasicResult> &result);
+	void CheckBasicHuPai(uint8 source[], uint8 sourceLen, std::vector<HuBasicResult> &result);
 }
 
 #endif

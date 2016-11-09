@@ -12,26 +12,15 @@ enum ws_cmd {
     CMD_MJ_GAME_START_NOTIFY = 1001; //游戏开始
     CMD_MJ_GAME_END_NOTIFY = 1002;   //游戏结束
 
-    CMD_MJ_PENG_REQ = 1003;				//碰牌
-	CMD_MJ_PENG_NOTIFY = 1005;			//碰牌的通知(自己不会收到)
-
-	CMD_MJ_CHI_REQ = 1006;				//吃牌
-	CMD_MJ_CHI_NOTIFY = 1008;			//吃牌的通知(自己不会收到)
-	
-	CMD_MJ_GANG_REQ = 1009;				//杠牌
-	CMD_MJ_GANG_NOTIFY = 1011;			//杠牌的通知
-	
-	CMD_MJ_GUO_REQ = 1012;				//过牌
-	CMD_MJ_GUO_NOTIFY = 1014;			//过牌的通知
-	
-	CMD_MJ_HU_REQ = 1015;				//胡牌的请求
+    CMD_MJ_OPER_REQ = 1003;				//游戏操作
+	CMD_MJ_OPER_NOTIFY = 1004;			//游戏操作的通知
 	
 }
 
 message qp_mj_game_start_notify {
     repeated uint32 pai = 1;					//自己的牌
-	required uint32 banker_seat_number = 2;		//庄家
-	optional uint32 oper_flag = 3;					//操作信息(庄家自己才会有效)
+	required int32 banker_seat_number = 2;		//庄家
+	optional uint32 oper_flag = 3;				//操作信息(庄家自己才会有效)
 }
 
 message qp_mj_game_end_notify {
@@ -44,13 +33,13 @@ message qp_mj_oper_req {
 	optional uint32 v2 = 3;						//操作对应的值2
 }
 
-message qp_mj_oper_notify {						//又人操作的通知(所有人都会收到)
-	required uint32 seat_numer = 1;				//做操作的座位号
+message qp_mj_oper_notify {						//有人操作的通知(所有人都会收到)
+	required int32 seat_numer = 1;				//做操作的座位号
 	required uint32 type = 2;					//操作类型 （吃，碰，杠，过，出，胡）
 	optional uint32 v1 = 3;						//操作对应的值1
 	optional uint32 v2 = 4;						//操作对应的值和返回的值(比如杠牌是有返回值的)
 
-	optional uint32 next_oper_seat_num = 5;		//下一个操作的座位号
+	optional int32 next_oper_seat_num = 5;		//下一个操作的座位号
 	optional uint32 next_oper_flag = 6;			//下一个操作的信息
 }
 

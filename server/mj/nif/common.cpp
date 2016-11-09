@@ -103,7 +103,7 @@ namespace common {
 		}
 	}
 
-	void CheckBasicHuPai(uint8 source[], int8 sourceLen, std::vector<HuBasicResult> &result)
+	void CheckBasicHuPai(uint8 source[], uint8 sourceLen, std::vector<HuBasicResult> &result)
 	{
 		//看总数是否为3n + 2
 		if (sourceLen == 2)

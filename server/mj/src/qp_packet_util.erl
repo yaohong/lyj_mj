@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(qp_packet_util).
 -author("yaohong").
--include("../include/mj_pb.hrl").
+-include("../include/common_pb.hrl").
 %% API
 -export([create_room_failed_bin/1, create_ping_rsp_bin/0]).
 

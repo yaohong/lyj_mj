@@ -27,54 +27,28 @@
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 
-namespace qp_server {
+namespace qp_mj {
 
 // Internal implementation detail -- do not call these.
 void  protobuf_AddDesc_mj_2eproto();
 void protobuf_AssignDesc_mj_2eproto();
 void protobuf_ShutdownFile_mj_2eproto();
 
-class qp_packet;
-class qp_login_req;
-class qp_user_data;
-class qp_login_rsp;
-class qp_create_room_req;
-class qp_create_room_rsp;
-class qp_join_room_req;
-class qp_room_user;
-class qp_join_room_rsp;
-class qp_join_room_push;
-class qp_ready_req;
-class qp_ready_rsp;
-class qp_ready_push;
-class qp_exit_room_req;
-class qp_exit_room_rsp;
-class qp_exit_room_push;
-class qp_game_data;
-class qp_ping_req;
-class qp_ping_rsp;
+class qp_logic;
+class qp_mj_game_start_notify;
+class qp_mj_game_end_notify;
+class qp_mj_oper_req;
+class qp_mj_oper_notify;
 
 enum ws_cmd {
-  CMD_QP_LOGIN_REQ = 1001,
-  CMD_QP_LOGIN_RSP = 1002,
-  CMD_QP_CREATE_ROOM_REQ = 1003,
-  CMD_QP_CREATE_ROOM_RSP = 1004,
-  CMD_QP_JOIN_ROOM_REQ = 1005,
-  CMD_QP_JOIN_ROOM_RSP = 1006,
-  CMD_QP_JOIN_ROOM_PUSH = 1007,
-  CMD_QP_READY_REQ = 1008,
-  CMD_QP_READY_RSP = 1009,
-  CMD_QP_READY_PUSH = 1010,
-  CMD_QP_EXIT_ROOM_REQ = 1011,
-  CMD_QP_EXIT_ROOM_RSP = 1012,
-  CMD_QP_EXIT_ROOM_PUSH = 1013,
-  CMD_QP_GAME_DATA = 1014,
-  CMD_QP_PING_REQ = 1015,
-  CMD_QP_PING_RSP = 1016
+  CMD_MJ_GAME_START_NOTIFY = 1001,
+  CMD_MJ_GAME_END_NOTIFY = 1002,
+  CMD_MJ_OPER_REQ = 1003,
+  CMD_MJ_OPER_NOTIFY = 1004
 };
 bool ws_cmd_IsValid(int value);
-const ws_cmd ws_cmd_MIN = CMD_QP_LOGIN_REQ;
-const ws_cmd ws_cmd_MAX = CMD_QP_PING_RSP;
+const ws_cmd ws_cmd_MIN = CMD_MJ_GAME_START_NOTIFY;
+const ws_cmd ws_cmd_MAX = CMD_MJ_OPER_NOTIFY;
 const int ws_cmd_ARRAYSIZE = ws_cmd_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* ws_cmd_descriptor();
@@ -89,14 +63,14 @@ inline bool ws_cmd_Parse(
 }
 // ===================================================================
 
-class qp_packet : public ::google::protobuf::Message {
+class qp_logic : public ::google::protobuf::Message {
  public:
-  qp_packet();
-  virtual ~qp_packet();
+  qp_logic();
+  virtual ~qp_logic();
 
-  qp_packet(const qp_packet& from);
+  qp_logic(const qp_logic& from);
 
-  inline qp_packet& operator=(const qp_packet& from) {
+  inline qp_logic& operator=(const qp_logic& from) {
     CopyFrom(from);
     return *this;
   }
@@ -110,17 +84,17 @@ class qp_packet : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_packet& default_instance();
+  static const qp_logic& default_instance();
 
-  void Swap(qp_packet* other);
+  void Swap(qp_logic* other);
 
   // implements Message ----------------------------------------------
 
-  qp_packet* New() const;
+  qp_logic* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_packet& from);
-  void MergeFrom(const qp_packet& from);
+  void CopyFrom(const qp_logic& from);
+  void MergeFrom(const qp_logic& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -150,13 +124,6 @@ class qp_packet : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 cmd() const;
   inline void set_cmd(::google::protobuf::int32 value);
 
-  // required uint32 seq_id = 2;
-  inline bool has_seq_id() const;
-  inline void clear_seq_id();
-  static const int kSeqIdFieldNumber = 2;
-  inline ::google::protobuf::uint32 seq_id() const;
-  inline void set_seq_id(::google::protobuf::uint32 value);
-
   // optional bytes serialized = 3;
   inline bool has_serialized() const;
   inline void clear_serialized();
@@ -169,323 +136,17 @@ class qp_packet : public ::google::protobuf::Message {
   inline ::std::string* release_serialized();
   inline void set_allocated_serialized(::std::string* serialized);
 
-  // @@protoc_insertion_point(class_scope:qp_server.qp_packet)
+  // @@protoc_insertion_point(class_scope:qp_mj.qp_logic)
  private:
   inline void set_has_cmd();
   inline void clear_has_cmd();
-  inline void set_has_seq_id();
-  inline void clear_has_seq_id();
   inline void set_has_serialized();
   inline void clear_has_serialized();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::google::protobuf::int32 cmd_;
-  ::google::protobuf::uint32 seq_id_;
   ::std::string* serialized_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_packet* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_login_req : public ::google::protobuf::Message {
- public:
-  qp_login_req();
-  virtual ~qp_login_req();
-
-  qp_login_req(const qp_login_req& from);
-
-  inline qp_login_req& operator=(const qp_login_req& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_login_req& default_instance();
-
-  void Swap(qp_login_req* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_login_req* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_login_req& from);
-  void MergeFrom(const qp_login_req& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required string account = 1;
-  inline bool has_account() const;
-  inline void clear_account();
-  static const int kAccountFieldNumber = 1;
-  inline const ::std::string& account() const;
-  inline void set_account(const ::std::string& value);
-  inline void set_account(const char* value);
-  inline void set_account(const char* value, size_t size);
-  inline ::std::string* mutable_account();
-  inline ::std::string* release_account();
-  inline void set_allocated_account(::std::string* account);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_login_req)
- private:
-  inline void set_has_account();
-  inline void clear_has_account();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::std::string* account_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_login_req* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_user_data : public ::google::protobuf::Message {
- public:
-  qp_user_data();
-  virtual ~qp_user_data();
-
-  qp_user_data(const qp_user_data& from);
-
-  inline qp_user_data& operator=(const qp_user_data& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_user_data& default_instance();
-
-  void Swap(qp_user_data* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_user_data* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_user_data& from);
-  void MergeFrom(const qp_user_data& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required uint32 user_id = 1;
-  inline bool has_user_id() const;
-  inline void clear_user_id();
-  static const int kUserIdFieldNumber = 1;
-  inline ::google::protobuf::uint32 user_id() const;
-  inline void set_user_id(::google::protobuf::uint32 value);
-
-  // required int64 gold = 2;
-  inline bool has_gold() const;
-  inline void clear_gold();
-  static const int kGoldFieldNumber = 2;
-  inline ::google::protobuf::int64 gold() const;
-  inline void set_gold(::google::protobuf::int64 value);
-
-  // required string avatar_url = 3;
-  inline bool has_avatar_url() const;
-  inline void clear_avatar_url();
-  static const int kAvatarUrlFieldNumber = 3;
-  inline const ::std::string& avatar_url() const;
-  inline void set_avatar_url(const ::std::string& value);
-  inline void set_avatar_url(const char* value);
-  inline void set_avatar_url(const char* value, size_t size);
-  inline ::std::string* mutable_avatar_url();
-  inline ::std::string* release_avatar_url();
-  inline void set_allocated_avatar_url(::std::string* avatar_url);
-
-  // required string nick_name = 4;
-  inline bool has_nick_name() const;
-  inline void clear_nick_name();
-  static const int kNickNameFieldNumber = 4;
-  inline const ::std::string& nick_name() const;
-  inline void set_nick_name(const ::std::string& value);
-  inline void set_nick_name(const char* value);
-  inline void set_nick_name(const char* value, size_t size);
-  inline ::std::string* mutable_nick_name();
-  inline ::std::string* release_nick_name();
-  inline void set_allocated_nick_name(::std::string* nick_name);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_user_data)
- private:
-  inline void set_has_user_id();
-  inline void clear_has_user_id();
-  inline void set_has_gold();
-  inline void clear_has_gold();
-  inline void set_has_avatar_url();
-  inline void clear_has_avatar_url();
-  inline void set_has_nick_name();
-  inline void clear_has_nick_name();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int64 gold_;
-  ::std::string* avatar_url_;
-  ::std::string* nick_name_;
-  ::google::protobuf::uint32 user_id_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_user_data* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_login_rsp : public ::google::protobuf::Message {
- public:
-  qp_login_rsp();
-  virtual ~qp_login_rsp();
-
-  qp_login_rsp(const qp_login_rsp& from);
-
-  inline qp_login_rsp& operator=(const qp_login_rsp& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_login_rsp& default_instance();
-
-  void Swap(qp_login_rsp* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_login_rsp* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_login_rsp& from);
-  void MergeFrom(const qp_login_rsp& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 state = 1;
-  inline bool has_state() const;
-  inline void clear_state();
-  static const int kStateFieldNumber = 1;
-  inline ::google::protobuf::int32 state() const;
-  inline void set_state(::google::protobuf::int32 value);
-
-  // optional .qp_server.qp_user_data data = 2;
-  inline bool has_data() const;
-  inline void clear_data();
-  static const int kDataFieldNumber = 2;
-  inline const ::qp_server::qp_user_data& data() const;
-  inline ::qp_server::qp_user_data* mutable_data();
-  inline ::qp_server::qp_user_data* release_data();
-  inline void set_allocated_data(::qp_server::qp_user_data* data);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_login_rsp)
- private:
-  inline void set_has_state();
-  inline void clear_has_state();
-  inline void set_has_data();
-  inline void clear_has_data();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::qp_server::qp_user_data* data_;
-  ::google::protobuf::int32 state_;
+  ::google::protobuf::int32 cmd_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
@@ -495,18 +156,18 @@ class qp_login_rsp : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_mj_2eproto();
 
   void InitAsDefaultInstance();
-  static qp_login_rsp* default_instance_;
+  static qp_logic* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class qp_create_room_req : public ::google::protobuf::Message {
+class qp_mj_game_start_notify : public ::google::protobuf::Message {
  public:
-  qp_create_room_req();
-  virtual ~qp_create_room_req();
+  qp_mj_game_start_notify();
+  virtual ~qp_mj_game_start_notify();
 
-  qp_create_room_req(const qp_create_room_req& from);
+  qp_mj_game_start_notify(const qp_mj_game_start_notify& from);
 
-  inline qp_create_room_req& operator=(const qp_create_room_req& from) {
+  inline qp_mj_game_start_notify& operator=(const qp_mj_game_start_notify& from) {
     CopyFrom(from);
     return *this;
   }
@@ -520,17 +181,17 @@ class qp_create_room_req : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_create_room_req& default_instance();
+  static const qp_mj_game_start_notify& default_instance();
 
-  void Swap(qp_create_room_req* other);
+  void Swap(qp_mj_game_start_notify* other);
 
   // implements Message ----------------------------------------------
 
-  qp_create_room_req* New() const;
+  qp_mj_game_start_notify* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_create_room_req& from);
-  void MergeFrom(const qp_create_room_req& from);
+  void CopyFrom(const qp_mj_game_start_notify& from);
+  void MergeFrom(const qp_mj_game_start_notify& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -553,123 +214,44 @@ class qp_create_room_req : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required int32 room_type = 1;
-  inline bool has_room_type() const;
-  inline void clear_room_type();
-  static const int kRoomTypeFieldNumber = 1;
-  inline ::google::protobuf::int32 room_type() const;
-  inline void set_room_type(::google::protobuf::int32 value);
+  // repeated uint32 pai = 1;
+  inline int pai_size() const;
+  inline void clear_pai();
+  static const int kPaiFieldNumber = 1;
+  inline ::google::protobuf::uint32 pai(int index) const;
+  inline void set_pai(int index, ::google::protobuf::uint32 value);
+  inline void add_pai(::google::protobuf::uint32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      pai() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_pai();
 
-  // @@protoc_insertion_point(class_scope:qp_server.qp_create_room_req)
+  // required int32 banker_seat_number = 2;
+  inline bool has_banker_seat_number() const;
+  inline void clear_banker_seat_number();
+  static const int kBankerSeatNumberFieldNumber = 2;
+  inline ::google::protobuf::int32 banker_seat_number() const;
+  inline void set_banker_seat_number(::google::protobuf::int32 value);
+
+  // optional uint32 oper_flag = 3;
+  inline bool has_oper_flag() const;
+  inline void clear_oper_flag();
+  static const int kOperFlagFieldNumber = 3;
+  inline ::google::protobuf::uint32 oper_flag() const;
+  inline void set_oper_flag(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:qp_mj.qp_mj_game_start_notify)
  private:
-  inline void set_has_room_type();
-  inline void clear_has_room_type();
+  inline void set_has_banker_seat_number();
+  inline void clear_has_banker_seat_number();
+  inline void set_has_oper_flag();
+  inline void clear_has_oper_flag();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::google::protobuf::int32 room_type_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_create_room_req* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_create_room_rsp : public ::google::protobuf::Message {
- public:
-  qp_create_room_rsp();
-  virtual ~qp_create_room_rsp();
-
-  qp_create_room_rsp(const qp_create_room_rsp& from);
-
-  inline qp_create_room_rsp& operator=(const qp_create_room_rsp& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_create_room_rsp& default_instance();
-
-  void Swap(qp_create_room_rsp* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_create_room_rsp* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_create_room_rsp& from);
-  void MergeFrom(const qp_create_room_rsp& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 state = 1;
-  inline bool has_state() const;
-  inline void clear_state();
-  static const int kStateFieldNumber = 1;
-  inline ::google::protobuf::int32 state() const;
-  inline void set_state(::google::protobuf::int32 value);
-
-  // optional int32 room_id = 2;
-  inline bool has_room_id() const;
-  inline void clear_room_id();
-  static const int kRoomIdFieldNumber = 2;
-  inline ::google::protobuf::int32 room_id() const;
-  inline void set_room_id(::google::protobuf::int32 value);
-
-  // optional int32 seat_id = 3;
-  inline bool has_seat_id() const;
-  inline void clear_seat_id();
-  static const int kSeatIdFieldNumber = 3;
-  inline ::google::protobuf::int32 seat_id() const;
-  inline void set_seat_id(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_create_room_rsp)
- private:
-  inline void set_has_state();
-  inline void clear_has_state();
-  inline void set_has_room_id();
-  inline void clear_has_room_id();
-  inline void set_has_seat_id();
-  inline void clear_has_seat_id();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 state_;
-  ::google::protobuf::int32 room_id_;
-  ::google::protobuf::int32 seat_id_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > pai_;
+  ::google::protobuf::int32 banker_seat_number_;
+  ::google::protobuf::uint32 oper_flag_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
@@ -679,18 +261,18 @@ class qp_create_room_rsp : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_mj_2eproto();
 
   void InitAsDefaultInstance();
-  static qp_create_room_rsp* default_instance_;
+  static qp_mj_game_start_notify* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class qp_join_room_req : public ::google::protobuf::Message {
+class qp_mj_game_end_notify : public ::google::protobuf::Message {
  public:
-  qp_join_room_req();
-  virtual ~qp_join_room_req();
+  qp_mj_game_end_notify();
+  virtual ~qp_mj_game_end_notify();
 
-  qp_join_room_req(const qp_join_room_req& from);
+  qp_mj_game_end_notify(const qp_mj_game_end_notify& from);
 
-  inline qp_join_room_req& operator=(const qp_join_room_req& from) {
+  inline qp_mj_game_end_notify& operator=(const qp_mj_game_end_notify& from) {
     CopyFrom(from);
     return *this;
   }
@@ -704,17 +286,17 @@ class qp_join_room_req : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_join_room_req& default_instance();
+  static const qp_mj_game_end_notify& default_instance();
 
-  void Swap(qp_join_room_req* other);
+  void Swap(qp_mj_game_end_notify* other);
 
   // implements Message ----------------------------------------------
 
-  qp_join_room_req* New() const;
+  qp_mj_game_end_notify* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_join_room_req& from);
-  void MergeFrom(const qp_join_room_req& from);
+  void CopyFrom(const qp_mj_game_end_notify& from);
+  void MergeFrom(const qp_mj_game_end_notify& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -737,26 +319,21 @@ class qp_join_room_req : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required string room_id = 1;
-  inline bool has_room_id() const;
-  inline void clear_room_id();
-  static const int kRoomIdFieldNumber = 1;
-  inline const ::std::string& room_id() const;
-  inline void set_room_id(const ::std::string& value);
-  inline void set_room_id(const char* value);
-  inline void set_room_id(const char* value, size_t size);
-  inline ::std::string* mutable_room_id();
-  inline ::std::string* release_room_id();
-  inline void set_allocated_room_id(::std::string* room_id);
+  // required uint32 a = 1;
+  inline bool has_a() const;
+  inline void clear_a();
+  static const int kAFieldNumber = 1;
+  inline ::google::protobuf::uint32 a() const;
+  inline void set_a(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:qp_server.qp_join_room_req)
+  // @@protoc_insertion_point(class_scope:qp_mj.qp_mj_game_end_notify)
  private:
-  inline void set_has_room_id();
-  inline void clear_has_room_id();
+  inline void set_has_a();
+  inline void clear_has_a();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::std::string* room_id_;
+  ::google::protobuf::uint32 a_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
@@ -766,18 +343,18 @@ class qp_join_room_req : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_mj_2eproto();
 
   void InitAsDefaultInstance();
-  static qp_join_room_req* default_instance_;
+  static qp_mj_game_end_notify* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class qp_room_user : public ::google::protobuf::Message {
+class qp_mj_oper_req : public ::google::protobuf::Message {
  public:
-  qp_room_user();
-  virtual ~qp_room_user();
+  qp_mj_oper_req();
+  virtual ~qp_mj_oper_req();
 
-  qp_room_user(const qp_room_user& from);
+  qp_mj_oper_req(const qp_mj_oper_req& from);
 
-  inline qp_room_user& operator=(const qp_room_user& from) {
+  inline qp_mj_oper_req& operator=(const qp_mj_oper_req& from) {
     CopyFrom(from);
     return *this;
   }
@@ -791,17 +368,17 @@ class qp_room_user : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_room_user& default_instance();
+  static const qp_mj_oper_req& default_instance();
 
-  void Swap(qp_room_user* other);
+  void Swap(qp_mj_oper_req* other);
 
   // implements Message ----------------------------------------------
 
-  qp_room_user* New() const;
+  qp_mj_oper_req* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_room_user& from);
-  void MergeFrom(const qp_room_user& from);
+  void CopyFrom(const qp_mj_oper_req& from);
+  void MergeFrom(const qp_mj_oper_req& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -824,43 +401,41 @@ class qp_room_user : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required .qp_server.qp_user_data user_data = 1;
-  inline bool has_user_data() const;
-  inline void clear_user_data();
-  static const int kUserDataFieldNumber = 1;
-  inline const ::qp_server::qp_user_data& user_data() const;
-  inline ::qp_server::qp_user_data* mutable_user_data();
-  inline ::qp_server::qp_user_data* release_user_data();
-  inline void set_allocated_user_data(::qp_server::qp_user_data* user_data);
+  // required uint32 type = 1;
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 1;
+  inline ::google::protobuf::uint32 type() const;
+  inline void set_type(::google::protobuf::uint32 value);
 
-  // required int32 seat_number = 2;
-  inline bool has_seat_number() const;
-  inline void clear_seat_number();
-  static const int kSeatNumberFieldNumber = 2;
-  inline ::google::protobuf::int32 seat_number() const;
-  inline void set_seat_number(::google::protobuf::int32 value);
+  // optional uint32 v1 = 2;
+  inline bool has_v1() const;
+  inline void clear_v1();
+  static const int kV1FieldNumber = 2;
+  inline ::google::protobuf::uint32 v1() const;
+  inline void set_v1(::google::protobuf::uint32 value);
 
-  // required bool is_ready = 3;
-  inline bool has_is_ready() const;
-  inline void clear_is_ready();
-  static const int kIsReadyFieldNumber = 3;
-  inline bool is_ready() const;
-  inline void set_is_ready(bool value);
+  // optional uint32 v2 = 3;
+  inline bool has_v2() const;
+  inline void clear_v2();
+  static const int kV2FieldNumber = 3;
+  inline ::google::protobuf::uint32 v2() const;
+  inline void set_v2(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:qp_server.qp_room_user)
+  // @@protoc_insertion_point(class_scope:qp_mj.qp_mj_oper_req)
  private:
-  inline void set_has_user_data();
-  inline void clear_has_user_data();
-  inline void set_has_seat_number();
-  inline void clear_has_seat_number();
-  inline void set_has_is_ready();
-  inline void clear_has_is_ready();
+  inline void set_has_type();
+  inline void clear_has_type();
+  inline void set_has_v1();
+  inline void clear_has_v1();
+  inline void set_has_v2();
+  inline void clear_has_v2();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::qp_server::qp_user_data* user_data_;
-  ::google::protobuf::int32 seat_number_;
-  bool is_ready_;
+  ::google::protobuf::uint32 type_;
+  ::google::protobuf::uint32 v1_;
+  ::google::protobuf::uint32 v2_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
@@ -870,18 +445,18 @@ class qp_room_user : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_mj_2eproto();
 
   void InitAsDefaultInstance();
-  static qp_room_user* default_instance_;
+  static qp_mj_oper_req* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class qp_join_room_rsp : public ::google::protobuf::Message {
+class qp_mj_oper_notify : public ::google::protobuf::Message {
  public:
-  qp_join_room_rsp();
-  virtual ~qp_join_room_rsp();
+  qp_mj_oper_notify();
+  virtual ~qp_mj_oper_notify();
 
-  qp_join_room_rsp(const qp_join_room_rsp& from);
+  qp_mj_oper_notify(const qp_mj_oper_notify& from);
 
-  inline qp_join_room_rsp& operator=(const qp_join_room_rsp& from) {
+  inline qp_mj_oper_notify& operator=(const qp_mj_oper_notify& from) {
     CopyFrom(from);
     return *this;
   }
@@ -895,17 +470,17 @@ class qp_join_room_rsp : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_join_room_rsp& default_instance();
+  static const qp_mj_oper_notify& default_instance();
 
-  void Swap(qp_join_room_rsp* other);
+  void Swap(qp_mj_oper_notify* other);
 
   // implements Message ----------------------------------------------
 
-  qp_join_room_rsp* New() const;
+  qp_mj_oper_notify* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_join_room_rsp& from);
-  void MergeFrom(const qp_join_room_rsp& from);
+  void CopyFrom(const qp_mj_oper_notify& from);
+  void MergeFrom(const qp_mj_oper_notify& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -928,1001 +503,159 @@ class qp_join_room_rsp : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required int32 result = 1;
-  inline bool has_result() const;
-  inline void clear_result();
-  static const int kResultFieldNumber = 1;
-  inline ::google::protobuf::int32 result() const;
-  inline void set_result(::google::protobuf::int32 value);
+  // required int32 seat_numer = 1;
+  inline bool has_seat_numer() const;
+  inline void clear_seat_numer();
+  static const int kSeatNumerFieldNumber = 1;
+  inline ::google::protobuf::int32 seat_numer() const;
+  inline void set_seat_numer(::google::protobuf::int32 value);
 
-  // optional int32 seat_number = 2;
-  inline bool has_seat_number() const;
-  inline void clear_seat_number();
-  static const int kSeatNumberFieldNumber = 2;
-  inline ::google::protobuf::int32 seat_number() const;
-  inline void set_seat_number(::google::protobuf::int32 value);
+  // required uint32 type = 2;
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 2;
+  inline ::google::protobuf::uint32 type() const;
+  inline void set_type(::google::protobuf::uint32 value);
 
-  // optional bool is_ready = 3;
-  inline bool has_is_ready() const;
-  inline void clear_is_ready();
-  static const int kIsReadyFieldNumber = 3;
-  inline bool is_ready() const;
-  inline void set_is_ready(bool value);
+  // optional uint32 v1 = 3;
+  inline bool has_v1() const;
+  inline void clear_v1();
+  static const int kV1FieldNumber = 3;
+  inline ::google::protobuf::uint32 v1() const;
+  inline void set_v1(::google::protobuf::uint32 value);
 
-  // repeated .qp_server.qp_room_user room_user = 4;
-  inline int room_user_size() const;
-  inline void clear_room_user();
-  static const int kRoomUserFieldNumber = 4;
-  inline const ::qp_server::qp_room_user& room_user(int index) const;
-  inline ::qp_server::qp_room_user* mutable_room_user(int index);
-  inline ::qp_server::qp_room_user* add_room_user();
-  inline const ::google::protobuf::RepeatedPtrField< ::qp_server::qp_room_user >&
-      room_user() const;
-  inline ::google::protobuf::RepeatedPtrField< ::qp_server::qp_room_user >*
-      mutable_room_user();
+  // optional uint32 v2 = 4;
+  inline bool has_v2() const;
+  inline void clear_v2();
+  static const int kV2FieldNumber = 4;
+  inline ::google::protobuf::uint32 v2() const;
+  inline void set_v2(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:qp_server.qp_join_room_rsp)
+  // optional int32 next_oper_seat_num = 5;
+  inline bool has_next_oper_seat_num() const;
+  inline void clear_next_oper_seat_num();
+  static const int kNextOperSeatNumFieldNumber = 5;
+  inline ::google::protobuf::int32 next_oper_seat_num() const;
+  inline void set_next_oper_seat_num(::google::protobuf::int32 value);
+
+  // optional uint32 next_oper_flag = 6;
+  inline bool has_next_oper_flag() const;
+  inline void clear_next_oper_flag();
+  static const int kNextOperFlagFieldNumber = 6;
+  inline ::google::protobuf::uint32 next_oper_flag() const;
+  inline void set_next_oper_flag(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:qp_mj.qp_mj_oper_notify)
  private:
-  inline void set_has_result();
-  inline void clear_has_result();
-  inline void set_has_seat_number();
-  inline void clear_has_seat_number();
-  inline void set_has_is_ready();
-  inline void clear_has_is_ready();
+  inline void set_has_seat_numer();
+  inline void clear_has_seat_numer();
+  inline void set_has_type();
+  inline void clear_has_type();
+  inline void set_has_v1();
+  inline void clear_has_v1();
+  inline void set_has_v2();
+  inline void clear_has_v2();
+  inline void set_has_next_oper_seat_num();
+  inline void clear_has_next_oper_seat_num();
+  inline void set_has_next_oper_flag();
+  inline void clear_has_next_oper_flag();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::google::protobuf::int32 result_;
-  ::google::protobuf::int32 seat_number_;
-  ::google::protobuf::RepeatedPtrField< ::qp_server::qp_room_user > room_user_;
-  bool is_ready_;
+  ::google::protobuf::int32 seat_numer_;
+  ::google::protobuf::uint32 type_;
+  ::google::protobuf::uint32 v1_;
+  ::google::protobuf::uint32 v2_;
+  ::google::protobuf::int32 next_oper_seat_num_;
+  ::google::protobuf::uint32 next_oper_flag_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
 
   friend void  protobuf_AddDesc_mj_2eproto();
   friend void protobuf_AssignDesc_mj_2eproto();
   friend void protobuf_ShutdownFile_mj_2eproto();
 
   void InitAsDefaultInstance();
-  static qp_join_room_rsp* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_join_room_push : public ::google::protobuf::Message {
- public:
-  qp_join_room_push();
-  virtual ~qp_join_room_push();
-
-  qp_join_room_push(const qp_join_room_push& from);
-
-  inline qp_join_room_push& operator=(const qp_join_room_push& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_join_room_push& default_instance();
-
-  void Swap(qp_join_room_push* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_join_room_push* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_join_room_push& from);
-  void MergeFrom(const qp_join_room_push& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required .qp_server.qp_room_user room_user = 1;
-  inline bool has_room_user() const;
-  inline void clear_room_user();
-  static const int kRoomUserFieldNumber = 1;
-  inline const ::qp_server::qp_room_user& room_user() const;
-  inline ::qp_server::qp_room_user* mutable_room_user();
-  inline ::qp_server::qp_room_user* release_room_user();
-  inline void set_allocated_room_user(::qp_server::qp_room_user* room_user);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_join_room_push)
- private:
-  inline void set_has_room_user();
-  inline void clear_has_room_user();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::qp_server::qp_room_user* room_user_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_join_room_push* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_ready_req : public ::google::protobuf::Message {
- public:
-  qp_ready_req();
-  virtual ~qp_ready_req();
-
-  qp_ready_req(const qp_ready_req& from);
-
-  inline qp_ready_req& operator=(const qp_ready_req& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_ready_req& default_instance();
-
-  void Swap(qp_ready_req* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_ready_req* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_ready_req& from);
-  void MergeFrom(const qp_ready_req& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 ready_state = 1;
-  inline bool has_ready_state() const;
-  inline void clear_ready_state();
-  static const int kReadyStateFieldNumber = 1;
-  inline ::google::protobuf::int32 ready_state() const;
-  inline void set_ready_state(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_ready_req)
- private:
-  inline void set_has_ready_state();
-  inline void clear_has_ready_state();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 ready_state_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_ready_req* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_ready_rsp : public ::google::protobuf::Message {
- public:
-  qp_ready_rsp();
-  virtual ~qp_ready_rsp();
-
-  qp_ready_rsp(const qp_ready_rsp& from);
-
-  inline qp_ready_rsp& operator=(const qp_ready_rsp& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_ready_rsp& default_instance();
-
-  void Swap(qp_ready_rsp* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_ready_rsp* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_ready_rsp& from);
-  void MergeFrom(const qp_ready_rsp& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 ready_state = 1;
-  inline bool has_ready_state() const;
-  inline void clear_ready_state();
-  static const int kReadyStateFieldNumber = 1;
-  inline ::google::protobuf::int32 ready_state() const;
-  inline void set_ready_state(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_ready_rsp)
- private:
-  inline void set_has_ready_state();
-  inline void clear_has_ready_state();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 ready_state_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_ready_rsp* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_ready_push : public ::google::protobuf::Message {
- public:
-  qp_ready_push();
-  virtual ~qp_ready_push();
-
-  qp_ready_push(const qp_ready_push& from);
-
-  inline qp_ready_push& operator=(const qp_ready_push& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_ready_push& default_instance();
-
-  void Swap(qp_ready_push* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_ready_push* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_ready_push& from);
-  void MergeFrom(const qp_ready_push& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 seat_number = 1;
-  inline bool has_seat_number() const;
-  inline void clear_seat_number();
-  static const int kSeatNumberFieldNumber = 1;
-  inline ::google::protobuf::int32 seat_number() const;
-  inline void set_seat_number(::google::protobuf::int32 value);
-
-  // required int32 ready_state = 2;
-  inline bool has_ready_state() const;
-  inline void clear_ready_state();
-  static const int kReadyStateFieldNumber = 2;
-  inline ::google::protobuf::int32 ready_state() const;
-  inline void set_ready_state(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_ready_push)
- private:
-  inline void set_has_seat_number();
-  inline void clear_has_seat_number();
-  inline void set_has_ready_state();
-  inline void clear_has_ready_state();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 seat_number_;
-  ::google::protobuf::int32 ready_state_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_ready_push* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_exit_room_req : public ::google::protobuf::Message {
- public:
-  qp_exit_room_req();
-  virtual ~qp_exit_room_req();
-
-  qp_exit_room_req(const qp_exit_room_req& from);
-
-  inline qp_exit_room_req& operator=(const qp_exit_room_req& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_exit_room_req& default_instance();
-
-  void Swap(qp_exit_room_req* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_exit_room_req* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_exit_room_req& from);
-  void MergeFrom(const qp_exit_room_req& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 seat_number = 1;
-  inline bool has_seat_number() const;
-  inline void clear_seat_number();
-  static const int kSeatNumberFieldNumber = 1;
-  inline ::google::protobuf::int32 seat_number() const;
-  inline void set_seat_number(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_exit_room_req)
- private:
-  inline void set_has_seat_number();
-  inline void clear_has_seat_number();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 seat_number_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_exit_room_req* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_exit_room_rsp : public ::google::protobuf::Message {
- public:
-  qp_exit_room_rsp();
-  virtual ~qp_exit_room_rsp();
-
-  qp_exit_room_rsp(const qp_exit_room_rsp& from);
-
-  inline qp_exit_room_rsp& operator=(const qp_exit_room_rsp& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_exit_room_rsp& default_instance();
-
-  void Swap(qp_exit_room_rsp* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_exit_room_rsp* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_exit_room_rsp& from);
-  void MergeFrom(const qp_exit_room_rsp& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 result = 1;
-  inline bool has_result() const;
-  inline void clear_result();
-  static const int kResultFieldNumber = 1;
-  inline ::google::protobuf::int32 result() const;
-  inline void set_result(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_exit_room_rsp)
- private:
-  inline void set_has_result();
-  inline void clear_has_result();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 result_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_exit_room_rsp* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_exit_room_push : public ::google::protobuf::Message {
- public:
-  qp_exit_room_push();
-  virtual ~qp_exit_room_push();
-
-  qp_exit_room_push(const qp_exit_room_push& from);
-
-  inline qp_exit_room_push& operator=(const qp_exit_room_push& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_exit_room_push& default_instance();
-
-  void Swap(qp_exit_room_push* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_exit_room_push* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_exit_room_push& from);
-  void MergeFrom(const qp_exit_room_push& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 seat_number = 1;
-  inline bool has_seat_number() const;
-  inline void clear_seat_number();
-  static const int kSeatNumberFieldNumber = 1;
-  inline ::google::protobuf::int32 seat_number() const;
-  inline void set_seat_number(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_exit_room_push)
- private:
-  inline void set_has_seat_number();
-  inline void clear_has_seat_number();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 seat_number_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_exit_room_push* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_game_data : public ::google::protobuf::Message {
- public:
-  qp_game_data();
-  virtual ~qp_game_data();
-
-  qp_game_data(const qp_game_data& from);
-
-  inline qp_game_data& operator=(const qp_game_data& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_game_data& default_instance();
-
-  void Swap(qp_game_data* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_game_data* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_game_data& from);
-  void MergeFrom(const qp_game_data& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required bytes game_data = 1;
-  inline bool has_game_data() const;
-  inline void clear_game_data();
-  static const int kGameDataFieldNumber = 1;
-  inline const ::std::string& game_data() const;
-  inline void set_game_data(const ::std::string& value);
-  inline void set_game_data(const char* value);
-  inline void set_game_data(const void* value, size_t size);
-  inline ::std::string* mutable_game_data();
-  inline ::std::string* release_game_data();
-  inline void set_allocated_game_data(::std::string* game_data);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_game_data)
- private:
-  inline void set_has_game_data();
-  inline void clear_has_game_data();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::std::string* game_data_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_game_data* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_ping_req : public ::google::protobuf::Message {
- public:
-  qp_ping_req();
-  virtual ~qp_ping_req();
-
-  qp_ping_req(const qp_ping_req& from);
-
-  inline qp_ping_req& operator=(const qp_ping_req& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_ping_req& default_instance();
-
-  void Swap(qp_ping_req* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_ping_req* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_ping_req& from);
-  void MergeFrom(const qp_ping_req& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 seat_number = 1;
-  inline bool has_seat_number() const;
-  inline void clear_seat_number();
-  static const int kSeatNumberFieldNumber = 1;
-  inline ::google::protobuf::int32 seat_number() const;
-  inline void set_seat_number(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_ping_req)
- private:
-  inline void set_has_seat_number();
-  inline void clear_has_seat_number();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 seat_number_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_ping_req* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class qp_ping_rsp : public ::google::protobuf::Message {
- public:
-  qp_ping_rsp();
-  virtual ~qp_ping_rsp();
-
-  qp_ping_rsp(const qp_ping_rsp& from);
-
-  inline qp_ping_rsp& operator=(const qp_ping_rsp& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const qp_ping_rsp& default_instance();
-
-  void Swap(qp_ping_rsp* other);
-
-  // implements Message ----------------------------------------------
-
-  qp_ping_rsp* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const qp_ping_rsp& from);
-  void MergeFrom(const qp_ping_rsp& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 seat_number = 1;
-  inline bool has_seat_number() const;
-  inline void clear_seat_number();
-  static const int kSeatNumberFieldNumber = 1;
-  inline ::google::protobuf::int32 seat_number() const;
-  inline void set_seat_number(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:qp_server.qp_ping_rsp)
- private:
-  inline void set_has_seat_number();
-  inline void clear_has_seat_number();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 seat_number_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_mj_2eproto();
-  friend void protobuf_AssignDesc_mj_2eproto();
-  friend void protobuf_ShutdownFile_mj_2eproto();
-
-  void InitAsDefaultInstance();
-  static qp_ping_rsp* default_instance_;
+  static qp_mj_oper_notify* default_instance_;
 };
 // ===================================================================
 
 
 // ===================================================================
 
-// qp_packet
+// qp_logic
 
 // required int32 cmd = 1;
-inline bool qp_packet::has_cmd() const {
+inline bool qp_logic::has_cmd() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void qp_packet::set_has_cmd() {
+inline void qp_logic::set_has_cmd() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void qp_packet::clear_has_cmd() {
+inline void qp_logic::clear_has_cmd() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void qp_packet::clear_cmd() {
+inline void qp_logic::clear_cmd() {
   cmd_ = 0;
   clear_has_cmd();
 }
-inline ::google::protobuf::int32 qp_packet::cmd() const {
+inline ::google::protobuf::int32 qp_logic::cmd() const {
   return cmd_;
 }
-inline void qp_packet::set_cmd(::google::protobuf::int32 value) {
+inline void qp_logic::set_cmd(::google::protobuf::int32 value) {
   set_has_cmd();
   cmd_ = value;
 }
 
-// required uint32 seq_id = 2;
-inline bool qp_packet::has_seq_id() const {
+// optional bytes serialized = 3;
+inline bool qp_logic::has_serialized() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void qp_packet::set_has_seq_id() {
+inline void qp_logic::set_has_serialized() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void qp_packet::clear_has_seq_id() {
+inline void qp_logic::clear_has_serialized() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void qp_packet::clear_seq_id() {
-  seq_id_ = 0u;
-  clear_has_seq_id();
-}
-inline ::google::protobuf::uint32 qp_packet::seq_id() const {
-  return seq_id_;
-}
-inline void qp_packet::set_seq_id(::google::protobuf::uint32 value) {
-  set_has_seq_id();
-  seq_id_ = value;
-}
-
-// optional bytes serialized = 3;
-inline bool qp_packet::has_serialized() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void qp_packet::set_has_serialized() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void qp_packet::clear_has_serialized() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void qp_packet::clear_serialized() {
+inline void qp_logic::clear_serialized() {
   if (serialized_ != &::google::protobuf::internal::kEmptyString) {
     serialized_->clear();
   }
   clear_has_serialized();
 }
-inline const ::std::string& qp_packet::serialized() const {
+inline const ::std::string& qp_logic::serialized() const {
   return *serialized_;
 }
-inline void qp_packet::set_serialized(const ::std::string& value) {
+inline void qp_logic::set_serialized(const ::std::string& value) {
   set_has_serialized();
   if (serialized_ == &::google::protobuf::internal::kEmptyString) {
     serialized_ = new ::std::string;
   }
   serialized_->assign(value);
 }
-inline void qp_packet::set_serialized(const char* value) {
+inline void qp_logic::set_serialized(const char* value) {
   set_has_serialized();
   if (serialized_ == &::google::protobuf::internal::kEmptyString) {
     serialized_ = new ::std::string;
   }
   serialized_->assign(value);
 }
-inline void qp_packet::set_serialized(const void* value, size_t size) {
+inline void qp_logic::set_serialized(const void* value, size_t size) {
   set_has_serialized();
   if (serialized_ == &::google::protobuf::internal::kEmptyString) {
     serialized_ = new ::std::string;
   }
   serialized_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* qp_packet::mutable_serialized() {
+inline ::std::string* qp_logic::mutable_serialized() {
   set_has_serialized();
   if (serialized_ == &::google::protobuf::internal::kEmptyString) {
     serialized_ = new ::std::string;
   }
   return serialized_;
 }
-inline ::std::string* qp_packet::release_serialized() {
+inline ::std::string* qp_logic::release_serialized() {
   clear_has_serialized();
   if (serialized_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
@@ -1932,7 +665,7 @@ inline ::std::string* qp_packet::release_serialized() {
     return temp;
   }
 }
-inline void qp_packet::set_allocated_serialized(::std::string* serialized) {
+inline void qp_logic::set_allocated_serialized(::std::string* serialized) {
   if (serialized_ != &::google::protobuf::internal::kEmptyString) {
     delete serialized_;
   }
@@ -1947,1039 +680,321 @@ inline void qp_packet::set_allocated_serialized(::std::string* serialized) {
 
 // -------------------------------------------------------------------
 
-// qp_login_req
+// qp_mj_game_start_notify
 
-// required string account = 1;
-inline bool qp_login_req::has_account() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+// repeated uint32 pai = 1;
+inline int qp_mj_game_start_notify::pai_size() const {
+  return pai_.size();
 }
-inline void qp_login_req::set_has_account() {
-  _has_bits_[0] |= 0x00000001u;
+inline void qp_mj_game_start_notify::clear_pai() {
+  pai_.Clear();
 }
-inline void qp_login_req::clear_has_account() {
-  _has_bits_[0] &= ~0x00000001u;
+inline ::google::protobuf::uint32 qp_mj_game_start_notify::pai(int index) const {
+  return pai_.Get(index);
 }
-inline void qp_login_req::clear_account() {
-  if (account_ != &::google::protobuf::internal::kEmptyString) {
-    account_->clear();
-  }
-  clear_has_account();
+inline void qp_mj_game_start_notify::set_pai(int index, ::google::protobuf::uint32 value) {
+  pai_.Set(index, value);
 }
-inline const ::std::string& qp_login_req::account() const {
-  return *account_;
+inline void qp_mj_game_start_notify::add_pai(::google::protobuf::uint32 value) {
+  pai_.Add(value);
 }
-inline void qp_login_req::set_account(const ::std::string& value) {
-  set_has_account();
-  if (account_ == &::google::protobuf::internal::kEmptyString) {
-    account_ = new ::std::string;
-  }
-  account_->assign(value);
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+qp_mj_game_start_notify::pai() const {
+  return pai_;
 }
-inline void qp_login_req::set_account(const char* value) {
-  set_has_account();
-  if (account_ == &::google::protobuf::internal::kEmptyString) {
-    account_ = new ::std::string;
-  }
-  account_->assign(value);
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+qp_mj_game_start_notify::mutable_pai() {
+  return &pai_;
 }
-inline void qp_login_req::set_account(const char* value, size_t size) {
-  set_has_account();
-  if (account_ == &::google::protobuf::internal::kEmptyString) {
-    account_ = new ::std::string;
-  }
-  account_->assign(reinterpret_cast<const char*>(value), size);
+
+// required int32 banker_seat_number = 2;
+inline bool qp_mj_game_start_notify::has_banker_seat_number() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline ::std::string* qp_login_req::mutable_account() {
-  set_has_account();
-  if (account_ == &::google::protobuf::internal::kEmptyString) {
-    account_ = new ::std::string;
-  }
-  return account_;
+inline void qp_mj_game_start_notify::set_has_banker_seat_number() {
+  _has_bits_[0] |= 0x00000002u;
 }
-inline ::std::string* qp_login_req::release_account() {
-  clear_has_account();
-  if (account_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = account_;
-    account_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
+inline void qp_mj_game_start_notify::clear_has_banker_seat_number() {
+  _has_bits_[0] &= ~0x00000002u;
 }
-inline void qp_login_req::set_allocated_account(::std::string* account) {
-  if (account_ != &::google::protobuf::internal::kEmptyString) {
-    delete account_;
-  }
-  if (account) {
-    set_has_account();
-    account_ = account;
-  } else {
-    clear_has_account();
-    account_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
+inline void qp_mj_game_start_notify::clear_banker_seat_number() {
+  banker_seat_number_ = 0;
+  clear_has_banker_seat_number();
+}
+inline ::google::protobuf::int32 qp_mj_game_start_notify::banker_seat_number() const {
+  return banker_seat_number_;
+}
+inline void qp_mj_game_start_notify::set_banker_seat_number(::google::protobuf::int32 value) {
+  set_has_banker_seat_number();
+  banker_seat_number_ = value;
+}
+
+// optional uint32 oper_flag = 3;
+inline bool qp_mj_game_start_notify::has_oper_flag() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void qp_mj_game_start_notify::set_has_oper_flag() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void qp_mj_game_start_notify::clear_has_oper_flag() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void qp_mj_game_start_notify::clear_oper_flag() {
+  oper_flag_ = 0u;
+  clear_has_oper_flag();
+}
+inline ::google::protobuf::uint32 qp_mj_game_start_notify::oper_flag() const {
+  return oper_flag_;
+}
+inline void qp_mj_game_start_notify::set_oper_flag(::google::protobuf::uint32 value) {
+  set_has_oper_flag();
+  oper_flag_ = value;
 }
 
 // -------------------------------------------------------------------
 
-// qp_user_data
+// qp_mj_game_end_notify
 
-// required uint32 user_id = 1;
-inline bool qp_user_data::has_user_id() const {
+// required uint32 a = 1;
+inline bool qp_mj_game_end_notify::has_a() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void qp_user_data::set_has_user_id() {
+inline void qp_mj_game_end_notify::set_has_a() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void qp_user_data::clear_has_user_id() {
+inline void qp_mj_game_end_notify::clear_has_a() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void qp_user_data::clear_user_id() {
-  user_id_ = 0u;
-  clear_has_user_id();
+inline void qp_mj_game_end_notify::clear_a() {
+  a_ = 0u;
+  clear_has_a();
 }
-inline ::google::protobuf::uint32 qp_user_data::user_id() const {
-  return user_id_;
+inline ::google::protobuf::uint32 qp_mj_game_end_notify::a() const {
+  return a_;
 }
-inline void qp_user_data::set_user_id(::google::protobuf::uint32 value) {
-  set_has_user_id();
-  user_id_ = value;
+inline void qp_mj_game_end_notify::set_a(::google::protobuf::uint32 value) {
+  set_has_a();
+  a_ = value;
 }
 
-// required int64 gold = 2;
-inline bool qp_user_data::has_gold() const {
+// -------------------------------------------------------------------
+
+// qp_mj_oper_req
+
+// required uint32 type = 1;
+inline bool qp_mj_oper_req::has_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void qp_mj_oper_req::set_has_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void qp_mj_oper_req::clear_has_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void qp_mj_oper_req::clear_type() {
+  type_ = 0u;
+  clear_has_type();
+}
+inline ::google::protobuf::uint32 qp_mj_oper_req::type() const {
+  return type_;
+}
+inline void qp_mj_oper_req::set_type(::google::protobuf::uint32 value) {
+  set_has_type();
+  type_ = value;
+}
+
+// optional uint32 v1 = 2;
+inline bool qp_mj_oper_req::has_v1() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void qp_user_data::set_has_gold() {
+inline void qp_mj_oper_req::set_has_v1() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void qp_user_data::clear_has_gold() {
+inline void qp_mj_oper_req::clear_has_v1() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void qp_user_data::clear_gold() {
-  gold_ = GOOGLE_LONGLONG(0);
-  clear_has_gold();
+inline void qp_mj_oper_req::clear_v1() {
+  v1_ = 0u;
+  clear_has_v1();
 }
-inline ::google::protobuf::int64 qp_user_data::gold() const {
-  return gold_;
+inline ::google::protobuf::uint32 qp_mj_oper_req::v1() const {
+  return v1_;
 }
-inline void qp_user_data::set_gold(::google::protobuf::int64 value) {
-  set_has_gold();
-  gold_ = value;
+inline void qp_mj_oper_req::set_v1(::google::protobuf::uint32 value) {
+  set_has_v1();
+  v1_ = value;
 }
 
-// required string avatar_url = 3;
-inline bool qp_user_data::has_avatar_url() const {
+// optional uint32 v2 = 3;
+inline bool qp_mj_oper_req::has_v2() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void qp_user_data::set_has_avatar_url() {
+inline void qp_mj_oper_req::set_has_v2() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void qp_user_data::clear_has_avatar_url() {
+inline void qp_mj_oper_req::clear_has_v2() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void qp_user_data::clear_avatar_url() {
-  if (avatar_url_ != &::google::protobuf::internal::kEmptyString) {
-    avatar_url_->clear();
-  }
-  clear_has_avatar_url();
+inline void qp_mj_oper_req::clear_v2() {
+  v2_ = 0u;
+  clear_has_v2();
 }
-inline const ::std::string& qp_user_data::avatar_url() const {
-  return *avatar_url_;
+inline ::google::protobuf::uint32 qp_mj_oper_req::v2() const {
+  return v2_;
 }
-inline void qp_user_data::set_avatar_url(const ::std::string& value) {
-  set_has_avatar_url();
-  if (avatar_url_ == &::google::protobuf::internal::kEmptyString) {
-    avatar_url_ = new ::std::string;
-  }
-  avatar_url_->assign(value);
-}
-inline void qp_user_data::set_avatar_url(const char* value) {
-  set_has_avatar_url();
-  if (avatar_url_ == &::google::protobuf::internal::kEmptyString) {
-    avatar_url_ = new ::std::string;
-  }
-  avatar_url_->assign(value);
-}
-inline void qp_user_data::set_avatar_url(const char* value, size_t size) {
-  set_has_avatar_url();
-  if (avatar_url_ == &::google::protobuf::internal::kEmptyString) {
-    avatar_url_ = new ::std::string;
-  }
-  avatar_url_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* qp_user_data::mutable_avatar_url() {
-  set_has_avatar_url();
-  if (avatar_url_ == &::google::protobuf::internal::kEmptyString) {
-    avatar_url_ = new ::std::string;
-  }
-  return avatar_url_;
-}
-inline ::std::string* qp_user_data::release_avatar_url() {
-  clear_has_avatar_url();
-  if (avatar_url_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = avatar_url_;
-    avatar_url_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void qp_user_data::set_allocated_avatar_url(::std::string* avatar_url) {
-  if (avatar_url_ != &::google::protobuf::internal::kEmptyString) {
-    delete avatar_url_;
-  }
-  if (avatar_url) {
-    set_has_avatar_url();
-    avatar_url_ = avatar_url;
-  } else {
-    clear_has_avatar_url();
-    avatar_url_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
+inline void qp_mj_oper_req::set_v2(::google::protobuf::uint32 value) {
+  set_has_v2();
+  v2_ = value;
 }
 
-// required string nick_name = 4;
-inline bool qp_user_data::has_nick_name() const {
+// -------------------------------------------------------------------
+
+// qp_mj_oper_notify
+
+// required int32 seat_numer = 1;
+inline bool qp_mj_oper_notify::has_seat_numer() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void qp_mj_oper_notify::set_has_seat_numer() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void qp_mj_oper_notify::clear_has_seat_numer() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void qp_mj_oper_notify::clear_seat_numer() {
+  seat_numer_ = 0;
+  clear_has_seat_numer();
+}
+inline ::google::protobuf::int32 qp_mj_oper_notify::seat_numer() const {
+  return seat_numer_;
+}
+inline void qp_mj_oper_notify::set_seat_numer(::google::protobuf::int32 value) {
+  set_has_seat_numer();
+  seat_numer_ = value;
+}
+
+// required uint32 type = 2;
+inline bool qp_mj_oper_notify::has_type() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void qp_mj_oper_notify::set_has_type() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void qp_mj_oper_notify::clear_has_type() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void qp_mj_oper_notify::clear_type() {
+  type_ = 0u;
+  clear_has_type();
+}
+inline ::google::protobuf::uint32 qp_mj_oper_notify::type() const {
+  return type_;
+}
+inline void qp_mj_oper_notify::set_type(::google::protobuf::uint32 value) {
+  set_has_type();
+  type_ = value;
+}
+
+// optional uint32 v1 = 3;
+inline bool qp_mj_oper_notify::has_v1() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void qp_mj_oper_notify::set_has_v1() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void qp_mj_oper_notify::clear_has_v1() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void qp_mj_oper_notify::clear_v1() {
+  v1_ = 0u;
+  clear_has_v1();
+}
+inline ::google::protobuf::uint32 qp_mj_oper_notify::v1() const {
+  return v1_;
+}
+inline void qp_mj_oper_notify::set_v1(::google::protobuf::uint32 value) {
+  set_has_v1();
+  v1_ = value;
+}
+
+// optional uint32 v2 = 4;
+inline bool qp_mj_oper_notify::has_v2() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void qp_user_data::set_has_nick_name() {
+inline void qp_mj_oper_notify::set_has_v2() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void qp_user_data::clear_has_nick_name() {
+inline void qp_mj_oper_notify::clear_has_v2() {
   _has_bits_[0] &= ~0x00000008u;
 }
-inline void qp_user_data::clear_nick_name() {
-  if (nick_name_ != &::google::protobuf::internal::kEmptyString) {
-    nick_name_->clear();
-  }
-  clear_has_nick_name();
+inline void qp_mj_oper_notify::clear_v2() {
+  v2_ = 0u;
+  clear_has_v2();
 }
-inline const ::std::string& qp_user_data::nick_name() const {
-  return *nick_name_;
+inline ::google::protobuf::uint32 qp_mj_oper_notify::v2() const {
+  return v2_;
 }
-inline void qp_user_data::set_nick_name(const ::std::string& value) {
-  set_has_nick_name();
-  if (nick_name_ == &::google::protobuf::internal::kEmptyString) {
-    nick_name_ = new ::std::string;
-  }
-  nick_name_->assign(value);
-}
-inline void qp_user_data::set_nick_name(const char* value) {
-  set_has_nick_name();
-  if (nick_name_ == &::google::protobuf::internal::kEmptyString) {
-    nick_name_ = new ::std::string;
-  }
-  nick_name_->assign(value);
-}
-inline void qp_user_data::set_nick_name(const char* value, size_t size) {
-  set_has_nick_name();
-  if (nick_name_ == &::google::protobuf::internal::kEmptyString) {
-    nick_name_ = new ::std::string;
-  }
-  nick_name_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* qp_user_data::mutable_nick_name() {
-  set_has_nick_name();
-  if (nick_name_ == &::google::protobuf::internal::kEmptyString) {
-    nick_name_ = new ::std::string;
-  }
-  return nick_name_;
-}
-inline ::std::string* qp_user_data::release_nick_name() {
-  clear_has_nick_name();
-  if (nick_name_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = nick_name_;
-    nick_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void qp_user_data::set_allocated_nick_name(::std::string* nick_name) {
-  if (nick_name_ != &::google::protobuf::internal::kEmptyString) {
-    delete nick_name_;
-  }
-  if (nick_name) {
-    set_has_nick_name();
-    nick_name_ = nick_name;
-  } else {
-    clear_has_nick_name();
-    nick_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
+inline void qp_mj_oper_notify::set_v2(::google::protobuf::uint32 value) {
+  set_has_v2();
+  v2_ = value;
 }
 
-// -------------------------------------------------------------------
-
-// qp_login_rsp
-
-// required int32 state = 1;
-inline bool qp_login_rsp::has_state() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+// optional int32 next_oper_seat_num = 5;
+inline bool qp_mj_oper_notify::has_next_oper_seat_num() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void qp_login_rsp::set_has_state() {
-  _has_bits_[0] |= 0x00000001u;
+inline void qp_mj_oper_notify::set_has_next_oper_seat_num() {
+  _has_bits_[0] |= 0x00000010u;
 }
-inline void qp_login_rsp::clear_has_state() {
-  _has_bits_[0] &= ~0x00000001u;
+inline void qp_mj_oper_notify::clear_has_next_oper_seat_num() {
+  _has_bits_[0] &= ~0x00000010u;
 }
-inline void qp_login_rsp::clear_state() {
-  state_ = 0;
-  clear_has_state();
+inline void qp_mj_oper_notify::clear_next_oper_seat_num() {
+  next_oper_seat_num_ = 0;
+  clear_has_next_oper_seat_num();
 }
-inline ::google::protobuf::int32 qp_login_rsp::state() const {
-  return state_;
+inline ::google::protobuf::int32 qp_mj_oper_notify::next_oper_seat_num() const {
+  return next_oper_seat_num_;
 }
-inline void qp_login_rsp::set_state(::google::protobuf::int32 value) {
-  set_has_state();
-  state_ = value;
+inline void qp_mj_oper_notify::set_next_oper_seat_num(::google::protobuf::int32 value) {
+  set_has_next_oper_seat_num();
+  next_oper_seat_num_ = value;
 }
 
-// optional .qp_server.qp_user_data data = 2;
-inline bool qp_login_rsp::has_data() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+// optional uint32 next_oper_flag = 6;
+inline bool qp_mj_oper_notify::has_next_oper_flag() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
-inline void qp_login_rsp::set_has_data() {
-  _has_bits_[0] |= 0x00000002u;
+inline void qp_mj_oper_notify::set_has_next_oper_flag() {
+  _has_bits_[0] |= 0x00000020u;
 }
-inline void qp_login_rsp::clear_has_data() {
-  _has_bits_[0] &= ~0x00000002u;
+inline void qp_mj_oper_notify::clear_has_next_oper_flag() {
+  _has_bits_[0] &= ~0x00000020u;
 }
-inline void qp_login_rsp::clear_data() {
-  if (data_ != NULL) data_->::qp_server::qp_user_data::Clear();
-  clear_has_data();
+inline void qp_mj_oper_notify::clear_next_oper_flag() {
+  next_oper_flag_ = 0u;
+  clear_has_next_oper_flag();
 }
-inline const ::qp_server::qp_user_data& qp_login_rsp::data() const {
-  return data_ != NULL ? *data_ : *default_instance_->data_;
+inline ::google::protobuf::uint32 qp_mj_oper_notify::next_oper_flag() const {
+  return next_oper_flag_;
 }
-inline ::qp_server::qp_user_data* qp_login_rsp::mutable_data() {
-  set_has_data();
-  if (data_ == NULL) data_ = new ::qp_server::qp_user_data;
-  return data_;
-}
-inline ::qp_server::qp_user_data* qp_login_rsp::release_data() {
-  clear_has_data();
-  ::qp_server::qp_user_data* temp = data_;
-  data_ = NULL;
-  return temp;
-}
-inline void qp_login_rsp::set_allocated_data(::qp_server::qp_user_data* data) {
-  delete data_;
-  data_ = data;
-  if (data) {
-    set_has_data();
-  } else {
-    clear_has_data();
-  }
-}
-
-// -------------------------------------------------------------------
-
-// qp_create_room_req
-
-// required int32 room_type = 1;
-inline bool qp_create_room_req::has_room_type() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_create_room_req::set_has_room_type() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_create_room_req::clear_has_room_type() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_create_room_req::clear_room_type() {
-  room_type_ = 0;
-  clear_has_room_type();
-}
-inline ::google::protobuf::int32 qp_create_room_req::room_type() const {
-  return room_type_;
-}
-inline void qp_create_room_req::set_room_type(::google::protobuf::int32 value) {
-  set_has_room_type();
-  room_type_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// qp_create_room_rsp
-
-// required int32 state = 1;
-inline bool qp_create_room_rsp::has_state() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_create_room_rsp::set_has_state() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_create_room_rsp::clear_has_state() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_create_room_rsp::clear_state() {
-  state_ = 0;
-  clear_has_state();
-}
-inline ::google::protobuf::int32 qp_create_room_rsp::state() const {
-  return state_;
-}
-inline void qp_create_room_rsp::set_state(::google::protobuf::int32 value) {
-  set_has_state();
-  state_ = value;
-}
-
-// optional int32 room_id = 2;
-inline bool qp_create_room_rsp::has_room_id() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void qp_create_room_rsp::set_has_room_id() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void qp_create_room_rsp::clear_has_room_id() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void qp_create_room_rsp::clear_room_id() {
-  room_id_ = 0;
-  clear_has_room_id();
-}
-inline ::google::protobuf::int32 qp_create_room_rsp::room_id() const {
-  return room_id_;
-}
-inline void qp_create_room_rsp::set_room_id(::google::protobuf::int32 value) {
-  set_has_room_id();
-  room_id_ = value;
-}
-
-// optional int32 seat_id = 3;
-inline bool qp_create_room_rsp::has_seat_id() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void qp_create_room_rsp::set_has_seat_id() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void qp_create_room_rsp::clear_has_seat_id() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void qp_create_room_rsp::clear_seat_id() {
-  seat_id_ = 0;
-  clear_has_seat_id();
-}
-inline ::google::protobuf::int32 qp_create_room_rsp::seat_id() const {
-  return seat_id_;
-}
-inline void qp_create_room_rsp::set_seat_id(::google::protobuf::int32 value) {
-  set_has_seat_id();
-  seat_id_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// qp_join_room_req
-
-// required string room_id = 1;
-inline bool qp_join_room_req::has_room_id() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_join_room_req::set_has_room_id() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_join_room_req::clear_has_room_id() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_join_room_req::clear_room_id() {
-  if (room_id_ != &::google::protobuf::internal::kEmptyString) {
-    room_id_->clear();
-  }
-  clear_has_room_id();
-}
-inline const ::std::string& qp_join_room_req::room_id() const {
-  return *room_id_;
-}
-inline void qp_join_room_req::set_room_id(const ::std::string& value) {
-  set_has_room_id();
-  if (room_id_ == &::google::protobuf::internal::kEmptyString) {
-    room_id_ = new ::std::string;
-  }
-  room_id_->assign(value);
-}
-inline void qp_join_room_req::set_room_id(const char* value) {
-  set_has_room_id();
-  if (room_id_ == &::google::protobuf::internal::kEmptyString) {
-    room_id_ = new ::std::string;
-  }
-  room_id_->assign(value);
-}
-inline void qp_join_room_req::set_room_id(const char* value, size_t size) {
-  set_has_room_id();
-  if (room_id_ == &::google::protobuf::internal::kEmptyString) {
-    room_id_ = new ::std::string;
-  }
-  room_id_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* qp_join_room_req::mutable_room_id() {
-  set_has_room_id();
-  if (room_id_ == &::google::protobuf::internal::kEmptyString) {
-    room_id_ = new ::std::string;
-  }
-  return room_id_;
-}
-inline ::std::string* qp_join_room_req::release_room_id() {
-  clear_has_room_id();
-  if (room_id_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = room_id_;
-    room_id_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void qp_join_room_req::set_allocated_room_id(::std::string* room_id) {
-  if (room_id_ != &::google::protobuf::internal::kEmptyString) {
-    delete room_id_;
-  }
-  if (room_id) {
-    set_has_room_id();
-    room_id_ = room_id;
-  } else {
-    clear_has_room_id();
-    room_id_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
-}
-
-// -------------------------------------------------------------------
-
-// qp_room_user
-
-// required .qp_server.qp_user_data user_data = 1;
-inline bool qp_room_user::has_user_data() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_room_user::set_has_user_data() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_room_user::clear_has_user_data() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_room_user::clear_user_data() {
-  if (user_data_ != NULL) user_data_->::qp_server::qp_user_data::Clear();
-  clear_has_user_data();
-}
-inline const ::qp_server::qp_user_data& qp_room_user::user_data() const {
-  return user_data_ != NULL ? *user_data_ : *default_instance_->user_data_;
-}
-inline ::qp_server::qp_user_data* qp_room_user::mutable_user_data() {
-  set_has_user_data();
-  if (user_data_ == NULL) user_data_ = new ::qp_server::qp_user_data;
-  return user_data_;
-}
-inline ::qp_server::qp_user_data* qp_room_user::release_user_data() {
-  clear_has_user_data();
-  ::qp_server::qp_user_data* temp = user_data_;
-  user_data_ = NULL;
-  return temp;
-}
-inline void qp_room_user::set_allocated_user_data(::qp_server::qp_user_data* user_data) {
-  delete user_data_;
-  user_data_ = user_data;
-  if (user_data) {
-    set_has_user_data();
-  } else {
-    clear_has_user_data();
-  }
-}
-
-// required int32 seat_number = 2;
-inline bool qp_room_user::has_seat_number() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void qp_room_user::set_has_seat_number() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void qp_room_user::clear_has_seat_number() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void qp_room_user::clear_seat_number() {
-  seat_number_ = 0;
-  clear_has_seat_number();
-}
-inline ::google::protobuf::int32 qp_room_user::seat_number() const {
-  return seat_number_;
-}
-inline void qp_room_user::set_seat_number(::google::protobuf::int32 value) {
-  set_has_seat_number();
-  seat_number_ = value;
-}
-
-// required bool is_ready = 3;
-inline bool qp_room_user::has_is_ready() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void qp_room_user::set_has_is_ready() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void qp_room_user::clear_has_is_ready() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void qp_room_user::clear_is_ready() {
-  is_ready_ = false;
-  clear_has_is_ready();
-}
-inline bool qp_room_user::is_ready() const {
-  return is_ready_;
-}
-inline void qp_room_user::set_is_ready(bool value) {
-  set_has_is_ready();
-  is_ready_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// qp_join_room_rsp
-
-// required int32 result = 1;
-inline bool qp_join_room_rsp::has_result() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_join_room_rsp::set_has_result() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_join_room_rsp::clear_has_result() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_join_room_rsp::clear_result() {
-  result_ = 0;
-  clear_has_result();
-}
-inline ::google::protobuf::int32 qp_join_room_rsp::result() const {
-  return result_;
-}
-inline void qp_join_room_rsp::set_result(::google::protobuf::int32 value) {
-  set_has_result();
-  result_ = value;
-}
-
-// optional int32 seat_number = 2;
-inline bool qp_join_room_rsp::has_seat_number() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void qp_join_room_rsp::set_has_seat_number() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void qp_join_room_rsp::clear_has_seat_number() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void qp_join_room_rsp::clear_seat_number() {
-  seat_number_ = 0;
-  clear_has_seat_number();
-}
-inline ::google::protobuf::int32 qp_join_room_rsp::seat_number() const {
-  return seat_number_;
-}
-inline void qp_join_room_rsp::set_seat_number(::google::protobuf::int32 value) {
-  set_has_seat_number();
-  seat_number_ = value;
-}
-
-// optional bool is_ready = 3;
-inline bool qp_join_room_rsp::has_is_ready() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void qp_join_room_rsp::set_has_is_ready() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void qp_join_room_rsp::clear_has_is_ready() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void qp_join_room_rsp::clear_is_ready() {
-  is_ready_ = false;
-  clear_has_is_ready();
-}
-inline bool qp_join_room_rsp::is_ready() const {
-  return is_ready_;
-}
-inline void qp_join_room_rsp::set_is_ready(bool value) {
-  set_has_is_ready();
-  is_ready_ = value;
-}
-
-// repeated .qp_server.qp_room_user room_user = 4;
-inline int qp_join_room_rsp::room_user_size() const {
-  return room_user_.size();
-}
-inline void qp_join_room_rsp::clear_room_user() {
-  room_user_.Clear();
-}
-inline const ::qp_server::qp_room_user& qp_join_room_rsp::room_user(int index) const {
-  return room_user_.Get(index);
-}
-inline ::qp_server::qp_room_user* qp_join_room_rsp::mutable_room_user(int index) {
-  return room_user_.Mutable(index);
-}
-inline ::qp_server::qp_room_user* qp_join_room_rsp::add_room_user() {
-  return room_user_.Add();
-}
-inline const ::google::protobuf::RepeatedPtrField< ::qp_server::qp_room_user >&
-qp_join_room_rsp::room_user() const {
-  return room_user_;
-}
-inline ::google::protobuf::RepeatedPtrField< ::qp_server::qp_room_user >*
-qp_join_room_rsp::mutable_room_user() {
-  return &room_user_;
-}
-
-// -------------------------------------------------------------------
-
-// qp_join_room_push
-
-// required .qp_server.qp_room_user room_user = 1;
-inline bool qp_join_room_push::has_room_user() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_join_room_push::set_has_room_user() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_join_room_push::clear_has_room_user() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_join_room_push::clear_room_user() {
-  if (room_user_ != NULL) room_user_->::qp_server::qp_room_user::Clear();
-  clear_has_room_user();
-}
-inline const ::qp_server::qp_room_user& qp_join_room_push::room_user() const {
-  return room_user_ != NULL ? *room_user_ : *default_instance_->room_user_;
-}
-inline ::qp_server::qp_room_user* qp_join_room_push::mutable_room_user() {
-  set_has_room_user();
-  if (room_user_ == NULL) room_user_ = new ::qp_server::qp_room_user;
-  return room_user_;
-}
-inline ::qp_server::qp_room_user* qp_join_room_push::release_room_user() {
-  clear_has_room_user();
-  ::qp_server::qp_room_user* temp = room_user_;
-  room_user_ = NULL;
-  return temp;
-}
-inline void qp_join_room_push::set_allocated_room_user(::qp_server::qp_room_user* room_user) {
-  delete room_user_;
-  room_user_ = room_user;
-  if (room_user) {
-    set_has_room_user();
-  } else {
-    clear_has_room_user();
-  }
-}
-
-// -------------------------------------------------------------------
-
-// qp_ready_req
-
-// required int32 ready_state = 1;
-inline bool qp_ready_req::has_ready_state() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_ready_req::set_has_ready_state() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_ready_req::clear_has_ready_state() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_ready_req::clear_ready_state() {
-  ready_state_ = 0;
-  clear_has_ready_state();
-}
-inline ::google::protobuf::int32 qp_ready_req::ready_state() const {
-  return ready_state_;
-}
-inline void qp_ready_req::set_ready_state(::google::protobuf::int32 value) {
-  set_has_ready_state();
-  ready_state_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// qp_ready_rsp
-
-// required int32 ready_state = 1;
-inline bool qp_ready_rsp::has_ready_state() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_ready_rsp::set_has_ready_state() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_ready_rsp::clear_has_ready_state() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_ready_rsp::clear_ready_state() {
-  ready_state_ = 0;
-  clear_has_ready_state();
-}
-inline ::google::protobuf::int32 qp_ready_rsp::ready_state() const {
-  return ready_state_;
-}
-inline void qp_ready_rsp::set_ready_state(::google::protobuf::int32 value) {
-  set_has_ready_state();
-  ready_state_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// qp_ready_push
-
-// required int32 seat_number = 1;
-inline bool qp_ready_push::has_seat_number() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_ready_push::set_has_seat_number() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_ready_push::clear_has_seat_number() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_ready_push::clear_seat_number() {
-  seat_number_ = 0;
-  clear_has_seat_number();
-}
-inline ::google::protobuf::int32 qp_ready_push::seat_number() const {
-  return seat_number_;
-}
-inline void qp_ready_push::set_seat_number(::google::protobuf::int32 value) {
-  set_has_seat_number();
-  seat_number_ = value;
-}
-
-// required int32 ready_state = 2;
-inline bool qp_ready_push::has_ready_state() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void qp_ready_push::set_has_ready_state() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void qp_ready_push::clear_has_ready_state() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void qp_ready_push::clear_ready_state() {
-  ready_state_ = 0;
-  clear_has_ready_state();
-}
-inline ::google::protobuf::int32 qp_ready_push::ready_state() const {
-  return ready_state_;
-}
-inline void qp_ready_push::set_ready_state(::google::protobuf::int32 value) {
-  set_has_ready_state();
-  ready_state_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// qp_exit_room_req
-
-// required int32 seat_number = 1;
-inline bool qp_exit_room_req::has_seat_number() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_exit_room_req::set_has_seat_number() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_exit_room_req::clear_has_seat_number() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_exit_room_req::clear_seat_number() {
-  seat_number_ = 0;
-  clear_has_seat_number();
-}
-inline ::google::protobuf::int32 qp_exit_room_req::seat_number() const {
-  return seat_number_;
-}
-inline void qp_exit_room_req::set_seat_number(::google::protobuf::int32 value) {
-  set_has_seat_number();
-  seat_number_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// qp_exit_room_rsp
-
-// required int32 result = 1;
-inline bool qp_exit_room_rsp::has_result() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_exit_room_rsp::set_has_result() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_exit_room_rsp::clear_has_result() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_exit_room_rsp::clear_result() {
-  result_ = 0;
-  clear_has_result();
-}
-inline ::google::protobuf::int32 qp_exit_room_rsp::result() const {
-  return result_;
-}
-inline void qp_exit_room_rsp::set_result(::google::protobuf::int32 value) {
-  set_has_result();
-  result_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// qp_exit_room_push
-
-// required int32 seat_number = 1;
-inline bool qp_exit_room_push::has_seat_number() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_exit_room_push::set_has_seat_number() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_exit_room_push::clear_has_seat_number() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_exit_room_push::clear_seat_number() {
-  seat_number_ = 0;
-  clear_has_seat_number();
-}
-inline ::google::protobuf::int32 qp_exit_room_push::seat_number() const {
-  return seat_number_;
-}
-inline void qp_exit_room_push::set_seat_number(::google::protobuf::int32 value) {
-  set_has_seat_number();
-  seat_number_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// qp_game_data
-
-// required bytes game_data = 1;
-inline bool qp_game_data::has_game_data() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_game_data::set_has_game_data() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_game_data::clear_has_game_data() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_game_data::clear_game_data() {
-  if (game_data_ != &::google::protobuf::internal::kEmptyString) {
-    game_data_->clear();
-  }
-  clear_has_game_data();
-}
-inline const ::std::string& qp_game_data::game_data() const {
-  return *game_data_;
-}
-inline void qp_game_data::set_game_data(const ::std::string& value) {
-  set_has_game_data();
-  if (game_data_ == &::google::protobuf::internal::kEmptyString) {
-    game_data_ = new ::std::string;
-  }
-  game_data_->assign(value);
-}
-inline void qp_game_data::set_game_data(const char* value) {
-  set_has_game_data();
-  if (game_data_ == &::google::protobuf::internal::kEmptyString) {
-    game_data_ = new ::std::string;
-  }
-  game_data_->assign(value);
-}
-inline void qp_game_data::set_game_data(const void* value, size_t size) {
-  set_has_game_data();
-  if (game_data_ == &::google::protobuf::internal::kEmptyString) {
-    game_data_ = new ::std::string;
-  }
-  game_data_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* qp_game_data::mutable_game_data() {
-  set_has_game_data();
-  if (game_data_ == &::google::protobuf::internal::kEmptyString) {
-    game_data_ = new ::std::string;
-  }
-  return game_data_;
-}
-inline ::std::string* qp_game_data::release_game_data() {
-  clear_has_game_data();
-  if (game_data_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = game_data_;
-    game_data_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void qp_game_data::set_allocated_game_data(::std::string* game_data) {
-  if (game_data_ != &::google::protobuf::internal::kEmptyString) {
-    delete game_data_;
-  }
-  if (game_data) {
-    set_has_game_data();
-    game_data_ = game_data;
-  } else {
-    clear_has_game_data();
-    game_data_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
-}
-
-// -------------------------------------------------------------------
-
-// qp_ping_req
-
-// required int32 seat_number = 1;
-inline bool qp_ping_req::has_seat_number() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_ping_req::set_has_seat_number() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_ping_req::clear_has_seat_number() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_ping_req::clear_seat_number() {
-  seat_number_ = 0;
-  clear_has_seat_number();
-}
-inline ::google::protobuf::int32 qp_ping_req::seat_number() const {
-  return seat_number_;
-}
-inline void qp_ping_req::set_seat_number(::google::protobuf::int32 value) {
-  set_has_seat_number();
-  seat_number_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// qp_ping_rsp
-
-// required int32 seat_number = 1;
-inline bool qp_ping_rsp::has_seat_number() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void qp_ping_rsp::set_has_seat_number() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void qp_ping_rsp::clear_has_seat_number() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void qp_ping_rsp::clear_seat_number() {
-  seat_number_ = 0;
-  clear_has_seat_number();
-}
-inline ::google::protobuf::int32 qp_ping_rsp::seat_number() const {
-  return seat_number_;
-}
-inline void qp_ping_rsp::set_seat_number(::google::protobuf::int32 value) {
-  set_has_seat_number();
-  seat_number_ = value;
+inline void qp_mj_oper_notify::set_next_oper_flag(::google::protobuf::uint32 value) {
+  set_has_next_oper_flag();
+  next_oper_flag_ = value;
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
 
-}  // namespace qp_server
+}  // namespace qp_mj
 
 #ifndef SWIG
 namespace google {
 namespace protobuf {
 
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::qp_server::ws_cmd>() {
-  return ::qp_server::ws_cmd_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::qp_mj::ws_cmd>() {
+  return ::qp_mj::ws_cmd_descriptor();
 }
 
 }  // namespace google

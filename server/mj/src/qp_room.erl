@@ -14,7 +14,7 @@
 %% API
 -export([start_link/3]).
 -include("../deps/file_log/include/file_log.hrl").
--include("../include/mj_pb.hrl").
+-include("../include/common_pb.hrl").
 %% gen_fsm callbacks
 -export([init/1,
          idle/2,
@@ -381,9 +381,14 @@ handle_info(_Info, StateName, State) ->
 -spec(terminate(Reason :: normal | shutdown | {shutdown, term()}
                 | term(), StateName :: atom(), StateData :: term()) ->
                    term()).
-terminate(_Reason, _StateName, #state{room_id = RoomId}) ->
-    ?FILE_LOG_DEBUG("room_id[~p] [~p] terminate", [RoomId, _StateName]),
+terminate(_Reason, _StateName, #state{room_id = RoomId, seat_tree = SeatTree}) ->
+    ?FILE_LOG_DEBUG("room_id[~p] [~p] terminate, reason=~p", [RoomId, _StateName, _Reason]),
     qp_room_manager:destroy_room(RoomId),
+    RoomUsers = extract_room_users(SeatTree),
+    lists:foreach(
+        fun({RoomUserData, _, _}) ->
+            RoomUserData:send_room_msg({room_dismiss, RoomId})
+        end, RoomUsers),
     ok.
 
 %%--------------------------------------------------------------------

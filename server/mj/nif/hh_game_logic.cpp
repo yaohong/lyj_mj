@@ -32,7 +32,7 @@ namespace hh
 
         //将牌乱序
         uint8 tmpRandRange = writeOffset;
-        for (int i = 0; i < writeOffset; ++i)
+		for (uint8 i = 0; i < writeOffset; ++i)
         {
             uint8 tmpIndex = rand() % tmpRandRange--;
             //和最大索引交换值
@@ -128,8 +128,6 @@ namespace hh
                 printf( "%s ", v.c_str() );
             }
             printf( "\n" );
-
-            
         }
     }
 }
