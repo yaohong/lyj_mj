@@ -1,7 +1,9 @@
 #ifndef _game_logic_h__
 #define _game_logic_h__
 #include "common.h"
-
+extern "C"{
+	#include "erl_nif.h"
+}
 //最大麻将牌数
 #define HH_MAX_COUNT 3 * 9 * 4 + 3*4
 namespace hh
@@ -29,6 +31,8 @@ namespace hh
     };
 
 	void Init(MainLogic *logic, int8 bankerSeatNumber, uint32 randSeed);
+
+	ERL_NIF_TERM GenerateReturnValue(ErlNifEnv *env, MainLogic *logic);
 }
 
 

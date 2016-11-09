@@ -2,8 +2,6 @@
 
 namespace hh
 {
-
-
     void RandomPool( MainLogic *logic )
     {
         //初始化池里的牌 (万子 条子 筒子)
@@ -121,15 +119,20 @@ namespace hh
         {
             Seat &seat = logic->seats_[i];
 			common::Sort(seat.pai_, seat.writeIndex_);
-            printf( "seat_number[%d]:", i );
+            //printf( "seat_number[%d]:", i );
             for (int j = 0; j < seat.writeIndex_; j++)
             {
                 std::string v = common::getPaiString( seat.pai_[j] );
                 printf( "%s ", v.c_str() );
             }
-            printf( "\n" );
+            //printf( "\n" );
         }
     }
+
+	ERL_NIF_TERM GenerateReturnValue(ErlNifEnv *env, MainLogic *logic)
+	{
+		return enif_make_int(env, 1);
+	}
 }
 
 
@@ -150,3 +153,6 @@ int main( int argc, const char * argv[] )
     return 0;
 }
 #endif
+
+
+
