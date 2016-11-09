@@ -1,5 +1,5 @@
 
-flag= -g -DHH_EXE -fPIC -std=c++0x
+flag= -g -DHH_EXE -I./ -I/usr/local/erlang/lib/erlang/usr/include/ -fPIC -std=c++0x
 
 OBJDIR:=./obj
 
