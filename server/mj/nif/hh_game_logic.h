@@ -13,7 +13,7 @@ namespace hh
         uint8   gang_[4];				//杠的牌
         uint8   pai_[14];				//手里的牌
         uint8   writeIndex_;            //写入的索引
-        uint8   opers_;                 //能够进行的操作
+        uint8   operFlag_;                 //能够进行的操作
     };
 
     struct MainLogic
