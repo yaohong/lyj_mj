@@ -102,20 +102,16 @@ namespace hh
         //给庄家在发一张
         Seat &seat = logic->seats_[logic->bankerSeatNumber_];
         seat.pai_[seat.writeIndex_++] = logic->pool_[logic->poolHeadReadIndex_++];
-        printf( "banker_seat_number=%d\n", logic->bankerSeatNumber_ );
 
         //给牌排序
         for (int i = 0; i < 4; i++)
         {
             Seat &seat = logic->seats_[i];
 			common::Sort(seat.pai_, seat.writeIndex_);
-            //printf( "seat_number[%d]:", i );
             for (int j = 0; j < seat.writeIndex_; j++)
             {
                 std::string v = common::getPaiString( seat.pai_[j] );
-                printf( "%s ", v.c_str() );
             }
-            //printf( "\n" );
         }
     }
 }
@@ -128,13 +124,18 @@ int main( int argc, const char * argv[] )
 	//insert code here...
 	hh::MainLogic logic;
 	hh::Init(&logic, -1, (uint32)time(NULL));
-	//uint8 source[14] = {1,2,3,4,3,3,7,8,9,10,11,12,13,14};
-	//uint8 remove[4] = { 3, 7, 1, 13 };
-	//common::RemovePai(source, 14, remove, 3);
-	//for (int8 i = 0; i < 14; i++)
-	//{
-	//	printf("%d ", source[i]);
-	//}
+	printf("banker_seat_number=%d\n", logic.bankerSeatNumber_);
+	for (int i = 0; i < 4; i++)
+	{
+		hh::Seat &seat = logic.seats_[i];
+		printf( "seat_number[%d]:", i );
+		for (int j = 0; j < seat.writeIndex_; j++)
+		{
+			std::string v = common::getPaiString(seat.pai_[j]);
+			printf("%s ", v.c_str());
+		}
+		printf( "\n" );
+	}
     return 0;
 }
 #endif
