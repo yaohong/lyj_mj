@@ -68,10 +68,10 @@ namespace hh
         }
     }
 
-    void Init( MainLogic *logic, int8 bankerSeatNumber )
+	void Init(MainLogic *logic, int8 bankerSeatNumber, uint32 randSeed)
     {
         memset( logic, 0, sizeof(MainLogic) );
-        srand( (uint32)time( NULL ) );
+		srand(randSeed);
         RandomPool( logic );
         CrcPool( logic );
         //随即一个庄家
@@ -139,7 +139,7 @@ int main( int argc, const char * argv[] )
 {
 	//insert code here...
 	hh::MainLogic logic;
-	hh::Init(&logic, -1);
+	hh::Init(&logic, -1, (uint32)time(NULL));
 	//uint8 source[14] = {1,2,3,4,3,3,7,8,9,10,11,12,13,14};
 	//uint8 remove[4] = { 3, 7, 1, 13 };
 	//common::RemovePai(source, 14, remove, 3);

@@ -55,7 +55,7 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 		}
 
 		hh::MainLogic *foo = (hh::MainLogic *)(nifBin.data);
-		hh::Init(foo, (int8)brankerNumber);
+		hh::Init(foo, (int8)brankerNumber, randSeed);
 		return make_success(env, enif_make_binary(env, &nifBin));
 	} else if (1 == gameType) {
 
@@ -65,7 +65,7 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 
 	}
 
-	return make_failed(env, "error gameType[%d].", gameType);
+	return make_failed(env, "error gameType %d.", gameType);
 }
 
 
