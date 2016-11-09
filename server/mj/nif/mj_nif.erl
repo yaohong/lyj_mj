@@ -7,7 +7,7 @@ init() ->
 	erlang:load_nif("./mj_nif", 0).
 
 
-game_start(GameType, BankerNumber, RandSeed) ->
+game_start(GameType, BankerNumber, RandSeed) when is_integer(GameType) andalso is_integer(BankerNumber) andalso is_integer(RandSeed) ->
 	exception.
 
 test_func() ->
