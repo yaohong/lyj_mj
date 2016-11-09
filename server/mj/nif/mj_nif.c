@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
+#include <stdarg.h>
 #include "erl_nif.h"
 #include "hh_game_logic.h"
 
@@ -24,7 +25,7 @@ ERL_NIF_TERM make_failed(ErlNifEnv *env, const char *fmt, ...) {
 }
 
 ERL_NIF_TERM make_success(ErlNifEnv *env, ERL_NIF_TERM reply) {
-	return enif_make_tuple(env, 2, enif_make_atom(env, "success"), v);
+	return enif_make_tuple(env, 2, enif_make_atom(env, "success"), reply);
 }
 
 static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
