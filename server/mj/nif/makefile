@@ -12,7 +12,7 @@ C_SRC:=$(wildcard *.c)
 CPP_OBJ:=$(patsubst %.cpp,$(OBJDIR)/%.o,$(notdir $(CPP_SRC)))
 C_OBJ:=$(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(C_SRC)))
 OBJ:= ${CPP_OBJ} ${C_OBJ}
-all:  client $(e_so) beam
+all:	$(e_so) beam
 
 client: ${CPP_OBJ} 
 	g++ $(flag) -o $@ $^
