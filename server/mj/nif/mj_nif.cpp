@@ -23,12 +23,6 @@ ERL_NIF_TERM MakeSuccess0(ErlNifEnv *env) {
 	return enif_make_tuple(env, 1, enif_make_atom(env, "success"));
 }
 
-
-ERL_NIF_TERM generateReturnValue(ErlNifEnv *env, hh::MainLogic *logic) {
-
-}
-
-
 static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
 	//获取游戏类型
