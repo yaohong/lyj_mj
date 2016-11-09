@@ -1,5 +1,5 @@
 
-flag= -g -DHH_EXE -I./ -I/usr/local/erlang/lib/erlang/usr/include/ -fPIC -std=c++0x
+flag= -g -DHH_EXE -fPIC -std=c++0x
 
 OBJDIR:=./obj
 
@@ -12,7 +12,7 @@ C_SRC:=$(wildcard *.c)
 CPP_OBJ:=$(patsubst %.cpp,$(OBJDIR)/%.o,$(notdir $(CPP_SRC)))
 C_OBJ:=$(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(C_SRC)))
 OBJ:= ${CPP_OBJ} ${C_OBJ}
-all:	$(e_so) beam
+all: client $(e_so) beam
 
 client: ${CPP_OBJ} 
 	g++ $(flag) -o $@ $^
