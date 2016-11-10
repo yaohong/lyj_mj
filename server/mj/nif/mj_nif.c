@@ -5,7 +5,6 @@
 #include <stdarg.h>
 #include "erl_nif.h"
 #include "hh_game_logic.h"
-#include "mj.pb.h"
 
 ERL_NIF_TERM MakeFailed(ErlNifEnv *env, const char *fmt, ...) {
 	va_list va;
