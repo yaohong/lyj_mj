@@ -50,6 +50,9 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 		}
 		qp_mj::qp_mj_oper_req operReq;
 		operReq.set_type(1);
+		char buffer[128];
+		operReq.SerializeToArray(buffer, 128);
+
 		hh::MainLogic *logic = (hh::MainLogic *)(nifBin.data);
 		hh::Init(logic, (qp_int8)brankerNumber, randSeed);
 		ERL_NIF_TERM returnValue = enif_make_int(env, 1);
