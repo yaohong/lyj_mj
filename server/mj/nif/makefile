@@ -37,5 +37,8 @@ clean:
 $(OBJDIR)/%.o:%.cpp
 	g++ -c $< -o $@ $(flag)
 
+$(OBJDIR)/%.o:%.cc
+	g++ -c $< -o $@ $(flag)
+
 $(OBJDIR)/%.o:%.c
 	g++ -c $< -o $@ $(e_flag)
