@@ -52,7 +52,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;HH_EXE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>E:\Program Files\erl7.3\usr\include;D:\Program Files\erl7.3\usr\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Program Files\erl7.3\usr\include;D:\Program Files\erl7.3\usr\include;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -82,10 +82,12 @@
   <ItemGroup>
     <ClInclude Include="..\common.h" />
     <ClInclude Include="..\hh_game_logic.h" />
+    <ClInclude Include="..\mj.pb.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common.cpp" />
     <ClCompile Include="..\hh_game_logic.cpp" />
+    <ClCompile Include="..\mj.pb.cc" />
     <ClCompile Include="..\mj_nif.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
