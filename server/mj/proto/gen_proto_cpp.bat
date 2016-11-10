@@ -37,7 +37,7 @@ IF %ERRORLEVEL% NEQ 0 goto ErrorLabel
 protoc --cpp_out=%Src% common.proto > nul
 IF %ERRORLEVEL% NEQ 0 goto ErrorLabel
 
-protoc --c_out=%NifSrc% mj.proto > nul
+protoc --cpp_out=%NifSrc% mj.proto > nul
 IF %ERRORLEVEL% NEQ 0 goto ErrorLabel
 
 goto SuccLabel
