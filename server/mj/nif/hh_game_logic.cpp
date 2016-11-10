@@ -108,10 +108,6 @@ namespace hh
         {
             Seat &seat = logic->seats_[i];
 			common::Sort(seat.pai_, seat.writeIndex_);
-            for (int j = 0; j < seat.writeIndex_; j++)
-            {
-                std::string v = common::getPaiString( seat.pai_[j] );
-            }
         }
     }
 }
