@@ -4,7 +4,7 @@ flag= -g -DHH_EXE -I./include -fPIC -std=c++0x
 OBJDIR:=./obj
 
 e_so=./mj_nif.so
-e_flag= -g -fPIC -shared -I./ -I./include/ -I/usr/local/erlang/lib/erlang/usr/include/
+e_flag= -g -fPIC -shared -I./ -I./include/ -I/usr/local/erlang/lib/erlang/usr/include/ -L./lib -lprotobuf
 
 
 CPP_SRC:=$(wildcard *.cpp )
