@@ -101,7 +101,7 @@ namespace hh
 
         //给庄家在发一张
         Seat &seat = logic->seats_[logic->bankerSeatNumber_];
-        seat.pai_[seat.writeIndex_++] = logic->pool_[logic->poolHeadReadIndex_++];
+		seat.pai_[seat.writeIndex_++] = logic->pool_[logic->poolHeadReadIndex_++];
 
         //给牌排序
         for (int i = 0; i < 4; i++)
