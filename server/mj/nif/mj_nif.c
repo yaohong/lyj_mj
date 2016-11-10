@@ -48,10 +48,6 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 		if (!enif_alloc_binary(sizeof(hh::MainLogic), &nifBin)) {
 			return MakeFailed(env, "enif_alloc_binary failed, len=%u", sizeof(hh::MainLogic));
 		}
-		qp_mj::qp_mj_oper_req operReq;
-		operReq.set_type(1);
-		char buffer[128];
-		operReq.SerializeToArray(buffer, 128);
 
 		hh::MainLogic *logic = (hh::MainLogic *)(nifBin.data);
 		hh::Init(logic, (qp_int8)brankerNumber, randSeed);
