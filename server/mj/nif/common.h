@@ -19,9 +19,9 @@
 #define VALUE(p) (p & 0x0f)
 #define PAI(t, v) ((t) << 4 | v)
 
-#define uint8 unsigned char 
-#define int8 char
-#define uint32 unsigned int
+#define qp_uint8 unsigned char 
+#define qp_int8 char
+#define qp_uint32 unsigned int
 
 
 //能够进行的操作
@@ -33,7 +33,7 @@
 #define OP_CHU 16				//1 << 4
 namespace common {
 	static int MAX_TITLE_INDEX = 34;
-	static uint8 PAI_ARRAY[34] = {
+	static qp_uint8 PAI_ARRAY[34] = {
 		PAI(1, 1), PAI(1, 2), PAI(1, 3), PAI(1, 4), PAI(1, 5), PAI(1, 6), PAI(1, 7), PAI(1, 8), PAI(1, 9),        //万
 		PAI(2, 1), PAI(2, 2), PAI(2, 3), PAI(2, 4), PAI(2, 5), PAI(2, 6), PAI(2, 7), PAI(2, 8), PAI(2, 9),        //条
 		PAI(3, 1), PAI(3, 2), PAI(3, 3), PAI(3, 4), PAI(3, 5), PAI(3, 6), PAI(3, 7), PAI(3, 8), PAI(3, 9),        //筒
@@ -42,31 +42,31 @@ namespace common {
 	};
 
 	struct HuBasicResult {
-		uint8 sequence_[4][3];
-		int8 sequenceLen_;
-		uint8 pair_[2];
+		qp_uint8 sequence_[4][3];
+		qp_int8 sequenceLen_;
+		qp_uint8 pair_[2];
 		HuBasicResult()
 		{
-			for (int8 i = 0; i < 4; i++)
+			for (qp_int8 i = 0; i < 4; i++)
 			{
-				for (int8 j = 0; j < 3; j++)
+				for (qp_int8 j = 0; j < 3; j++)
 				{
 					sequence_[i][j] = 0;
 				}
 			}
 			sequenceLen_ = 0;
-			for (int8 i = 0; i < 2; i++)
+			for (qp_int8 i = 0; i < 2; i++)
 			{
 				pair_[i] = 0;
 			}
 		}
 	};
-	std::string getPaiString(uint8 p);
-	void Sort(uint8 pai[], uint8 count);
-	void Random(uint8 pai[], uint8 count);
-	void Crc(uint8 pai[], uint8 count);
-	void RemovePai(uint8 source[], int8 sourceLen, uint8 dest[], int8 destLen);
-	void CheckBasicHuPai(uint8 source[], uint8 sourceLen, std::vector<HuBasicResult> &result);
+	std::string getPaiString(qp_uint8 p);
+	void Sort(qp_uint8 pai[], qp_uint8 count);
+	void Random(qp_uint8 pai[], qp_uint8 count);
+	void Crc(qp_uint8 pai[], qp_uint8 count);
+	void RemovePai(qp_uint8 source[], qp_int8 sourceLen, qp_uint8 dest[], qp_int8 destLen);
+	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result);
 }
 
 #endif

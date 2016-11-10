@@ -5,12 +5,12 @@ namespace hh
     void InitPool( MainLogic *logic )
     {
         //初始化池里的牌 (万子 条子 筒子)
-        uint8 writeOffset = 0;
-        for (uint8 i = 0; i < 3; i++)
+		qp_uint8 writeOffset = 0;
+		for (qp_uint8 i = 0; i < 3; i++)
         {
-            for (uint8 j = 0; j < 9; j++)
+			for (qp_uint8 j = 0; j < 9; j++)
             {
-                for (uint8 k = 0; k < 4; k++)
+				for (qp_uint8 k = 0; k < 4; k++)
                 {
                     logic->pool_[writeOffset++] = PAI( i + 1, j + 1 );
                 }
@@ -18,9 +18,9 @@ namespace hh
         }
 
         //插入中发白
-        for (uint8 i = 0; i < 3; i++)
+		for (qp_uint8 i = 0; i < 3; i++)
         {
-            for (uint8 j = 0; j < 4; j++)
+			for (qp_uint8 j = 0; j < 4; j++)
             {
                 logic->pool_[writeOffset++] = PAI( FA, i + 1 );
             }
@@ -29,33 +29,7 @@ namespace hh
         assert( HH_MAX_COUNT == writeOffset );
     }
 
-    void CrcPool( MainLogic *logic )
-    {
-        std::map<uint8, int> verifyMap;
-        for (int i = 0; i < HH_MAX_COUNT; ++i)
-        {
-            std::map<uint8, int>::iterator p_it = verifyMap.find( logic->pool_[i] );
-            if (p_it == verifyMap.end())
-            {
-                verifyMap.insert( std::pair<uint8, int>( logic->pool_[i], 1 ) );
-            }
-            else
-            {
-                p_it->second++;
-            }
-        }
-
-        for (int i = 0; i < common::MAX_TITLE_INDEX; ++i)
-        {
-			std::map<uint8, int>::iterator p_it = verifyMap.find(logic->pool_[common::PAI_ARRAY[i]]);
-			if (p_it != verifyMap.end())
-			{
-				assert(p_it->second == 4);
-			}
-        }
-    }
-
-	void Init(MainLogic *logic, int8 bankerSeatNumber, uint32 randSeed)
+	void Init(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint32 randSeed)
     {
         memset( logic, 0, sizeof(MainLogic) );
 		srand(randSeed);
@@ -80,7 +54,7 @@ namespace hh
         {
             for (int j = 0; j < 4; j++)
             {
-                int8 tmpOperSeatNumer = (logic->bankerSeatNumber_ + j) % 4;
+				qp_int8 tmpOperSeatNumer = (logic->bankerSeatNumber_ + j) % 4;
                 assert( tmpOperSeatNumer >= 0 && tmpOperSeatNumer < 4 );
                 Seat &seat = logic->seats_[tmpOperSeatNumer];
                 for (int k = 0; k < 4; k++)
@@ -93,7 +67,7 @@ namespace hh
         //发一轮一张
         for (int i = 0; i < 4; i++)
         {
-            int8 tmpOperSeatNumer = (logic->bankerSeatNumber_ + i) % 4;
+			qp_int8 tmpOperSeatNumer = (logic->bankerSeatNumber_ + i) % 4;
             assert( tmpOperSeatNumer >= 0 && tmpOperSeatNumer < 4 );
             Seat &seat = logic->seats_[tmpOperSeatNumer];
             seat.pai_[seat.writeIndex_++] = logic->pool_[logic->poolHeadReadIndex_++];
@@ -119,7 +93,7 @@ int main( int argc, const char * argv[] )
 {
 	//insert code here...
 	hh::MainLogic logic;
-	hh::Init(&logic, -1, (uint32)time(NULL));
+	hh::Init(&logic, -1, (qp_uint32)time(NULL));
 	printf("banker_seat_number=%d\n", logic.bankerSeatNumber_);
 	for (int i = 0; i < 4; i++)
 	{
