@@ -4,14 +4,17 @@ flag= -g -DHH_EXE -fPIC -std=c++0x
 OBJDIR:=./obj
 
 e_so=./mj_nif.so
-e_flag= -g -fPIC -shared -I./ -I/usr/local/erlang/lib/erlang/usr/include/
+e_flag= -g -fPIC -shared -I./ -I./include/ -I/usr/local/erlang/lib/erlang/usr/include/
 
 
 CPP_SRC:=$(wildcard *.cpp )
 C_SRC:=$(wildcard *.c)
+CC_SRC:=$(wildcard *.cc)
+
 CPP_OBJ:=$(patsubst %.cpp,$(OBJDIR)/%.o,$(notdir $(CPP_SRC)))
 C_OBJ:=$(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(C_SRC)))
-OBJ:= ${CPP_OBJ} ${C_OBJ}
+CC_OBJ:=$(patsubst %.cc,$(OBJDIR)/%.o,$(notdir $(CC_SRC)))
+OBJ:= ${CPP_OBJ} ${C_OBJ} ${CC_OBJ}
 all: client $(e_so) beam
 
 client: ${CPP_OBJ} 

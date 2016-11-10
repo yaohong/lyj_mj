@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include "erl_nif.h"
 #include "hh_game_logic.h"
+#include "mj.pb.h"
 
 ERL_NIF_TERM MakeFailed(ErlNifEnv *env, const char *fmt, ...) {
 	va_list va;
@@ -47,6 +48,8 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 		if (!enif_alloc_binary(sizeof(hh::MainLogic), &nifBin)) {
 			return MakeFailed(env, "enif_alloc_binary failed, len=%u", sizeof(hh::MainLogic));
 		}
+		qp_mj::qp_mj_oper_req operReq;
+		operReq.set_type(1);
 		hh::MainLogic *logic = (hh::MainLogic *)(nifBin.data);
 		hh::Init(logic, (int8)brankerNumber, randSeed);
 		ERL_NIF_TERM returnValue = enif_make_int(env, 1);
