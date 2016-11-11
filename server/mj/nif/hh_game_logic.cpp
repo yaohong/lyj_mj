@@ -45,13 +45,12 @@ namespace hh
         }
         else
         {
+			assert(bankerSeatNumber >= 0 && bankerSeatNumber <= 3);
             logic->bankerSeatNumber_ = bankerSeatNumber;
         }
 
         logic->currentSeatNumber_ = logic->bankerSeatNumber_;
 
-		printf("bankerSeatNumber_=%d\n", logic->bankerSeatNumber_);
-		printf("currentSeatNumber_=%d\n", logic->currentSeatNumber_);
         //发三轮四张
         for (int i = 0; i < 3; i++)
         {
