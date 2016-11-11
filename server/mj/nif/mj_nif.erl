@@ -75,7 +75,9 @@ resolve(Bin) ->
 	ValidPoolList = binary_to_list(ValidPool),
 	io:format("vaild_pool_list=~p~n", [ValidPoolList]),
 
-
+	io:format("branker_number=~p~n", [BrankerNumber]),
+	io:format("current_seat_number=~p~n", [CurrentSeatNumber]),
+	io:format("last_time=~p~n", [LastTime]),
 	ok.
 %%resolve(Bin) ->
 %%	<<
