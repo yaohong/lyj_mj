@@ -19,10 +19,10 @@ namespace hh
     {
 		qp_uint8	pool_[HH_MAX_COUNT];        //牌池里的牌
 		qp_uint8	poolHeadReadIndex_;			//麻将池的头部读取索引
-		qp_uint8   poolTailReadIndex_;         //麻将池的尾部读取索引
-        Seat	seats_[4];                  //四个座位
-		qp_int8    bankerSeatNumber_;          //庄家的座位号
-		qp_int8	currentSeatNumber_;         //当前操作的座位
+		qp_uint8	poolTailReadIndex_;         //麻将池的尾部读取索引
+        Seat		seats_[4];                  //四个座位
+		qp_int8		bankerSeatNumber_;          //庄家的座位号
+		qp_int8		currentSeatNumber_;         //当前操作的座位
 		qp_uint32	lastTime_;                  //开始操作的时间
 
     };
