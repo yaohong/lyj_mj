@@ -70,7 +70,8 @@ resolve(Bin) ->
 	HeadLen = PoolTailReadIndex,
 	TailLen = ?HH_POOL_COUNT - 1 - PoolTailReadIndex,
 	ValidPoolLen = ?HH_POOL_COUNT - HeadLen - TailLen,
-	<<_:PoolHeadReadIndex/binary, ValidPool:ValidPoolLen/binary, _:TailLen/binary>> = PaiPool,
+	io:format("head_len=~p, valid_pool_len=~p, tail_len=~p~n", [HeadLen, ValidPoolLen, TailLen]),
+	<<_:HeadLen/binary, ValidPool:ValidPoolLen/binary, _:TailLen/binary>> = PaiPool,
 	ValidPoolList = binary_to_list(ValidPool),
 	io:format("vaild_pool_list=~p~n", [ValidPoolList]),
 
