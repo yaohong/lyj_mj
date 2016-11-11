@@ -47,7 +47,7 @@
 -define(BIG_UINT64, 64/unsigned-integer-big).
 
 -export([init/0]).
--export([game_start/3, test_func/0]).
+-export([game_start/3, game_oper/2]).
 -export([resolve/1]).
 init() ->
 	erlang:load_nif("./mj_nif", 0).
@@ -60,7 +60,7 @@ game_start(GameType, BankerNumber, RandSeed) when is_integer(GameType) andalso i
 
 resolve(Bin) ->
 	<<
-		PaiPool:120/binay, PoolHeadReadIndex:?BIG_UINT8, PoolTailReadIndex:?BIG_UINT8,
+		PaiPool:120/binary, PoolHeadReadIndex:?BIG_UINT8, PoolTailReadIndex:?BIG_UINT8,
 		Seat0:28/binary, Seat1:28/binary,Seat2:28/binary,Seat3:28/binary,
 		BrankerNumber:?BIG_UINT8, CurrentSeatNumber:?BIG_UINT8, LastTime:?BIG_UINT32
 	>> = Bin,
@@ -70,7 +70,7 @@ resolve(Bin) ->
 	HeadLen = PoolTailReadIndex,
 	TailLen = ?HH_POOL_COUNT - 1 - PoolTailReadIndex,
 	ValidPoolLen = ?HH_POOL_COUNT - HeadLen - TailLen,
-	<<_:PoolHeadReadIndex/binay, ValidPool:ValidPoolLen/binay, _:TailLen/binay>> = PaiPool,
+	<<_:PoolHeadReadIndex/binary, ValidPool:ValidPoolLen/binary, _:TailLen/binary>> = PaiPool,
 	ValidPoolList = binary_to_list(ValidPool),
 	io:format("vaild_pool_list=~p~n", [ValidPoolList]),
 
@@ -143,5 +143,5 @@ resolve(Bin) ->
 %%	ok.
 
 
-test_func() ->
+game_oper(V1, V2) ->
 	exception.
