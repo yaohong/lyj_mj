@@ -48,6 +48,7 @@
 
 -export([init/0]).
 -export([game_start/3, test_func/0]).
+-export([resolve/1]).
 init() ->
 	erlang:load_nif("./mj_nif", 0).
 
@@ -63,10 +64,15 @@ resolve(Bin) ->
 		Seat0:28/binary, Seat1:28/binary,Seat2:28/binary,Seat3:28/binary,
 		BrankerNumber:?BIG_UINT8, CurrentSeatNumber:?BIG_UINT8, LastTime:?BIG_UINT32
 	>> = Bin,
+	io:format("raw_pool=~p~n", [binary_to_list(PaiPool)]),
+	io:format("pool_head_read_index=~p~n", [PoolHeadReadIndex]),
+	io:format("pool_tail_read_index=~p~n", [PoolTailReadIndex]),
 	HeadLen = PoolTailReadIndex,
 	TailLen = ?HH_POOL_COUNT - 1 - PoolTailReadIndex,
 	ValidPoolLen = ?HH_POOL_COUNT - HeadLen - TailLen,
 	<<_:PoolHeadReadIndex/binay, ValidPool:ValidPoolLen/binay, _:TailLen/binay>> = PaiPool,
+	ValidPoolList = binary_to_list(ValidPool),
+	io:format("vaild_pool_list=~p~n", [ValidPoolList]),
 
 
 	ok.
