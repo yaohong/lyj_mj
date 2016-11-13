@@ -205,7 +205,7 @@ quit_user_from_seat(UserKey, 2, [S0, S1, {2, SeatData}|T]) when is_record(SeatDa
 quit_user_from_seat(UserKey, 3, [S0, S1, S2, {0, SeatData}]) when is_record(SeatData, seat_data) ->
     case UserKey:compare(SeatData#seat_data.user_data) of
         false -> failed;
-        true -> {success, [S0, S1, S2, {0, undefined}]}
+        true -> {success, [S0, S1, S2, {3, undefined}]}
     end.
 
 
@@ -268,14 +268,14 @@ idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join 
             end
     end;
 idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_list = SeatList, room_type = RoomType, room_id = RoomId} = State) ->
-    case proplists:get_value(SeatNum, SeatList, undefined) of
-        {SeatNum, undefined} ->
+    case proplists:get_value(SeatNum, SeatList, none) of
+        undefined ->
             ?FILE_LOG_WARNING("user_id[~p] ready seat_num[~p] undefined", [UserKey:get(user_id), SeatNum]),
             {reply, failed, idle, State};
         none ->
             ?FILE_LOG_WARNING("user_id[~p] ready seat_num[~p] none", [UserKey:get(user_id), SeatNum]),
             {reply, failed, idle, State};
-        {SeatNum, SeatData} when is_record(SeatData,seat_data) ->
+        SeatData when is_record(SeatData,seat_data) ->
             SeatUserData = SeatData#seat_data.user_data,
             SeatUserIsReady = SeatData#seat_data.is_ready,
             case UserKey:compare(SeatUserData) of
