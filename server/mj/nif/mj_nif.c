@@ -25,7 +25,6 @@ ERL_NIF_TERM MakeSuccess0(ErlNifEnv *env) {
 
 static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
-	//获取游戏类型
 	int gameType = -1;
 	int brankerNumber = -1;
 	unsigned int randSeed = 0;
@@ -42,7 +41,6 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 	}
 
 	if (0 == gameType) {
-		//晃晃
 		ErlNifBinary nifBin;
 		if (!enif_alloc_binary(sizeof(hh::MainLogic), &nifBin)) {
 			return MakeFailed(env, "enif_alloc_binary failed, len=%u", sizeof(hh::MainLogic));
@@ -50,8 +48,7 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 
 		hh::MainLogic *logic = (hh::MainLogic *)(nifBin.data);
 		hh::Init(logic, (qp_int8)brankerNumber, randSeed);
-		ERL_NIF_TERM returnValue = enif_make_int(env, 1);
-		return MakeSuccess1(env, enif_make_tuple(env, 2, returnValue, enif_make_binary(env, &nifBin)));
+		return MakeSuccess1(env, enif_make_binary(env, &nifBin));
 	} else if (1 == gameType) {
 
 	} else if (2 == gameType) {
@@ -78,7 +75,6 @@ static ERL_NIF_TERM game_oper(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[
 	hh::MainLogic *foo = (hh::MainLogic *)(nifBin.data);
 
 	if (0 == gameType) {
-		//晃晃
 		hh::MainLogic *foo = (hh::MainLogic *)(nifBin.data);
 		return MakeSuccess0(env);
 	} else if (1 == gameType) {
