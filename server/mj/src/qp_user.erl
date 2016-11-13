@@ -150,8 +150,8 @@ wait_login(Event, State) ->
   {next_state, wait_login, State}.
 
 
-hall(Event, State) ->
-  ?FILE_LOG_WARNING("~p", [Event]),
+hall(Event, #state{user_data = UserData} = State) ->
+  ?FILE_LOG_WARNING("user_id=~p ~p", [UserData#user_data.user_id, Event]),
   {next_state, hall, State}.
 
 

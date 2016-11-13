@@ -209,7 +209,7 @@ idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join 
                         }
                     },
                     PushBin = qp_proto:encode_qp_packet(Push),
-                    broadcast(RoomUsers, {room_bin_msg, PushBin}),
+                    broadcast(SeatTree, {room_bin_msg, PushBin}),
                     NewSeatTree = gb_trees:update(IdleSeatNum, #seat_data{user_data = UserData}, SeatTree),
                     ?FILE_LOG_WARNING("join room[~p] success, owner_user_id=~p, join_user_id=~p", [RoomId, OwnerUserId, JoinUserId]),
                     {reply, {success, {IdleSeatNum, false, RoomUsers}}, idle, State#state{seat_tree = NewSeatTree}}
@@ -247,7 +247,7 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
 %%                                            RoomUserData:send_room_msg({room_bin_msg, PushBin})
 %%                                    end
 %%                                end, RoomUsers),
-                            broadcast(extract_room_users(SeatTree), {room_bin_msg, PushBin}, fun(UserUserItem) -> UserKey:compare(UserUserItem) end ),
+                            broadcast(SeatTree, {room_bin_msg, PushBin}, fun(UserUserItem) -> UserKey:compare(UserUserItem) end ),
                             ok
                     end,
                     NewSeatData = SeatData#seat_data{is_ready = ReadyState},
@@ -260,7 +260,7 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
                             {success, GameBin} = mj_nif:game_start(RoomType, Banker, qp_util:timestamp()),
                             ?FILE_LOG_DEBUG("~p", hh_mj_util:generate_main_logic(GameBin)),
                             %%所有玩家切换到游戏状态
-                            broadcast(extract_room_users(NewSeatTree), {change_game_state, RoomId}),
+                            broadcast(NewSeatTree, {change_game_state, RoomId}),
                             {reply, {success, ReadyState}, game, State#state{seat_tree = NewSeatTree, game_logic = GameBin}};
                         false ->
                             %%没有准备好
@@ -292,21 +292,23 @@ idle({quit, {UserKey, SeatNum}}, _From, #state{seat_tree = SeatTree, room_id = R
                             %%房主退出了，房间解散
                             %%发送房间解散的消息
                             ?FILE_LOG_DEBUG("room_id[~p] banker_user_Id[~p] exit_room, room dismiss.", [RoomId, UserKey:get(user_id)]),
-                            lists:foreach(
-                                fun({RoomUserData, _, _}) ->
-                                    false = UserKey:compare(RoomUserData),
-                                    RoomUserData:send_room_msg({room_dismiss, RoomId})
-                                end, RoomUsers),
+%%                            lists:foreach(
+%%                                fun({RoomUserData, _, _}) ->
+%%                                    false = UserKey:compare(RoomUserData),
+%%                                    RoomUserData:send_room_msg({room_dismiss, RoomId})
+%%                                end, RoomUsers),
+                            broadcast(NewSeatTree, {room_dismiss, RoomId}),
                             {stop, normal, success, NewState};
                         true ->
                             %%广播其他用户，有人退出房间了
                             ?FILE_LOG_DEBUG("room_id[~p] user_id[~p] exit_room.", [RoomId, UserKey:get(user_id)]),
                             ExitPushBin = qp_proto:encode_qp_packet(#qp_exit_room_push{seat_number = SeatNum}),
-                            lists:foreach(
-                                fun({RoomUserData, _, _}) ->
-                                    false = UserKey:compare(RoomUserData),
-                                    RoomUserData:send_room_msg({room_bin_msg, ExitPushBin})
-                                end, RoomUsers),
+%%                            lists:foreach(
+%%                                fun({RoomUserData, _, _}) ->
+%%                                    false = UserKey:compare(RoomUserData),
+%%                                    RoomUserData:send_room_msg({room_bin_msg, ExitPushBin})
+%%                                end, RoomUsers),
+                            broadcast(NewSeatTree, {room_bin_msg, ExitPushBin}),
                             {reply, success, idle, NewState}
                     end
             end
@@ -447,18 +449,18 @@ check_all_ready(SeatTree, [SeatNumber|T]) ->
 
 
 
-broadcast(SeatRoomUsers, Msg) when is_list(SeatRoomUsers) ->
+broadcast(SeatTree, Msg) ->
     lists:foreach(
-        fun({RoomUserData, _, _}) ->
-            RoomUserData:send_room_msg(Msg)
-        end, SeatRoomUsers).
+        fun(#seat_data{user_data = UserData}) ->
+            UserData:send_room_msg(Msg)
+        end, gb_trees:values(SeatTree)).
 
-broadcast(SeatRoomUsers, Msg, FilterFun) when is_list(SeatRoomUsers) and is_function(FilterFun) ->
+broadcast(SeatTree, Msg, FilterFun) when is_function(FilterFun) ->
     lists:foreach(
-        fun({RoomUserData, _, _}) ->
-            case FilterFun(RoomUserData) of
+        fun(#seat_data{user_data = UserData}) ->
+            case FilterFun(UserData) of
                 true -> ok;
-                false -> RoomUserData:send_room_msg(Msg)
+                false -> UserData:send_room_msg(Msg)
             end
-        end, SeatRoomUsers).
+        end, gb_trees:values(SeatTree)).
 
