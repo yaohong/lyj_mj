@@ -31,6 +31,7 @@
 #define OP_GANG 4				//1 << 2
 #define OP_HU 8					//1 << 3
 #define OP_CHU 16				//1 << 4
+#define OP_GUO 32				//1 << 5
 namespace common {
 	static int MAX_TITLE_INDEX = 34;
 	static qp_uint8 PAI_ARRAY[34] = {
