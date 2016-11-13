@@ -3,7 +3,7 @@
 -export([init/0]).
 -export([game_start/3, game_oper/2]).
 init() ->
-	erlang:load_nif("./mj_nif", 0).
+	erlang:load_nif("../nif/mj_nif", 0).
 
 -define(HH_POOL_COUNT, 120).
 
