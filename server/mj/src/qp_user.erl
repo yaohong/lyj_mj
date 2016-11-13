@@ -168,8 +168,12 @@ room({room_dismiss, RoomId}, #state{user_data = UserData, room_data = RoomData} 
       {next_state, hall, State#state{room_data = undefined}};
     true -> {next_state, room, State}
   end;
+room({change_game_state, RoomId}, #state{room_data = #room_data{room_id = RoomId}, user_data = UserData} = State) ->
+  #user_data{user_id = UserId} = UserData,
+  ?FILE_LOG_WARNING("user_id=~p change_game_state", [UserId]),
+  {next_state, game, State};
 room(Event, State) ->
-  ?FILE_LOG_WARNING("~p", [Event]),
+  ?FILE_LOG_WARNING("~p ~p", [Event, State]),
   {next_state, room, State}.
 
 
@@ -385,8 +389,8 @@ packet_handle(Request, wait_login, State) ->
 
 packet_handle(#qp_create_room_req{room_type = RoomType}, hall, #state{user_data = UserData, room_data = undefined} = State) ->
   #user_data{user_id = UserId, gold = Gold, nickname = NickName, avatar_url = AvatarUrl} = UserData,
-  ?FILE_LOG_DEBUG("user_id[~p] [hall] qp_create_room_req", [UserId]),
-  case qp_room_manager:create_room(UserId, RoomType) of
+  ?FILE_LOG_DEBUG("user_id[~p] [hall] qp_create_room_req room_type=~p", [UserId, RoomType]),
+  case qp_room_manager:create_room(UserId, 0) of
     {success, {RoomId, RoomPid}} ->
       ?FILE_LOG_DEBUG("user_id[~p] [hall] create_room success, room_id=~p, room_pid=~p", [UserId, RoomId, RoomPid]),
       case qp_room:join(RoomPid, qp_user_data:new(UserId, self(), Gold, NickName, AvatarUrl)) of
