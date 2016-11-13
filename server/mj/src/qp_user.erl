@@ -177,7 +177,7 @@ room(Event, State) ->
   {next_state, room, State}.
 
 
-game({room_bin_msg, Bin}, State) ->
+game({room_bin_msg, Bin}, State) when is_binary(Bin) ->
   send_bin(Bin, State),
   {next_state, game, State};
 game({room_dismiss, RoomId}, #state{user_data = UserData, room_data = RoomData} = State) ->

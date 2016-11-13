@@ -36,8 +36,7 @@
     room_id :: integer(),               %%房间ID
     room_type :: integer(),             %%房间类型(麻将玩法类型)
     seat_tree :: gb_trees:tree(),       %%描述四个座位
-    game_logic :: binary(),              %%由nif生成的结构
-    banker :: integer()                 %%庄家的座位号
+    game_prive_data :: term()           %%游戏的私有数据
 }).
 
 -record(seat_data, {user_data=undefined, is_ready=false}).
@@ -95,7 +94,7 @@ init([OwnerUserId, RoomId, RoomType]) ->
     Tree1 = gb_trees:insert(1, undefined, Tree0),
     Tree2 = gb_trees:insert(2, undefined, Tree1),
     Tree3 = gb_trees:insert(3, undefined, Tree2),
-    {ok, idle, #state{owner_user_id = OwnerUserId, owner_is_join = false, room_id = RoomId,room_type = RoomType, seat_tree = Tree3, game_logic = <<>>, banker = -1}}.
+    {ok, idle, #state{owner_user_id = OwnerUserId, owner_is_join = false, room_id = RoomId,room_type = RoomType, seat_tree = Tree3, game_prive_data = undefined}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -215,7 +214,7 @@ idle({join, UserData}, _From, #state{owner_user_id = OwnerUserId, owner_is_join 
                     {reply, {success, {IdleSeatNum, false, RoomUsers}}, idle, State#state{seat_tree = NewSeatTree}}
             end
     end;
-idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree, room_type = RoomType, banker = Banker, room_id = RoomId} = State) ->
+idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree, room_type = RoomType, room_id = RoomId} = State) ->
     case gb_trees:lookup(SeatNum, SeatTree) of
         {value, undefined} ->
             ?FILE_LOG_WARNING("user_id[~p] ready seat_num[~p] undefined", [UserKey:get(user_id), SeatNum]),
@@ -257,11 +256,12 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_tree = SeatTree
                         true ->
                             %%全部准备好了
                             ?FILE_LOG_DEBUG("check_all_ready true", []),
-                            {success, GameBin} = mj_nif:game_start(RoomType, Banker, qp_util:timestamp()),
-                            ?FILE_LOG_DEBUG("~p", hh_mj_util:generate_main_logic(GameBin)),
-                            %%所有玩家切换到游戏状态
                             broadcast(NewSeatTree, {change_game_state, RoomId}),
-                            {reply, {success, ReadyState}, game, State#state{seat_tree = NewSeatTree, game_logic = GameBin}};
+                            LogicMod = qp_logic_cfg:get_logic_mod(RoomType),
+                            {success, {GamePrivateData, SendGameData}} = LogicMod:game_start([undefined, qp_util:timestamp()]),
+                            send_game_data(SendGameData, NewSeatTree),
+                            %%所有玩家切换到游戏状态
+                            {reply, {success, ReadyState}, game, State#state{seat_tree = NewSeatTree, game_prive_data = GamePrivateData}};
                         false ->
                             %%没有准备好
                             {reply, {success, ReadyState}, idle, State#state{seat_tree = NewSeatTree}}
@@ -400,11 +400,12 @@ handle_info(_Info, StateName, State) ->
 terminate(_Reason, _StateName, #state{room_id = RoomId, seat_tree = SeatTree}) ->
     ?FILE_LOG_DEBUG("room_id[~p] [~p] terminate, reason=~p", [RoomId, _StateName, _Reason]),
     qp_room_manager:destroy_room(RoomId),
-    RoomUsers = extract_room_users(SeatTree),
-    lists:foreach(
-        fun({RoomUserData, _, _}) ->
-            RoomUserData:send_room_msg({room_dismiss, RoomId})
-        end, RoomUsers),
+    broadcast(SeatTree, {room_dismiss, RoomId}),
+%%    RoomUsers = extract_room_users(SeatTree),
+%%    lists:foreach(
+%%        fun({RoomUserData, _, _}) ->
+%%            RoomUserData:send_room_msg({room_dismiss, RoomId})
+%%        end, RoomUsers),
     ok.
 
 %%--------------------------------------------------------------------
@@ -452,15 +453,33 @@ check_all_ready(SeatTree, [SeatNumber|T]) ->
 broadcast(SeatTree, Msg) ->
     lists:foreach(
         fun(#seat_data{user_data = UserData}) ->
-            UserData:send_room_msg(Msg)
+            if
+                UserData =/= undefined ->
+                    UserData:send_room_msg(Msg);
+                true -> ok
+            end
         end, gb_trees:values(SeatTree)).
 
 broadcast(SeatTree, Msg, FilterFun) when is_function(FilterFun) ->
     lists:foreach(
         fun(#seat_data{user_data = UserData}) ->
-            case FilterFun(UserData) of
-                true -> ok;
-                false -> UserData:send_room_msg(Msg)
+            if
+                UserData =/= undefined ->
+                    case FilterFun(UserData) of
+                        true -> ok;
+                        false -> UserData:send_room_msg(Msg)
+                    end;
+                true -> ok
             end
         end, gb_trees:values(SeatTree)).
 
+
+send_game_data({BroadcastHeadBinData, SendSeatData, BroadcastTailBinData}, SeatTree) ->
+    broadcast(SeatTree, {room_bin_msg, BroadcastHeadBinData}),
+    lists:foreach(
+        fun({SeatNumber, SeatBinData}) ->
+            #seat_data{user_data = UserData} = gb_trees:get(SeatNumber, SeatTree),
+            UserData:send_room_msg({room_bin_msg, SeatBinData})
+        end,  SendSeatData),
+    broadcast(SeatTree, {room_bin_msg, BroadcastTailBinData}),
+    ok.
