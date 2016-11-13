@@ -1,7 +1,5 @@
 -module(mj_nif).
 
--include("../qp_type.hrl").
-
 -export([init/0]).
 -export([game_start/3, game_oper/2]).
 init() ->

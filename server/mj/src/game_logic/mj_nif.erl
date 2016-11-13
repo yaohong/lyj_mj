@@ -1,7 +1,5 @@
 -module(mj_nif).
 
--include("../qp_type.hrl").
-
 -export([init/0]).
 -export([game_start/3, game_oper/2]).
 init() ->
@@ -12,6 +10,7 @@ init() ->
 
 game_start(GameType, BankerNumber, RandSeed) when is_integer(GameType) andalso is_integer(BankerNumber) andalso is_integer(RandSeed) ->
 	exception.
+
 
 
 
