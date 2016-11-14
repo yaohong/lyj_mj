@@ -4,16 +4,16 @@ package qp_mj;
 
 message qp_logic {
     required int32 cmd = 1;
-    optional bytes serialized = 3;
+    optional bytes serialized = 2;
 }
 
 
 enum ws_cmd {
-    CMD_MJ_GAME_START_NOTIFY = 1001; //游戏开始
-    CMD_MJ_GAME_END_NOTIFY = 1002;   //游戏结束
+    CMD_MJ_GAME_START_NOTIFY = 10001; //游戏开始
+    CMD_MJ_GAME_END_NOTIFY = 10002;   //游戏结束
 
-    CMD_MJ_OPER_REQ = 1003;				//游戏操作
-	CMD_MJ_OPER_NOTIFY = 1004;			//游戏操作的通知
+    CMD_MJ_OPER_REQ = 10003;				//游戏操作
+	CMD_MJ_OPER_NOTIFY = 10004;			//游戏操作的通知
 	
 }
 

@@ -33,8 +33,11 @@
 
 
 
-
-
+%%游戏内协议
+-define(CMD_MJ_GAME_START_NOTIFY, 10001).
+-define(CMD_MJ_GAME_END_NOTIFY, 10002).
+-define(CMD_MJ_OPER_REQ, 10003).
+-define(CMD_MJ_OPER_NOTIFY, 10004).
 
 
 

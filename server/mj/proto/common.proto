@@ -126,8 +126,7 @@ message qp_room_dismiss_push {
 
 
 message qp_game_data {
-    required string game_name = 1;
-    required bytes game_data = 2;
+    required bytes game_data = 1;
 }
 
 
