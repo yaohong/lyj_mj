@@ -494,10 +494,10 @@ send_game_data({BroadcastHeadBinData, SendSeatData, BroadcastTailBinData}, SeatL
     broadcast(SeatList, {room_bin_msg, BroadcastHeadBinData}),
     lists:foreach(
         fun({SeatNumber, SeatBinData}) ->
-            case proplists:get_value(SeatNumber, SeatList) of
+            case proplists:get_value(SeatNumber, SeatList, none) of
+                none -> ok;
                 undefined -> ok;
-                {SeatNumber, undefined} -> ok;
-                {SeatNumber, SeatData} when is_record(SeatData, seat_data) ->
+                SeatData when is_record(SeatData, seat_data) ->
                     UserData = SeatData#seat_data.is_ready,
                     UserData:send_room_msg({room_bin_msg, SeatBinData})
             end
