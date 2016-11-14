@@ -186,7 +186,58 @@ namespace common {
 
 	void GetChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p, qp_uint8 chi[3][2], qp_uint8 &chiCount)
 	{
-		
+		assert(poolLen <= 13);
+		qp_uint8 type = TYPE(p);
+		chiCount = 0;
+		if (FENG == type || FA == type)
+		{
+			//风和中发白不能吃
+			return;
+		}
+		qp_uint8 value = VALUE(p);
+		//取2个特殊值,1和9
+		if (1 == value)
+		{
+			//看2，3是否存在
+			qp_uint8 p2 = PAI(type, 2);
+			qp_uint8 p3 = PAI(type, 3);
+			if (GetPaiCount(pool, poolLen, p2) > 0 && GetPaiCount(pool, poolLen, p3) > 0)
+			{
+				chi[chiCount][0] = p2;
+				chi[chiCount][1] = p3;
+				chiCount++;
+			}
+		}
+
+		if (9 == value)
+		{
+			//看7，8是否存在
+			qp_uint8 p7 = PAI(type, 7);
+			qp_uint8 p8 = PAI(type, 8);
+			if (GetPaiCount(pool, poolLen, p7) > 0 && GetPaiCount(pool, poolLen, p8) > 0)
+			{
+				chi[chiCount][0] = p7;
+				chi[chiCount][1] = p8;
+				chiCount++;
+			}
+		}
+
+		qp_uint8 pl = PAI(type, value - 1);
+		qp_uint8 pr = PAI(type, value + 1);
+		if (GetPaiCount(pool, poolLen, pl) > 0 && GetPaiCount(pool, poolLen, pr) > 0)
+		{
+			chi[chiCount][0] = pl;
+			chi[chiCount][1] = pr;
+			chiCount++;
+		}
+	}
+
+	bool IsChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p)
+	{
+		qp_uint8 chiCount = 0;
+		qp_uint8 chiData[3][2];
+		GetChi(pool, poolLen, p, chiData, chiCount);
+		return chiCount > 0;
 	}
 
 	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result)

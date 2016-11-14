@@ -44,7 +44,7 @@ namespace common {
 
 	struct HuBasicResult {
 		qp_uint8 sequence_[4][3];
-		qp_int8 sequenceLen_;
+		qp_uint8 sequenceLen_;
 		qp_uint8 pair_[2];
 		HuBasicResult()
 		{
@@ -77,6 +77,8 @@ namespace common {
 	qp_uint8 GetPaiCount(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 p);
 	//获取吃的牌,chiCount大于0表示可以吃
 	void GetChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p, qp_uint8 chi[3][2], qp_uint8 &chiCount);
+
+	bool IsChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p);
 	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result);
 }
 
