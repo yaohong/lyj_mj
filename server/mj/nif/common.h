@@ -63,10 +63,19 @@ namespace common {
 		}
 	};
 	std::string getPaiString(qp_uint8 p);
+	//对牌进行排序
 	void Sort(qp_uint8 pai[], qp_uint8 count);
+	//随机牌
 	void Random(qp_uint8 pai[], qp_uint8 count);
+	//校验
 	void Crc(qp_uint8 pai[], qp_uint8 count);
-	void RemovePai(qp_uint8 source[], qp_int8 sourceLen, qp_uint8 dest[], qp_int8 destLen);
+	//从source里删除dest的牌
+	void RemovePai(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 dest[], qp_uint8 destLen);
+	//检测指定source的牌在dest里是否存在
+	bool CheckPai(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 dest[], qp_uint8 destLen);
+	//获取某张牌的数量
+	qp_uint8 GetPaiCount(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 p);
+	//判断是否能吃
 	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result);
 }
 

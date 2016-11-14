@@ -24,21 +24,12 @@
     <ClInclude Include="..\common.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\mj.pb.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\hh_game_logic.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\common.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\mj_nif.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\mj.pb.cc">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -142,6 +142,48 @@ namespace common {
 		}
 	}
 
+	bool CheckPai(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 dest[], qp_uint8 destLen)
+	{
+		assert(destLen <= 14);
+		qp_uint8 tmpDest[14];
+		memset(tmpDest, 0, 14 * sizeof(qp_uint8));
+		memcpy(tmpDest, dest, destLen * sizeof(qp_uint8));
+
+		qp_uint8 count = 0;
+		for (qp_uint8 i = 0; i < sourceLen; i++)
+		{
+			if (source[i] != 0)
+			{
+				bool isRemove = false;
+				for (qp_uint8 j = 0; j < destLen; j++)
+				{
+					if (source[i] == tmpDest[j])
+					{
+						tmpDest[j] = 0;
+						count++;
+						break;
+					}
+				}
+			}
+		}
+		return count == sourceLen;
+	}
+
+	qp_uint8 GetPaiCount(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 p)
+	{
+		assert(sourceLen <= 14);
+		qp_uint8 count = 0;
+		for (qp_uint8 i = 0; i < sourceLen; i++)
+		{
+			if (source[i] == p)
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result)
 	{
 		//看总数是否为3n + 2

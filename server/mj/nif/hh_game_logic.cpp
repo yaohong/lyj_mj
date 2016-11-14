@@ -100,14 +100,17 @@ int main( int argc, const char * argv[] )
 	for (int i = 0; i < 4; i++)
 	{
 		hh::Seat &seat = logic.seats_[i];
-		printf( "seat_number[%d]:", i );
+		printf("seat_number[%d]:", i);
 		for (int j = 0; j < seat.writeIndex_; j++)
 		{
 			std::string v = common::getPaiString(seat.pai_[j]);
 			printf("%s ", v.c_str());
 		}
-		printf( "\n" );
+		printf("\n");
 	}
+	//qp_uint8 dest[16] = {1,2,3,4,15,5,5,6,7,8,9,10,11,13,14};
+	//qp_uint8 source[5] = { 4, 15, 5, 5,14};
+	//bool ret = common::CheckPai(source, 5, dest, 14);
     return 0;
 }
 #endif
