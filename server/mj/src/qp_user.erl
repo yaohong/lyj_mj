@@ -341,7 +341,7 @@ terminate(_Reason, _StateName, #state{user_data = UserData, room_data = RoomData
       if
         RoomData =/= undefined ->
           #room_data{room_pid = RoomPid, seat_num = SeatNum} = RoomData,
-          qp_room:quit(RoomPid, qp_user_key:new(UserData#user_data.user_id, self()), SeatNum);
+          catch qp_room:quit(RoomPid, qp_user_key:new(UserData#user_data.user_id, self()), SeatNum);
         true -> ok
       end;
     true -> ok
