@@ -36,7 +36,7 @@ encode_packet(Packet) when is_record(Packet, qp_mj_oper_notify) ->
 
 encode_packet(Cmd, Body) ->
 	Packet = #qp_logic{cmd = Cmd, serialized = Body},
-	Bin = mj_pb:encode_qp_packet(Packet),
+	Bin = mj_pb:encode_qp_logic(Packet),
 	qp_proto:encode_qp_packet(#qp_game_data{game_data = Bin}).
 
 
