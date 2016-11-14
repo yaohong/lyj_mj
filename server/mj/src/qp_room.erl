@@ -498,7 +498,7 @@ send_game_data({BroadcastHeadBinData, SendSeatData, BroadcastTailBinData}, SeatL
                 none -> ok;
                 undefined -> ok;
                 SeatData when is_record(SeatData, seat_data) ->
-                    UserData = SeatData#seat_data.is_ready,
+                    UserData = SeatData#seat_data.user_data,
                     UserData:send_room_msg({room_bin_msg, SeatBinData})
             end
         end,  SendSeatData),
