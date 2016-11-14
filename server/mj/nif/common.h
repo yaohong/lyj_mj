@@ -75,7 +75,8 @@ namespace common {
 	bool CheckPai(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 dest[], qp_uint8 destLen);
 	//获取某张牌的数量
 	qp_uint8 GetPaiCount(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 p);
-	//判断是否能吃
+	//获取吃的牌,chiCount大于0表示可以吃
+	void GetChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p, qp_uint8 chi[3][2], qp_uint8 &chiCount);
 	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result);
 }
 

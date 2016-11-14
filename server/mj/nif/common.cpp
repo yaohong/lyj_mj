@@ -184,6 +184,11 @@ namespace common {
 		return count;
 	}
 
+	void GetChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p, qp_uint8 chi[3][2], qp_uint8 &chiCount)
+	{
+		
+	}
+
 	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result)
 	{
 		//看总数是否为3n + 2
