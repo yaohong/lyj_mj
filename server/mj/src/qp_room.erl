@@ -453,7 +453,7 @@ code_change(_OldVsn, StateName, State, _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
-
+check_all_ready([]) -> true;
 check_all_ready([{_, undefined}|_]) -> false;
 check_all_ready([{_, SeatData}|T]) ->
     if
