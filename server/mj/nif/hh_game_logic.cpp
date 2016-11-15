@@ -85,6 +85,16 @@ namespace hh
             Seat &seat = logic->seats_[i];
 			common::Sort(seat.pai_, seat.writeIndex_);
         }
+
+		//看庄家能够做的操作，杠
+		Seat &bankerSeat = logic->seats_[logic->bankerSeatNumber_];
+		bankerSeat.operFlag_ = 0;
+		if (common::IsGang(bankerSeat.pai_, bankerSeat.writeIndex_))
+		{
+			bankerSeat.operFlag_ |= OP_GANG;
+		}
+
+		bankerSeat.operFlag_ |= OP_CHU;
     }
 }
 
