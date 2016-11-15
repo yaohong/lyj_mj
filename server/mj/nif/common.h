@@ -39,7 +39,7 @@ namespace common {
 		PAI(2, 1), PAI(2, 2), PAI(2, 3), PAI(2, 4), PAI(2, 5), PAI(2, 6), PAI(2, 7), PAI(2, 8), PAI(2, 9),        //条
 		PAI(3, 1), PAI(3, 2), PAI(3, 3), PAI(3, 4), PAI(3, 5), PAI(3, 6), PAI(3, 7), PAI(3, 8), PAI(3, 9),        //筒
 		PAI(4, 1), PAI(4, 2), PAI(4, 3), PAI(4, 4),        //东 南西北
-		PAI(5, 1), PAI(5, 1), PAI(5, 1)  //中发白         
+		PAI(5, 1), PAI(5, 2), PAI(5, 3)  //中发白         
 	};
 
 	struct HuBasicResult {
