@@ -195,49 +195,91 @@ namespace common {
 			return;
 		}
 		qp_uint8 value = VALUE(p);
-		//取2个特殊值,1和9
-		if (1 == value)
+
+		//左边看右边两张是否存在
+		if (value + 1 < 9 && value + 2 <= 9)
 		{
-			//看2，3是否存在
-			qp_uint8 p2 = PAI(type, 2);
-			qp_uint8 p3 = PAI(type, 3);
-			if (GetPaiCount(pool, poolLen, p2) > 0 && GetPaiCount(pool, poolLen, p3) > 0)
+			qp_uint8 p1 = PAI(type, value + 1);
+			qp_uint8 p2 = PAI(type, value + 2);
+			if (GetPaiCount(pool, poolLen, p1) > 0 && GetPaiCount(pool, poolLen, p2) > 0)
 			{
-				chi[chiCount][0] = p2;
-				chi[chiCount][1] = p3;
+				chi[chiCount][0] = p1;
+				chi[chiCount][1] = p2;
 				chiCount++;
 			}
 		}
 
-		if (9 == value)
+		if (value - 1 >= 1 && value + 1 <= 9)
 		{
-			//看7，8是否存在
-			qp_uint8 p7 = PAI(type, 7);
-			qp_uint8 p8 = PAI(type, 8);
-			if (GetPaiCount(pool, poolLen, p7) > 0 && GetPaiCount(pool, poolLen, p8) > 0)
+			//中间看两边是否存在
+			qp_uint8 p1 = PAI(type, value - 1);
+			qp_uint8 p2 = PAI(type, value + 1);
+			if (GetPaiCount(pool, poolLen, p1) > 0 && GetPaiCount(pool, poolLen, p2) > 0)
 			{
-				chi[chiCount][0] = p7;
-				chi[chiCount][1] = p8;
+				chi[chiCount][0] = p1;
+				chi[chiCount][1] = p2;
 				chiCount++;
 			}
 		}
 
-		qp_uint8 pl = PAI(type, value - 1);
-		qp_uint8 pr = PAI(type, value + 1);
-		if (GetPaiCount(pool, poolLen, pl) > 0 && GetPaiCount(pool, poolLen, pr) > 0)
+
+
+		//右边看左边两张是否存在
+		if (value - 2 >= 1 && value - 1 > 1)
 		{
-			chi[chiCount][0] = pl;
-			chi[chiCount][1] = pr;
-			chiCount++;
+			qp_uint8 p1 = PAI(type, value - 2);
+			qp_uint8 p2 = PAI(type, value - 1);
+			if (GetPaiCount(pool, poolLen, p1) > 0 && GetPaiCount(pool, poolLen, p2) > 0)
+			{
+				chi[chiCount][0] = p1;
+				chi[chiCount][1] = p2;
+				chiCount++;
+			}
 		}
 	}
 
 	bool IsChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p)
 	{
+		assert(poolLen <= 13);
 		qp_uint8 chiCount = 0;
-		qp_uint8 chiData[3][2];
+		qp_uint8 chiData[3][2] = { {0,0}, {0,0}, {0,0} };
 		GetChi(pool, poolLen, p, chiData, chiCount);
 		return chiCount > 0;
+	}
+
+	bool IsPeng(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p)
+	{
+		assert(poolLen <= 13);
+		return GetPaiCount(pool, poolLen, p) >= 2;
+	}
+
+	bool IsGang1(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p)
+	{
+		assert(poolLen <= 13);
+		return GetPaiCount(pool, poolLen, p) >= 3;
+	}
+
+
+	void GetGang(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 gang[3], qp_uint8 &gangCount)
+	{
+		assert(poolLen <= 14);
+		gangCount = 0;
+		for (qp_uint8 i = 0; i < MAX_TITLE_INDEX; i++)
+		{
+			if (GetPaiCount(pool, poolLen, PAI_ARRAY[i]) == 4)
+			{
+				gang[gangCount++] = PAI_ARRAY[i];
+			}
+		}
+	}
+
+	bool IsGang(qp_uint8 pool[], qp_uint8 poolLen)
+	{
+		assert(poolLen <= 14);
+		qp_uint8 gang[3] = {0,0,0};
+		qp_uint8 gangCount = 0;
+		GetGang(pool, poolLen, gang, gangCount);
+		return gangCount > 0;
 	}
 
 	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result)

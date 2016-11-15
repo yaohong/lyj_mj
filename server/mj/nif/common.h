@@ -33,7 +33,7 @@
 #define OP_CHU 16				//1 << 4
 #define OP_GUO 32				//1 << 5
 namespace common {
-	static int MAX_TITLE_INDEX = 34;
+	static qp_uint8 MAX_TITLE_INDEX = 34;
 	static qp_uint8 PAI_ARRAY[34] = {
 		PAI(1, 1), PAI(1, 2), PAI(1, 3), PAI(1, 4), PAI(1, 5), PAI(1, 6), PAI(1, 7), PAI(1, 8), PAI(1, 9),        //万
 		PAI(2, 1), PAI(2, 2), PAI(2, 3), PAI(2, 4), PAI(2, 5), PAI(2, 6), PAI(2, 7), PAI(2, 8), PAI(2, 9),        //条
@@ -77,8 +77,15 @@ namespace common {
 	qp_uint8 GetPaiCount(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 p);
 	//获取吃的牌,chiCount大于0表示可以吃
 	void GetChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p, qp_uint8 chi[3][2], qp_uint8 &chiCount);
-
 	bool IsChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p);
+	bool IsPeng(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p);
+	bool IsGang1(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p);
+
+	//获取我手里四张的数量
+	void GetGang(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 gang[3], qp_uint8 &gangCount);
+	bool IsGang(qp_uint8 pool[], qp_uint8 poolLen);
+
+	bool IsHu(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p);
 	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result);
 }
 
