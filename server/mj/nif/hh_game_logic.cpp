@@ -120,6 +120,28 @@ int main( int argc, const char * argv[] )
 			}
 		}
 		printf("\n");
+
+		printf("peng:   ");
+		for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
+		{
+			if (common::IsPeng(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k]))
+			{
+				std::string v = common::getPaiString(common::PAI_ARRAY[k]);
+				printf("%s ", v.c_str());
+			}
+		}
+		printf("\n");
+
+		printf("gang:   ");
+		for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
+		{
+			if (common::IsGang1(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k]))
+			{
+				std::string v = common::getPaiString(common::PAI_ARRAY[k]);
+				printf("%s ", v.c_str());
+			}
+		}
+		printf("\n");
 	}
 	//qp_uint8 dest[16] = {1,2,3,4,15,5,5,6,7,8,9,10,11,13,14};
 	//qp_uint8 source[5] = { 4, 15, 5, 5,14};
