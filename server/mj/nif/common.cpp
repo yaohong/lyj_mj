@@ -186,7 +186,7 @@ namespace common {
 
 	void GetChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p, qp_uint8 chi[3][2], qp_uint8 &chiCount)
 	{
-		assert(poolLen <= 13);
+		assert(poolLen <= 14);
 		qp_uint8 type = TYPE(p);
 		chiCount = 0;
 		if (FENG == type || FA == type)
@@ -240,7 +240,7 @@ namespace common {
 
 	bool IsChi(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p)
 	{
-		assert(poolLen <= 13);
+		assert(poolLen <= 14);
 		qp_uint8 chiCount = 0;
 		qp_uint8 chiData[3][2] = { {0,0}, {0,0}, {0,0} };
 		GetChi(pool, poolLen, p, chiData, chiCount);
@@ -249,13 +249,13 @@ namespace common {
 
 	bool IsPeng(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p)
 	{
-		assert(poolLen <= 13);
+		assert(poolLen <= 14);
 		return GetPaiCount(pool, poolLen, p) >= 2;
 	}
 
 	bool IsGang1(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p)
 	{
-		assert(poolLen <= 13);
+		assert(poolLen <= 14);
 		return GetPaiCount(pool, poolLen, p) >= 3;
 	}
 

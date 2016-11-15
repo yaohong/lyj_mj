@@ -107,6 +107,20 @@ int main( int argc, const char * argv[] )
 			printf("%s ", v.c_str());
 		}
 		printf("\n");
+		printf("chi:   ");
+		for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
+		{
+			qp_uint8 chi[3][2];
+			qp_uint8 chiCount = 0;
+			common::GetChi(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k], chi, chiCount);
+			for (qp_uint8 f = 0; f < chiCount; f++)
+			{
+				std::string v0 = common::getPaiString(chi[f][0]);
+				std::string v1 = common::getPaiString(chi[f][1]);
+				printf("%s-%s ", v0.c_str(), v1.c_str());
+			}
+		}
+		printf("\n");
 	}
 	//qp_uint8 dest[16] = {1,2,3,4,15,5,5,6,7,8,9,10,11,13,14};
 	//qp_uint8 source[5] = { 4, 15, 5, 5,14};
