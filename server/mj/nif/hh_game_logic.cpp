@@ -113,11 +113,10 @@ int main( int argc, const char * argv[] )
 			qp_uint8 chi[3][2];
 			qp_uint8 chiCount = 0;
 			common::GetChi(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k], chi, chiCount);
-			for (qp_uint8 f = 0; f < chiCount; f++)
+			if (chiCount > 0)
 			{
-				std::string v0 = common::getPaiString(chi[f][0]);
-				std::string v1 = common::getPaiString(chi[f][1]);
-				printf("%s-%s ", v0.c_str(), v1.c_str());
+				std::string v = common::getPaiString(common::PAI_ARRAY[k]);
+				printf("%s ", v.c_str());
 			}
 		}
 		printf("\n");
