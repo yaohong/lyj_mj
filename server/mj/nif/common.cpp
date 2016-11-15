@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 namespace common {
+
 	std::string getPaiString(qp_uint8 p)
 	{
 		qp_uint8 type = p >> 4;
