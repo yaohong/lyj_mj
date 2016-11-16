@@ -28,6 +28,7 @@ namespace hh
     };
 
 	void Init(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint32 randSeed);
+	void Oper(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint8 v1, qp_uint8 v2);
 }
 
 

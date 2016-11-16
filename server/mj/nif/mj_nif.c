@@ -63,19 +63,36 @@ static ERL_NIF_TERM game_start(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 static ERL_NIF_TERM game_oper(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
 	int gameType = -1;
+	unsigned int seatNumber = 0;
+	unsigned int v1 = 0;
+	unsigned int v2 = 0;
 	ErlNifBinary nifBin;
-	if (!enif_get_int(env, argv[0], &gameType)) {
+
+	if (!enif_inspect_binary(env, argv[0], &nifBin)) {
+		return MakeFailed(env, "get param nifBin failed.");
+	}
+
+	if (!enif_get_int(env, argv[1], &gameType)) {
 		return MakeFailed(env, "get param gameType failed.");
 	}
 
-	if (!enif_inspect_binary(env, argv[1], &nifBin)) {
-		return MakeFailed(env, "get param nifBin failed.");
+	if (!enif_get_uint(env, argv[2], &seatNumber)) {
+		return MakeFailed(env, "get param seatNumber failed.");
+	}
+
+	if (!enif_get_uint(env, argv[3], &v1)) {
+		return MakeFailed(env, "get param v1 failed.");
+	}
+
+	if (!enif_get_uint(env, argv[4], &v2)) {
+		return MakeFailed(env, "get param v2 failed.");
 	}
 
 	hh::MainLogic *foo = (hh::MainLogic *)(nifBin.data);
 
 	if (0 == gameType) {
 		hh::MainLogic *foo = (hh::MainLogic *)(nifBin.data);
+		hh::Oper(foo, (qp_int8)seatNumber, (qp_uint8)v1, (qp_uint8)v2);
 		return MakeSuccess0(env);
 	} else if (1 == gameType) {
 
@@ -91,7 +108,7 @@ static ERL_NIF_TERM game_oper(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[
 
 static ErlNifFunc nif_funcs[] = {
 	{ "game_start", 3, game_start },
-	{ "game_oper", 2, game_oper }
+	{ "game_oper", 5, game_oper }
 };
 
 

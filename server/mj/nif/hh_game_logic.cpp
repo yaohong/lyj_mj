@@ -96,6 +96,12 @@ namespace hh
 
 		bankerSeat.operFlag_ |= OP_CHU;
     }
+
+
+	void Oper(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint8 v1, qp_uint8 v2)
+	{
+
+	}
 }
 
 

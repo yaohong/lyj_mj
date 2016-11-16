@@ -15,6 +15,6 @@
 -record(qp_exit_room_rsp, {result}).
 -record(qp_exit_room_push, {seat_number}).
 -record(qp_room_dismiss_push, {room_id}).
--record(qp_game_data, {game_name, game_data}).
+-record(qp_game_data, {game_data}).
 -record(qp_ping_req, {seat_number}).
 -record(qp_ping_rsp, {seat_number}).
