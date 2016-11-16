@@ -22,13 +22,25 @@ namespace hh
 		qp_uint8	poolTailReadIndex_;         //麻将池的尾部读取索引
         Seat		seats_[4];                  //四个座位
 		qp_int8		bankerSeatNumber_;          //庄家的座位号
+
+
 		qp_int8		currentSeatNumber_;         //当前操作的座位
+		qp_uint8	currentValue1_;				//当前操作的值1
+		qp_uint8	currentValue2_;				//当前操作的值2
+
+		qp_int8		nextSeatNumber_;			//下一个操作的座位号
+		qp_uint8	nextValue1_;				//下一个操作的值1
+		qp_uint8	nextValue2_;				//下一个操作的值2
+
+
+
+		qp_uint8    stateFlag_;					//状态标志(0为游戏中,大于0为结束原因）
 		qp_uint32	lastTime_;                  //开始操作的时间
 
     };
 
 	void Init(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint32 randSeed);
-	void Oper(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint8 v1, qp_uint8 v2);
+	void Oper(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint8 operType, qp_uint8 v1, qp_uint8 v2);
 }
 
 
