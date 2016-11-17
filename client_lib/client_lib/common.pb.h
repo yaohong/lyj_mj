@@ -1718,10 +1718,22 @@ class qp_game_data : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required bytes game_data = 1;
+  // required string game_name = 1;
+  inline bool has_game_name() const;
+  inline void clear_game_name();
+  static const int kGameNameFieldNumber = 1;
+  inline const ::std::string& game_name() const;
+  inline void set_game_name(const ::std::string& value);
+  inline void set_game_name(const char* value);
+  inline void set_game_name(const char* value, size_t size);
+  inline ::std::string* mutable_game_name();
+  inline ::std::string* release_game_name();
+  inline void set_allocated_game_name(::std::string* game_name);
+
+  // required bytes game_data = 2;
   inline bool has_game_data() const;
   inline void clear_game_data();
-  static const int kGameDataFieldNumber = 1;
+  static const int kGameDataFieldNumber = 2;
   inline const ::std::string& game_data() const;
   inline void set_game_data(const ::std::string& value);
   inline void set_game_data(const char* value);
@@ -1732,15 +1744,18 @@ class qp_game_data : public ::google::protobuf::Message {
 
   // @@protoc_insertion_point(class_scope:qp_server.qp_game_data)
  private:
+  inline void set_has_game_name();
+  inline void clear_has_game_name();
   inline void set_has_game_data();
   inline void clear_has_game_data();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
+  ::std::string* game_name_;
   ::std::string* game_data_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
 
   friend void  protobuf_AddDesc_common_2eproto();
   friend void protobuf_AssignDesc_common_2eproto();
@@ -2935,15 +2950,85 @@ inline void qp_room_dismiss_push::set_room_id(::google::protobuf::int32 value) {
 
 // qp_game_data
 
-// required bytes game_data = 1;
-inline bool qp_game_data::has_game_data() const {
+// required string game_name = 1;
+inline bool qp_game_data::has_game_name() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void qp_game_data::set_has_game_data() {
+inline void qp_game_data::set_has_game_name() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void qp_game_data::clear_has_game_data() {
+inline void qp_game_data::clear_has_game_name() {
   _has_bits_[0] &= ~0x00000001u;
+}
+inline void qp_game_data::clear_game_name() {
+  if (game_name_ != &::google::protobuf::internal::kEmptyString) {
+    game_name_->clear();
+  }
+  clear_has_game_name();
+}
+inline const ::std::string& qp_game_data::game_name() const {
+  return *game_name_;
+}
+inline void qp_game_data::set_game_name(const ::std::string& value) {
+  set_has_game_name();
+  if (game_name_ == &::google::protobuf::internal::kEmptyString) {
+    game_name_ = new ::std::string;
+  }
+  game_name_->assign(value);
+}
+inline void qp_game_data::set_game_name(const char* value) {
+  set_has_game_name();
+  if (game_name_ == &::google::protobuf::internal::kEmptyString) {
+    game_name_ = new ::std::string;
+  }
+  game_name_->assign(value);
+}
+inline void qp_game_data::set_game_name(const char* value, size_t size) {
+  set_has_game_name();
+  if (game_name_ == &::google::protobuf::internal::kEmptyString) {
+    game_name_ = new ::std::string;
+  }
+  game_name_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* qp_game_data::mutable_game_name() {
+  set_has_game_name();
+  if (game_name_ == &::google::protobuf::internal::kEmptyString) {
+    game_name_ = new ::std::string;
+  }
+  return game_name_;
+}
+inline ::std::string* qp_game_data::release_game_name() {
+  clear_has_game_name();
+  if (game_name_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = game_name_;
+    game_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void qp_game_data::set_allocated_game_name(::std::string* game_name) {
+  if (game_name_ != &::google::protobuf::internal::kEmptyString) {
+    delete game_name_;
+  }
+  if (game_name) {
+    set_has_game_name();
+    game_name_ = game_name;
+  } else {
+    clear_has_game_name();
+    game_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// required bytes game_data = 2;
+inline bool qp_game_data::has_game_data() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void qp_game_data::set_has_game_data() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void qp_game_data::clear_has_game_data() {
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void qp_game_data::clear_game_data() {
   if (game_data_ != &::google::protobuf::internal::kEmptyString) {

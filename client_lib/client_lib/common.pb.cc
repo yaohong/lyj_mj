@@ -362,7 +362,8 @@ void protobuf_AssignDesc_common_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(qp_room_dismiss_push));
   qp_game_data_descriptor_ = file->message_type(17);
-  static const int qp_game_data_offsets_[1] = {
+  static const int qp_game_data_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(qp_game_data, game_name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(qp_game_data, game_data_),
   };
   qp_game_data_reflection_ =
@@ -538,21 +539,21 @@ void protobuf_AddDesc_common_2eproto() {
     "\022\023\n\013seat_number\030\001 \002(\005\"\"\n\020qp_exit_room_rs"
     "p\022\016\n\006result\030\001 \002(\005\"(\n\021qp_exit_room_push\022\023"
     "\n\013seat_number\030\001 \002(\005\"\'\n\024qp_room_dismiss_p"
-    "ush\022\017\n\007room_id\030\001 \002(\005\"!\n\014qp_game_data\022\021\n\t"
-    "game_data\030\001 \002(\014\"\"\n\013qp_ping_req\022\023\n\013seat_n"
-    "umber\030\001 \002(\005\"\"\n\013qp_ping_rsp\022\023\n\013seat_numbe"
-    "r\030\001 \002(\005*\275\003\n\006ws_cmd\022\025\n\020CMD_QP_LOGIN_REQ\020\351"
-    "\007\022\025\n\020CMD_QP_LOGIN_RSP\020\352\007\022\033\n\026CMD_QP_CREAT"
-    "E_ROOM_REQ\020\353\007\022\033\n\026CMD_QP_CREATE_ROOM_RSP\020"
-    "\354\007\022\031\n\024CMD_QP_JOIN_ROOM_REQ\020\355\007\022\031\n\024CMD_QP_"
-    "JOIN_ROOM_RSP\020\356\007\022\032\n\025CMD_QP_JOIN_ROOM_PUS"
-    "H\020\357\007\022\025\n\020CMD_QP_READY_REQ\020\360\007\022\025\n\020CMD_QP_RE"
-    "ADY_RSP\020\361\007\022\026\n\021CMD_QP_READY_PUSH\020\362\007\022\031\n\024CM"
-    "D_QP_EXIT_ROOM_REQ\020\363\007\022\031\n\024CMD_QP_EXIT_ROO"
-    "M_RSP\020\364\007\022\032\n\025CMD_QP_EXIT_ROOM_PUSH\020\365\007\022\036\n\031"
-    "CMD_QP_ROOM_DISSMISS_PUSH\020\366\007\022\025\n\020CMD_QP_G"
-    "AME_DATA\020\367\007\022\024\n\017CMD_QP_PING_REQ\020\370\007\022\024\n\017CMD"
-    "_QP_PING_RSP\020\371\007", 1575);
+    "ush\022\017\n\007room_id\030\001 \002(\005\"4\n\014qp_game_data\022\021\n\t"
+    "game_name\030\001 \002(\t\022\021\n\tgame_data\030\002 \002(\014\"\"\n\013qp"
+    "_ping_req\022\023\n\013seat_number\030\001 \002(\005\"\"\n\013qp_pin"
+    "g_rsp\022\023\n\013seat_number\030\001 \002(\005*\275\003\n\006ws_cmd\022\025\n"
+    "\020CMD_QP_LOGIN_REQ\020\351\007\022\025\n\020CMD_QP_LOGIN_RSP"
+    "\020\352\007\022\033\n\026CMD_QP_CREATE_ROOM_REQ\020\353\007\022\033\n\026CMD_"
+    "QP_CREATE_ROOM_RSP\020\354\007\022\031\n\024CMD_QP_JOIN_ROO"
+    "M_REQ\020\355\007\022\031\n\024CMD_QP_JOIN_ROOM_RSP\020\356\007\022\032\n\025C"
+    "MD_QP_JOIN_ROOM_PUSH\020\357\007\022\025\n\020CMD_QP_READY_"
+    "REQ\020\360\007\022\025\n\020CMD_QP_READY_RSP\020\361\007\022\026\n\021CMD_QP_"
+    "READY_PUSH\020\362\007\022\031\n\024CMD_QP_EXIT_ROOM_REQ\020\363\007"
+    "\022\031\n\024CMD_QP_EXIT_ROOM_RSP\020\364\007\022\032\n\025CMD_QP_EX"
+    "IT_ROOM_PUSH\020\365\007\022\036\n\031CMD_QP_ROOM_DISSMISS_"
+    "PUSH\020\366\007\022\025\n\020CMD_QP_GAME_DATA\020\367\007\022\024\n\017CMD_QP"
+    "_PING_REQ\020\370\007\022\024\n\017CMD_QP_PING_RSP\020\371\007", 1594);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "common.proto", &protobuf_RegisterTypes);
   qp_packet::default_instance_ = new qp_packet();
@@ -4866,6 +4867,7 @@ void qp_room_dismiss_push::Swap(qp_room_dismiss_push* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
+const int qp_game_data::kGameNameFieldNumber;
 const int qp_game_data::kGameDataFieldNumber;
 #endif  // !_MSC_VER
 
@@ -4885,6 +4887,7 @@ qp_game_data::qp_game_data(const qp_game_data& from)
 
 void qp_game_data::SharedCtor() {
   _cached_size_ = 0;
+  game_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   game_data_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -4894,6 +4897,9 @@ qp_game_data::~qp_game_data() {
 }
 
 void qp_game_data::SharedDtor() {
+  if (game_name_ != &::google::protobuf::internal::kEmptyString) {
+    delete game_name_;
+  }
   if (game_data_ != &::google::protobuf::internal::kEmptyString) {
     delete game_data_;
   }
@@ -4924,6 +4930,11 @@ qp_game_data* qp_game_data::New() const {
 
 void qp_game_data::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (has_game_name()) {
+      if (game_name_ != &::google::protobuf::internal::kEmptyString) {
+        game_name_->clear();
+      }
+    }
     if (has_game_data()) {
       if (game_data_ != &::google::protobuf::internal::kEmptyString) {
         game_data_->clear();
@@ -4940,10 +4951,27 @@ bool qp_game_data::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required bytes game_data = 1;
+      // required string game_name = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_game_name()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->game_name().data(), this->game_name().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_game_data;
+        break;
+      }
+
+      // required bytes game_data = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_game_data:
           DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
                 input, this->mutable_game_data()));
         } else {
@@ -4971,10 +4999,19 @@ bool qp_game_data::MergePartialFromCodedStream(
 
 void qp_game_data::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required bytes game_data = 1;
+  // required string game_name = 1;
+  if (has_game_name()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->game_name().data(), this->game_name().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->game_name(), output);
+  }
+
+  // required bytes game_data = 2;
   if (has_game_data()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      1, this->game_data(), output);
+      2, this->game_data(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -4985,11 +5022,21 @@ void qp_game_data::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* qp_game_data::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // required bytes game_data = 1;
+  // required string game_name = 1;
+  if (has_game_name()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->game_name().data(), this->game_name().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->game_name(), target);
+  }
+
+  // required bytes game_data = 2;
   if (has_game_data()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        1, this->game_data(), target);
+        2, this->game_data(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -5003,7 +5050,14 @@ int qp_game_data::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required bytes game_data = 1;
+    // required string game_name = 1;
+    if (has_game_name()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->game_name());
+    }
+
+    // required bytes game_data = 2;
     if (has_game_data()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::BytesSize(
@@ -5037,6 +5091,9 @@ void qp_game_data::MergeFrom(const ::google::protobuf::Message& from) {
 void qp_game_data::MergeFrom(const qp_game_data& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_game_name()) {
+      set_game_name(from.game_name());
+    }
     if (from.has_game_data()) {
       set_game_data(from.game_data());
     }
@@ -5057,13 +5114,14 @@ void qp_game_data::CopyFrom(const qp_game_data& from) {
 }
 
 bool qp_game_data::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
 
   return true;
 }
 
 void qp_game_data::Swap(qp_game_data* other) {
   if (other != this) {
+    std::swap(game_name_, other->game_name_);
     std::swap(game_data_, other->game_data_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
