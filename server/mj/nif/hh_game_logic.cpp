@@ -148,11 +148,6 @@ namespace hh
 		logic->specialOperIndex_ = 0;
 		memset(logic->specialOperQueue_, 0, 3 * 2);
 
-		if (isEnd(logic))
-		{
-			//没有牌摸了
-			return;
-		}
 		//查找能够杠牌的玩家
 		for (qp_uint8 i = 0; i < 4; i++)
 		{
@@ -314,7 +309,7 @@ namespace hh
 		Seat &seat = logic->seats_[seatNumber];
 		for (qp_uint8 i = 0; i < 4; i++)
 		{
-			if (seat.gang_[i] == v)
+			if (seat.peng_[i] == v)
 			{
 				return true;
 			}
@@ -605,6 +600,16 @@ namespace hh
 				common::RemoveSinglePai(operSeat.pai_, operSeat.writeIndex_, v1);
 				assert(operSeat.writeIndex_ > 0);
 
+				//看有没谁能胡牌
+
+				//看还能不能摸牌
+				if (isEnd(logic))
+				{
+					//游戏穿掉了
+					logic->stateFlag_ = 1;
+					return;
+				}
+
 				//////////////////////////////////////////////////////////////////////////////
 				//另外三家看谁能[杠 碰 吃] 
 				generateSpecialOper(logic, operSeatNumber, v1);
@@ -619,19 +624,12 @@ namespace hh
 					//有人可以做操作,设置下一个操作的相关信息(给erlang用的)
 					logic->nextOperSeatNumber_ = newOperSeat;			//下一个操作的座位号
 					logic->nextOperFlag_ = newOperFlag;					//下一个能够做的操作类型 gang peng chi
-					logic->nextOperValue1_ = v1;						//下一个操作的值 操作对应的牌，也就是上家出的那张牌
+					logic->nextOperValue1_ = v1;						//下一个操作的值 操作对应的牌，也就是上家出的那张牌(用来存放明杠,吃，碰的牌)
 					logic->nextOperValue2_ = 0;							//为0
 				}
 				else 
 				{
-					if (isEnd(logic))
-					{
-						//游戏穿掉了
-						logic->stateFlag_ = 1;
-						return;
-					}
-					
-					//没有人可以操作,下家摸一张牌
+					//没有人可以做操作,下家摸一张牌
 					logic->nextOperSeatNumber_ = ((operSeatNumber + 1) % 4);
 					logic->nextOperFlag_ = 0;
 					Seat &nextSeat = logic->seats_[logic->nextOperSeatNumber_];
@@ -652,11 +650,9 @@ namespace hh
 						}
 					}
 
-					
-
 					logic->nextOperFlag_ |= OP_CHU;
-					logic->nextOperValue1_ = newPai;
-					logic->nextOperValue2_ = 0;
+					logic->nextOperValue1_ = 0;					//暗杠和补杠不指定杠的牌
+					logic->nextOperValue2_ = newPai;
 
 					clearSpecialOper(logic);
 				}
