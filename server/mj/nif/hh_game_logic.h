@@ -3,6 +3,7 @@
 #include "common.h"
 //最大麻将牌数
 #define HH_MAX_COUNT 3 * 9 * 4 + 3*4
+#define HH_LOG_LEN 4096
 namespace hh
 {
     struct Seat
@@ -25,26 +26,30 @@ namespace hh
 		qp_uint8	specialOperQueue_[3][2];	//特殊操作队列
 		qp_uint8	specialOperCount_;			//特殊操作的人数
 		qp_uint8	specialOperIndex_;			//当前进行特殊操作的索引
+		qp_int8		chuPaiSeatNumber_;			//开启特殊操作之前保存出牌的座位号
+		qp_uint8	chuPaiValue_;				//出的牌
 
-
-		qp_int8		oldSeatNumber_;				//之前操作的座位
+		qp_int8		oldOperSeatNumber_;			//之前操作的座位
 		qp_uint8	oldOperFlag_;				//之前能够做的操作
 		qp_uint8	oldOperType_;				//之前做的类型
 		qp_uint8	oldOperValue1_;				//之前操作的值1
 		qp_uint8	oldOperValue2_;				//之前操作的值2
 
-		qp_int8		nextSeatNumber_;			//下一个操作的座位号
+		qp_int8		nextOperSeatNumber_;		//下一个操作的座位号
 		qp_uint8	nextOperFlag_;				//下一个能够做的操作
-		qp_uint8	nextValue1_;				//下一个操作的值1
-		qp_uint8	nextValue2_;				//下一个操作的值2
+		qp_uint8	nextOperValue1_;			//下一个操作的值1
+		qp_uint8	nextOperValue2_;			//下一个操作的值2
 
 
 
 		qp_uint8    stateFlag_;					//状态标志(0为游戏中,大于0为结束原因）
 		qp_uint32	lastTime_;                  //开始操作的时间
 
-    };
+		char		logBuff_[HH_LOG_LEN];		//存放日志的buff
+		qp_uint32	logWriteOffset_;			//日志的写入偏移
 
+    };
+	void clearSpecialOper(MainLogic *logic);
 	void Init(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint32 randSeed);
 	void Oper(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint8 operType, qp_uint8 v1, qp_uint8 v2);
 }

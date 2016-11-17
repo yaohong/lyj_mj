@@ -22,6 +22,7 @@
 #define qp_uint8 unsigned char 
 #define qp_int8 char
 #define qp_uint32 unsigned int
+#define qp_int32 int
 
 
 //能够进行的操作
