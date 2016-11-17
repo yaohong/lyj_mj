@@ -70,7 +70,11 @@ namespace common {
 	//校验
 	void Crc(qp_uint8 pai[], qp_uint8 count);
 	//从source里删除dest的牌
-	void RemovePai(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 dest[], qp_uint8 destLen);
+	void RemoveSinglePai(qp_uint8 source[], qp_uint8 &sourceLen, qp_uint8 removePai);
+	void RemovePai(qp_uint8 source[], qp_uint8 &sourceLen, qp_uint8 dest[], qp_uint8 destLen);
+	//将牌添加到source
+	void AddSinglePai(qp_uint8 source[], qp_uint8 &sourceLen, qp_uint8 addPai);
+	void AddPai(qp_uint8 source[], qp_uint8 &sourceLen, qp_uint8 addPai[], qp_uint8 addLen);
 	//检测指定source的牌在dest里是否存在
 	bool CheckPai(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 dest[], qp_uint8 destLen);
 	//获取某张牌的数量

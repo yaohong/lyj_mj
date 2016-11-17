@@ -49,7 +49,7 @@ namespace hh
             logic->bankerSeatNumber_ = bankerSeatNumber;
         }
 
-        logic->currentSeatNumber_ = logic->bankerSeatNumber_;
+        logic->nextSeatNumber_ = logic->bankerSeatNumber_;
 
         //发三轮四张
         for (int i = 0; i < 3; i++)
@@ -88,25 +88,51 @@ namespace hh
 
 		//看庄家能够做的操作，杠
 		Seat &bankerSeat = logic->seats_[logic->bankerSeatNumber_];
-		bankerSeat.operFlag_ = 0;
 		if (common::IsGang(bankerSeat.pai_, bankerSeat.writeIndex_))
 		{
-			bankerSeat.operFlag_ |= OP_GANG;
+			logic->nextOperFlag_ |= OP_GANG;
 		}
 
-		bankerSeat.operFlag_ |= OP_CHU;
+		logic->nextOperFlag_ |= OP_CHU;
     }
 
-	//更新操作
-	void updateOper(MainLogic *logic, qp_uint8 operSeatNum, qp_uint8 cp)
+	bool isEnd(MainLogic *logic)
 	{
-		for (qp_uint8 i = 0; i < 4; i++)
-		{
-			logic->seats_[i].operFlag_ = OP_NONE;
-		}
-		//查找能够胡的玩家
+		return (logic->poolHeadReadIndex_ == 0 && logic->poolTailReadIndex_ == 0);
+	}
 
-		//查找能够杠的玩家
+	void addSpecialOper(MainLogic *logic, qp_uint8 seatNum, qp_uint8 operType)
+	{
+		assert(logic->specialOperCount_ < 3);
+		for (qp_uint8 i = 0; i < logic->specialOperCount_; i++)
+		{
+			if (logic->specialOperQueue_[i][0] == seatNum)
+			{
+				logic->specialOperQueue_[i][1] |= operType;
+				return;
+			}
+		}
+
+		//没有找到则添加到末尾
+		logic->specialOperQueue_[logic->specialOperCount_][0] = seatNum;
+		logic->specialOperQueue_[logic->specialOperCount_][1] = operType;
+		logic->specialOperCount_++;
+		
+	}
+
+	//杠吃碰
+	void generateSpecialOper(MainLogic *logic, qp_uint8 operSeatNum, qp_uint8 cp)
+	{
+		logic->specialOperCount_ = 0;
+		logic->specialOperIndex_ = 0;
+		memset(logic->specialOperQueue_, 0, 3 * 2);
+
+		if (isEnd(logic))
+		{
+			//没有牌摸了
+			return;
+		}
+		//查找能够杠牌的玩家
 		for (qp_uint8 i = 0; i < 4; i++)
 		{
 			if (i != operSeatNum)
@@ -115,7 +141,7 @@ namespace hh
 				if (common::IsGang1(tmpSeat.pai_, tmpSeat.writeIndex_, cp))
 				{
 					//可以杠
-					tmpSeat.operFlag_ |= (OP_GANG | OP_GUO);
+					addSpecialOper(logic, i, OP_GANG | OP_GUO);
 					//只有一个玩家能杠
 					break;
 				}
@@ -131,7 +157,7 @@ namespace hh
 				if (common::IsPeng(tmpSeat.pai_, tmpSeat.writeIndex_, cp))
 				{
 					//可以杠
-					tmpSeat.operFlag_ |= (OP_PENG | OP_GUO);
+					addSpecialOper(logic, i, OP_PENG | OP_GUO);
 					//只有一个玩家能碰
 					break;
 				}
@@ -144,50 +170,23 @@ namespace hh
 			Seat &nextSeat = logic->seats_[nextSeatNumber];
 			if (common::IsChi(nextSeat.pai_, nextSeat.writeIndex_, cp))
 			{
-				nextSeat.operFlag_ |= (OP_CHI | OP_GUO);
+				addSpecialOper(logic, nextSeatNumber, OP_CHI | OP_GUO);
 			}
 		}
+
 	}
 
-	bool pickingOperSeatNumber(MainLogic *logic, qp_int8 &operSeatNumber)
+	bool pickingSpecialOper(MainLogic *logic, qp_int8 &operSeatNumber, qp_uint8 &operType)
 	{
-		for (qp_int8 i = 0; i < 4; i++)
+		if (logic->specialOperCount_ == logic->specialOperIndex_) 
 		{
-			operSeatNumber = i;
-			if (logic->seats_[i].operFlag_ & OP_GANG)
-			{
-				//可以杠
-				return true;
-			}
+			return false;
 		}
 
-		for (qp_int8 i = 0; i < 4; i++)
-		{
-			operSeatNumber = i;
-			if (logic->seats_[i].operFlag_ & OP_PENG)
-			{
-				//可以碰
-				return true;
-			}
-		}
-
-		for (qp_int8 i = 0; i < 4; i++)
-		{
-			operSeatNumber = i;
-			if (logic->seats_[i].operFlag_ & OP_CHI)
-			{
-				//可以吃
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-
-	bool isEnd(MainLogic *logic)
-	{
-		return (logic->poolHeadReadIndex_ == 0 && logic->poolTailReadIndex_ == 0);
+		operSeatNumber = logic->specialOperQueue_[logic->specialOperIndex_][0];
+		operType = logic->specialOperQueue_[logic->specialOperIndex_][1];
+		logic->specialOperIndex_++;
+		return true;
 	}
 
 	qp_uint8 getNewPaiByHead(MainLogic *logic)
@@ -226,21 +225,25 @@ namespace hh
 
 	void Oper(MainLogic *logic, qp_int8 operSeatNumber, qp_uint8 operType, qp_uint8 v1, qp_uint8 v2)
 	{
-		if (logic->currentSeatNumber_ != operSeatNumber)
+		if (logic->nextSeatNumber_ != operSeatNumber)
 		{
 			//座位号不对
 			return;
 		}
 
-		Seat &currentSeat = logic->seats_[operSeatNumber];
-		if (!(operType & currentSeat.operFlag_))
+		if (!(operType & logic->nextOperFlag_))
 		{
 			//操作类型不对
 			return;
 		}
 
-		logic->currentValue1_ = v1;
-		logic->currentValue2_ = v2;
+		logic->oldSeatNumber_ = operSeatNumber;
+		logic->oldOperFlag_ = logic->nextOperFlag_;
+		logic->oldOperType_ = operType;
+		logic->oldOperValue1_ = v1;
+		logic->oldOperValue2_ = v2;
+
+		Seat &oldOperSeat = logic->seats_[operSeatNumber];
 
 		switch (operType)
 		{
@@ -250,24 +253,47 @@ namespace hh
 			}
 				break;
 			case OP_PENG:
+			{
+
+			}
 				break;
 			case OP_GANG:
+			{
+
+			}
+				break;
+			case OP_GUO:
+			{
+
+			}
 				break;
 			case OP_HU:
 				break;
 			case OP_CHU:
 			{
 				assert(v1 > 0);
-				//更新其他玩家的操作
-				updateOper(logic, operSeatNumber, v1);
+				if (common::GetPaiCount(oldOperSeat.pai_, oldOperSeat.writeIndex_, v1) == 0)
+				{
+					//自己没有这张牌
+					return;
+				}
+				//把这张牌从手牌里拿掉
+				common::RemoveSinglePai(oldOperSeat.pai_, oldOperSeat.writeIndex_, v1);
+				assert(oldOperSeat.writeIndex_ > 0);
+
+				//////////////////////////////////////////////////////////////////////////////
+				//另外三家看谁能[杠 碰 吃] 
+				generateSpecialOper(logic, operSeatNumber, v1);
 				//选取一个能够做操作的玩家
 				qp_int8 newOperSeat = -1;
-				if (pickingOperSeatNumber(logic, newOperSeat))
+				qp_uint8 newOperFlag = 0;
+				if (pickingSpecialOper(logic, newOperSeat, newOperFlag))
 				{
-					//有人可以做操作,设置下一个操作的相关信息
-					logic->nextSeatNumber_ = newOperSeat;
-					logic->nextValue1_ = 0;
-					logic->nextValue2_ = 0;
+					//有人可以做操作,设置下一个操作的相关信息(给erlang用的)
+					logic->nextSeatNumber_ = newOperSeat;			//下一个操作的座位号
+					logic->nextOperFlag_ = newOperFlag;				//下一个能够做的操作类型 gang peng chi
+					logic->nextValue1_ = v1;						//下一个操作的值 操作对应的牌，也就是上家出的那张牌
+					logic->nextValue2_ = 0;						
 				}
 				else 
 				{
@@ -280,16 +306,20 @@ namespace hh
 					
 					//没有人可以操作,下家摸一张牌
 					logic->nextSeatNumber_ = ((operSeatNumber + 1) % 4);
+					logic->nextOperFlag_ = 0;
 					Seat &nextSeat = logic->seats_[logic->nextSeatNumber_];
 					qp_uint8 newPai = getNewPaiByHead(logic);
+					common::AddSinglePai(nextSeat.pai_, nextSeat.writeIndex_, newPai);
+					assert(nextSeat.writeIndex_ > 0);
+					if (common::IsGang(nextSeat.pai_, nextSeat.writeIndex_))
+					{
+						logic->nextOperFlag_ |= OP_GANG;
+					}
+					logic->nextOperFlag_ |= OP_CHU;
 					logic->nextValue1_ = newPai;
 					logic->nextValue2_ = 0;
-					//检测下一个玩家能够做的操作
-					//杠？胡？
 				}
 			}
-				break;
-			case OP_GUO:
 				break;
 			default:
 				break;

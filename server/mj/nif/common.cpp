@@ -107,20 +107,27 @@ namespace common {
 		}
 	}
 
-	void RemovePai(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 dest[], qp_uint8 destLen)
+	void RemoveSinglePai(qp_uint8 source[], qp_uint8 &sourceLen, qp_uint8 removePai)
+	{
+		qp_uint8 removePool[1] = { removePai };
+		RemovePai(source, sourceLen, removePool, 1);
+	}
+
+	void RemovePai(qp_uint8 source[], qp_uint8 &sourceLen, qp_uint8 dest[], qp_uint8 destLen)
 	{
 		assert(sourceLen <= 14);
 		assert(destLen <= 14);
 		qp_uint8 tmpSource[14];
 		qp_uint8 tmpDest[14];
+		qp_uint8 tmpSourceLen = sourceLen;
 		memset(tmpSource, 0, 14 * sizeof(qp_uint8));
 		memset(tmpDest, 0, 14 * sizeof(qp_uint8));
-		memcpy(tmpSource, source, sourceLen * sizeof(qp_uint8));
+		memcpy(tmpSource, source, tmpSourceLen * sizeof(qp_uint8));
 		memcpy(tmpDest, dest, destLen * sizeof(qp_uint8));
 
-		memset(source, 0, sourceLen * sizeof(qp_uint8));
+		memset(source, 0, tmpSourceLen * sizeof(qp_uint8));
 		qp_uint8 writeIndex = 0;
-		for (qp_uint8 i = 0; i < sourceLen; i++)
+		for (qp_uint8 i = 0; i < tmpSourceLen; i++)
 		{
 			if (tmpSource[i] != 0)
 			{
@@ -131,6 +138,7 @@ namespace common {
 					{
 						tmpDest[j] = 0;
 						isRemove = true;
+						sourceLen--;
 						break;
 					}
 				}
@@ -141,6 +149,25 @@ namespace common {
 				}
 			}
 		}
+	}
+
+	void AddSinglePai(qp_uint8 source[], qp_uint8 &sourceLen, qp_uint8 addPai)
+	{
+		qp_uint8 paiPool[1] = { addPai };
+		AddPai(source, sourceLen, paiPool, 1);
+	}
+
+	void AddPai(qp_uint8 source[], qp_uint8 &sourceLen, qp_uint8 add_pai[], qp_uint8 addLen)
+	{
+		assert(sourceLen + addLen <= 14);
+		for (qp_uint8 i = 0; i < addLen; i++)
+		{
+			source[sourceLen + i] = add_pai[i];
+		}
+		sourceLen += addLen;
+
+		common::Sort(source, sourceLen);
+
 	}
 
 	bool CheckPai(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 dest[], qp_uint8 destLen)
