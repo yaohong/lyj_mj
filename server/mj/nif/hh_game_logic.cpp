@@ -730,67 +730,67 @@ namespace hh
 #ifdef HH_EXE
 int main( int argc, const char * argv[] )
 {
-	int a[2][2];
-	a[0][0] = 2;
-	a[0][1] = 3;
-	a[1][0] = 9;
-	a[1][1] = 11;
+//	int a[2][2];
+//	a[0][0] = 2;
+//	a[0][1] = 3;
+//	a[1][0] = 9;
+//	a[1][1] = 11;
+//
+//
+//	int v1 = *(int *)a;
+//	int v2 = *((int *)a + 1);
+//	int v3 = *((int *)a + 2);
+//	int v4 = *((int *)a + 3);
+//	insert code here...
+	hh::MainLogic logic;
+	hh::Init(&logic, -1, (qp_uint32)time(NULL));
+	printf("banker_seat_number=%d\n", logic.bankerSeatNumber_);
+	for (int i = 0; i < 4; i++)
+	{
+		hh::Seat &seat = logic.seats_[i];
+		printf("seat_number[%d]:", i);
+		for (int j = 0; j < seat.writeIndex_; j++)
+		{
+			std::string v = common::getPaiString(seat.pai_[j]);
+			printf("%s ", v.c_str());
+		}
+		printf("\n");
+		printf("chi:   ");
+		for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
+		{
+			qp_uint8 chi[3][2];
+			qp_uint8 chiCount = 0;
+			common::GetChi(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k], chi, chiCount);
+			if (chiCount > 0)
+			{
+				std::string v = common::getPaiString(common::PAI_ARRAY[k]);
+				printf("%s ", v.c_str());
+			}
+		}
+		printf("\n");
 
+		printf("peng:   ");
+		for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
+		{
+			if (common::IsPeng(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k]))
+			{
+				std::string v = common::getPaiString(common::PAI_ARRAY[k]);
+				printf("%s ", v.c_str());
+			}
+		}
+		printf("\n");
 
-	int v1 = *(int *)a;
-	int v2 = *((int *)a + 1);
-	int v3 = *((int *)a + 2);
-	int v4 = *((int *)a + 3);
-	//insert code here...
-	//hh::MainLogic logic;
-	//hh::Init(&logic, -1, (qp_uint32)time(NULL));
-	//printf("banker_seat_number=%d\n", logic.bankerSeatNumber_);
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	hh::Seat &seat = logic.seats_[i];
-	//	printf("seat_number[%d]:", i);
-	//	for (int j = 0; j < seat.writeIndex_; j++)
-	//	{
-	//		std::string v = common::getPaiString(seat.pai_[j]);
-	//		printf("%s ", v.c_str());
-	//	}
-	//	printf("\n");
-	//	printf("chi:   ");
-	//	for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
-	//	{
-	//		qp_uint8 chi[3][2];
-	//		qp_uint8 chiCount = 0;
-	//		common::GetChi(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k], chi, chiCount);
-	//		if (chiCount > 0)
-	//		{
-	//			std::string v = common::getPaiString(common::PAI_ARRAY[k]);
-	//			printf("%s ", v.c_str());
-	//		}
-	//	}
-	//	printf("\n");
-
-	//	printf("peng:   ");
-	//	for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
-	//	{
-	//		if (common::IsPeng(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k]))
-	//		{
-	//			std::string v = common::getPaiString(common::PAI_ARRAY[k]);
-	//			printf("%s ", v.c_str());
-	//		}
-	//	}
-	//	printf("\n");
-
-	//	printf("gang:   ");
-	//	for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
-	//	{
-	//		if (common::IsGang1(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k]))
-	//		{
-	//			std::string v = common::getPaiString(common::PAI_ARRAY[k]);
-	//			printf("%s ", v.c_str());
-	//		}
-	//	}
-	//	printf("\n");
-	//}
+		printf("gang:   ");
+		for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
+		{
+			if (common::IsGang1(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k]))
+			{
+				std::string v = common::getPaiString(common::PAI_ARRAY[k]);
+				printf("%s ", v.c_str());
+			}
+		}
+		printf("\n");
+	}
 	////qp_uint8 dest[16] = {1,2,3,4,15,5,5,6,7,8,9,10,11,13,14};
 	////qp_uint8 source[5] = { 4, 15, 5, 5,14};
 	////bool ret = common::CheckPai(source, 5, dest, 14);
