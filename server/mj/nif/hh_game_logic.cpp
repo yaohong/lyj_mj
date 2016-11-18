@@ -498,7 +498,7 @@ namespace hh
 						setError(logic, "seatNumber[%d] not ming gang v1=0\n", operSeatNumber);
 						return;
 					}
-					//检测暗杠
+					//检测暗杠或者补杠
 					qp_uint8 count = common::GetPaiCount(operSeat.pai_, operSeat.writeIndex_, v1);
 					if (count == 4)
 					{
