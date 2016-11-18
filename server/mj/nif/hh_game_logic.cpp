@@ -2,22 +2,6 @@
 #include <stdarg.h>
 namespace hh
 {
-	void writeLog(MainLogic *logic, const char *fmt, ...)
-	{
-		va_list va;
-		va_start(va, fmt);
-		char data[1024];
-		qp_int32 rt = vsnprintf(data, 1024, fmt, va);
-		va_end(va);
-
-		if (logic->logWriteOffset_ + rt >= HH_LOG_LEN)
-		{
-			//满了
-			return;
-		}
-		memcpy(logic->logBuff_ + logic->logWriteOffset_, data, rt);
-		logic->logWriteOffset_ += rt;
-	}
     void InitPool( MainLogic *logic )
     {
         //初始化池里的牌 (万子 条子 筒子)
@@ -284,6 +268,22 @@ namespace hh
 		assert(false);
 	}
 
+	void removePeng(MainLogic *logic, qp_int8 seatNumber, qp_uint8 v)
+	{
+		assert(seatNumber >= 0 && seatNumber < 4);
+		assert(v > 0);
+		Seat &seat = logic->seats_[seatNumber];
+		for (qp_uint8 i = 0; i < 4; i++)
+		{
+			if (seat.peng_[i] == v)
+			{
+				seat.peng_[i] = 0;
+				return;
+			}
+		}
+		assert(false);
+	}
+
 	void addGang(MainLogic *logic, qp_int8 seatNumber, qp_uint8 v)
 	{
 		assert(seatNumber >= 0 && seatNumber < 4);
@@ -318,19 +318,31 @@ namespace hh
 		return false;
 	}
 
+	void setError(MainLogic *logic, const char *fmt, ...)
+	{
+		assert(logic->errorFlag_ == 0);
+		va_list va;
+		va_start(va, fmt);
+		qp_int32 rt = vsnprintf(logic->errorLogBuff_, HH_LOG_LEN, fmt, va);
+		va_end(va);
+		logic->errorLogLen = rt;
+		logic->errorFlag_ = 1;
+	}
+
 	void Oper(MainLogic *logic, qp_int8 operSeatNumber, qp_uint8 operType, qp_uint8 v1, qp_uint8 v2)
 	{
 		if (logic->nextOperSeatNumber_ != operSeatNumber)
 		{
 			//座位号不对
-			writeLog(logic, "logic->nextOperSeatNumber_=%d, operSeatNumber=%d\n", logic->nextOperSeatNumber_, operSeatNumber);
+			setError(logic, "logic->nextOperSeatNumber_=%d, operSeatNumber=%d\n", logic->nextOperSeatNumber_, operSeatNumber);
 			return;
 		}
 
 		if (!(operType & logic->nextOperFlag_))
 		{
 			//操作类型不对
-			writeLog(logic, "logic->nextOperFlag_=%d, operType=%d\n", logic->nextOperFlag_, operType);
+			setError(logic, "logic->nextOperFlag_=%d, operType=%d\n", logic->nextOperFlag_, operType);
+			logic->errorFlag_ = 1;
 			return;
 		}
 
@@ -351,7 +363,7 @@ namespace hh
 				if (logic->nextOperValue1_ != v1)
 				{
 					//操作值1不对
-					writeLog(logic, "OP_CHI logic->nextOperValue1_=%d, v1=%d\n", logic->nextOperValue1_, v1);
+					setError(logic, "seatNumber[%d] OP_CHI logic->nextOperValue1_=%d, v1=%d\n", operSeatNumber, logic->nextOperValue1_, v1);
 					return;
 				}
 
@@ -369,7 +381,7 @@ namespace hh
 					if (paiValue > 7)
 					{
 						//牌值异常，不能左吃
-						writeLog(logic, "oper[chi] type=0, error paiValue=%d\n", paiValue);
+						setError(logic, "seatNumber[%d] oper[chi] type=0, error paiValue=%d\n", operSeatNumber, paiValue);
 						return;
 					}
 					tmpChiPai[0] = PAI(paiType, paiValue + 1);
@@ -382,7 +394,7 @@ namespace hh
 					if (paiValue == 1 || paiValue == 9)
 					{
 						//牌值异常，不能中吃
-						writeLog(logic, "oper[chi]  type=1, error paiValue=%d\n", paiValue);
+						setError(logic, "seatNumber[%d] oper[chi]  type=1, error paiValue=%d\n", operSeatNumber, paiValue);
 						return;
 					}
 					tmpChiPai[0] = PAI(paiType, paiValue - 1);
@@ -395,7 +407,7 @@ namespace hh
 					if (paiValue < 3 )
 					{
 						//牌值异常，不能左吃
-						writeLog(logic, "oper[chi]  type=2, error paiValue=%d\n", paiValue);
+						setError(logic, "seatNumber[%d] oper[chi]  type=2, error paiValue=%d\n", operSeatNumber, paiValue);
 						return;
 					}
 					tmpChiPai[0] = PAI(paiType, paiValue - 2);
@@ -404,13 +416,14 @@ namespace hh
 				}
 				else 
 				{
-					writeLog(logic, "oper[chi] error chiType=%d\n", v2);
+					setError(logic, "oper[chi] error chiType=%d\n", v2);
 					return;
 				}
 
 				if (!common::CheckPai(operSeat.pai_, operSeat.writeIndex_, tmpChiPai, 2))
 				{
 					//牌不存在
+					setError(logic, "seatNumber[%d] [chi] CheckPai[%d, %d] failed\n", operSeatNumber, tmpChiPai[0], tmpChiPai[1]);
 					return;
 				}
 
@@ -442,17 +455,12 @@ namespace hh
 				if (logic->nextOperValue1_ != v1)
 				{
 					//操作值1不对
-					writeLog(logic, "OP_PENG logic->nextOperValue1_=%d, v1=%d\n", logic->nextOperValue1_, v1);
+					setError(logic, "seatNumber[%d] OP_PENG logic->nextOperValue1_=%d, v1=%d\n", operSeatNumber, logic->nextOperValue1_, v1);
 					return;
 				}
 
 				//看牌的数量
-				qp_uint8 paiCount = common::GetPaiCount(operSeat.pai_, operSeat.writeIndex_, v1);
-				if (paiCount < 2)
-				{
-					writeLog(logic, "oper[peng]  type=2, paiValue=%d paiCount=%d\n", v1, paiCount);
-					return;
-				}
+				assert( common::GetPaiCount(operSeat.pai_, operSeat.writeIndex_, v1) >= 2);
 
 				//牌从手里移除
 				qp_uint8 removePai[2] = {v1, v1};
@@ -479,54 +487,94 @@ namespace hh
 			case OP_GANG:
 			{
 				//分明杠和(暗杠,补杠(从碰的对子里杠)		
-				if (logic->nextOperValue1_ != v1)
+				if (logic->nextOperValue1_ == 0)
 				{
-					//暗杠,补杠
-					writeLog(logic, "minggang %d\n", v1);
+					//必须是暗杠或者补杠
+					//检查特殊操作(在特殊操作下不能出现暗杠或者补杠)
+					assert(logic->specialOperCount_ == 0);
+					if (0 == v1)
+					{
+						//V1不能为0，必须为正确的牌
+						setError(logic, "seatNumber[%d] not ming gang v1=0\n", operSeatNumber);
+						return;
+					}
+					//检测暗杠
+					qp_uint8 count = common::GetPaiCount(operSeat.pai_, operSeat.writeIndex_, v1);
+					if (count == 4)
+					{
+						//暗杠成功
+						qp_uint8 removePai[4] = { v1, v1, v1, v1 };
+						common::RemovePai(operSeat.pai_, operSeat.writeIndex_, removePai, 4);
+						assert(operSeat.writeIndex_ > 0);
+						addGang(logic, operSeatNumber, v1);
+					}
+					else 
+					{
+						//检查是否能补杠,补杠的这张牌必须是之前摸的牌
+						
+						if (v1 != logic->nextOperValue2_)
+						{
+							setError(logic, "seatNumber[%d] bugang, pai error, logic->nextOperValue2_=%d, v2=%d\n", operSeatNumber, logic->nextOperValue2_, v1);
+							return;
+						}
+						assert( 1 == common::GetPaiCount(operSeat.pai_, operSeat.writeIndex_, v1));
+						assert(isBuGang(logic, operSeatNumber, v1));
+						//从牌池里移除这张牌
+						common::RemoveSinglePai(operSeat.pai_, operSeat.writeIndex_, v1);
+						assert(operSeat.writeIndex_ > 0);
+						//补杠成功，将碰的牌放到杠
+						removePeng(logic, operSeatNumber, v1);
+						addGang(logic, operSeatNumber, v1);
+					}
+
 				}
 				else 
 				{
-					//特殊操作,明杠
+					//明杠
 					assert(logic->specialOperCount_ > 0);
-					//看牌的数量
+					if (logic->nextOperValue1_ != v1)
+					{
+						//明杠杠的牌必须和服务器指定的相等
+						setError(logic, "seatNumber[%d] minggang logic->nextOperValue1_=%d v1=%d\n", operSeatNumber, logic->nextOperValue1_, v1);
+						return;
+					}
 					qp_uint8 paiCount = common::GetPaiCount(operSeat.pai_, operSeat.writeIndex_, v1);
 					if (paiCount < 3)
 					{
-						writeLog(logic, "oper[gang] , paiValue=%d paiCount=%d\n", v1, paiCount);
+						setError(logic, "seatNumber[%d] oper[ming gang] , paiValue=%d paiCount=%d\n", operSeatNumber, v1, paiCount);
 						return;
 					}
-
-					//牌从手里移除
-					qp_uint8 removePai[3] = { v1, v1, v1};
+					qp_uint8 removePai[3] = { v1, v1, v1 };
 					common::RemovePai(operSeat.pai_, operSeat.writeIndex_, removePai, 3);
 					assert(operSeat.writeIndex_ > 0);
-					//添加到杠里面
 					addGang(logic, operSeatNumber, v1);
-					//屁股摸一张牌
-					assert(!isEnd(logic));
-					qp_uint8 newPai = getNewPaiByTail(logic);
-					common::AddSinglePai(operSeat.pai_, operSeat.writeIndex_, newPai);
-					assert(operSeat.writeIndex_ <= 14);
 
-					if (common::IsGang(operSeat.pai_, operSeat.writeIndex_))
+				}
+
+				//屁股摸一张牌
+				assert(!isEnd(logic));
+				qp_uint8 newPai = getNewPaiByTail(logic);
+				common::AddSinglePai(operSeat.pai_, operSeat.writeIndex_, newPai);
+				assert(operSeat.writeIndex_ <= 14);
+
+				if (common::IsGang(operSeat.pai_, operSeat.writeIndex_))
+				{
+					logic->nextOperFlag_ |= OP_GANG;
+				}
+				else 
+				{
+					//看是否能够补杠
+					if (isBuGang(logic, operSeatNumber, newPai))
 					{
 						logic->nextOperFlag_ |= OP_GANG;
 					}
-					else {
-						//看是否能够补杠
-						if (isBuGang(logic, operSeatNumber, newPai))
-						{
-							logic->nextOperFlag_ |= OP_GANG;
-						}
-					}
-					logic->nextOperFlag_ |= OP_CHU;
-					logic->nextOperValue1_ = newPai;
-					logic->nextOperValue2_ = 0;
-
-					clearSpecialOper(logic);
-					////////////////////////////////////////////////////////////////////////////////
 				}
+				logic->nextOperFlag_ |= OP_CHU;
+				logic->nextOperValue1_ = 0;
+				logic->nextOperValue2_ = newPai;					//摸的牌放在V2
 
+				clearSpecialOper(logic);
+				////////////////////////////////////////////////////////////////////////////////
 			}
 				break;
 			case OP_GUO:
@@ -549,12 +597,8 @@ namespace hh
 				else 
 				{
 					//所有人都点过了
-					if (isEnd(logic))
-					{
-						//游戏穿掉了
-						logic->stateFlag_ = 1;
-						return;
-					}
+					//肯定还有牌
+					assert(!isEnd(logic));
 
 					//没有人可以操作,下家摸一张牌
 					logic->nextOperSeatNumber_ = ((logic->chuPaiSeatNumber_ + 1) % 4);
@@ -575,8 +619,8 @@ namespace hh
 						}
 					}
 					logic->nextOperFlag_ |= OP_CHU;
-					logic->nextOperValue1_ = newPai;
-					logic->nextOperValue2_ = 0;
+					logic->nextOperValue1_ = 0;						//补杠或者暗杠不指定杠的牌
+					logic->nextOperValue2_ = newPai;				//摸的牌放在v2
 
 					clearSpecialOper(logic);
 				}
@@ -593,7 +637,7 @@ namespace hh
 				if (common::GetPaiCount(operSeat.pai_, operSeat.writeIndex_, v1) == 0)
 				{
 					//自己没有这张牌
-					writeLog(logic, "seatNumber[%d] not pai[%d]\n", operSeatNumber, v1);
+					setError(logic, "seatNumber[%d] not pai[%d]\n", operSeatNumber, v1);
 					return;
 				}
 				//把这张牌从手牌里拿掉
@@ -601,7 +645,10 @@ namespace hh
 				assert(operSeat.writeIndex_ > 0);
 
 				//看有没谁能胡牌
+				//
 
+
+				//
 				//看还能不能摸牌
 				if (isEnd(logic))
 				{
@@ -618,7 +665,7 @@ namespace hh
 				qp_uint8 newOperFlag = 0;
 				if (pickingSpecialOper(logic, newOperSeat, newOperFlag))
 				{
-					//保存出牌的座位号（一轮都过了以后，让下一个玩家摸牌）
+					//保存出牌的座位号（所有特殊操作的玩家都选过了以后，让出牌的下一个玩家摸牌）
 					logic->chuPaiSeatNumber_ = operSeatNumber;
 					logic->chuPaiValue_ = v1;
 					//有人可以做操作,设置下一个操作的相关信息(给erlang用的)
@@ -652,7 +699,7 @@ namespace hh
 
 					logic->nextOperFlag_ |= OP_CHU;
 					logic->nextOperValue1_ = 0;					//暗杠和补杠不指定杠的牌
-					logic->nextOperValue2_ = newPai;
+					logic->nextOperValue2_ = newPai;			//新摸的牌放在V2
 
 					clearSpecialOper(logic);
 				}
