@@ -18,7 +18,7 @@
 generate_main_logic(Bin) ->
 	<<
 		PaiPool:120/binary, PoolHeadReadIndex:?BIG_UINT8, PoolTailReadIndex:?BIG_UINT8,
-		Seat0:28/binary, Seat1:28/binary,Seat2:28/binary,Seat3:28/binary,
+		Seat0:27/binary, Seat1:27/binary,Seat2:27/binary,Seat3:27/binary,
 		BrankerNumber:?BIG_UINT8, CurrentSeatNumber:?BIG_UINT8, LastTime:?BIG_UINT32
 	>> = Bin,
 	HeadLen = PoolHeadReadIndex,
@@ -43,7 +43,7 @@ generate_seat(Bin) ->
 		C0:?BIG_UINT8, C1:?BIG_UINT8, C2:?BIG_UINT8, C3:?BIG_UINT8,
 		P0:?BIG_UINT8, P1:?BIG_UINT8, P2:?BIG_UINT8, P3:?BIG_UINT8,
 		G0:?BIG_UINT8, G1:?BIG_UINT8, G2:?BIG_UINT8, G3:?BIG_UINT8,
-		PaiBin:14/binary, WriteIndex:?BIG_UINT8, OperFlag:?BIG_UINT8
+		PaiBin:14/binary, WriteIndex:?BIG_UINT8
 	>> = Bin,
 	Chi = generate_seat_pai(C0, C1, C2, C3),
 	Peng = generate_seat_pai(P0, P1, P2, P3),
@@ -55,8 +55,7 @@ generate_seat(Bin) ->
 		chi = Chi,
 		peng = Peng,
 		gang = Gang,
-		pai = ValidPoolList,
-		oper_flag  = OperFlag
+		pai = ValidPoolList
 	}.
 
 generate_seat_pai(0, _, _, _) -> [];

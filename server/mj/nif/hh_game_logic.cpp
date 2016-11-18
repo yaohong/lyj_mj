@@ -272,15 +272,29 @@ namespace hh
 	{
 		assert(seatNumber >= 0 && seatNumber < 4);
 		assert(v > 0);
+		qp_int8 removeIndex = -1;
 		Seat &seat = logic->seats_[seatNumber];
 		for (qp_uint8 i = 0; i < 4; i++)
 		{
 			if (seat.peng_[i] == v)
 			{
 				seat.peng_[i] = 0;
-				return;
+				removeIndex = i;
+				break;
 			}
 		}
+
+		if (removeIndex != -1)
+		{
+			for (qp_uint8 i = removeIndex; i < 3; i++)
+			{
+				seat.peng_[i] = seat.peng_[i+1];
+				seat.peng_[i + 1] = 0;
+			}
+
+			return;
+		}
+
 		assert(false);
 	}
 

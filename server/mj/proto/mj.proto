@@ -41,6 +41,8 @@ message qp_mj_oper_notify {						//有人操作的通知(所有人都会收到)
 
 	optional int32 next_oper_seat_num = 5;		//下一个操作的座位号
 	optional uint32 next_oper_flag = 6;			//下一个操作的信息
+	optional uint32 next_oper_value1 = 7;		//下一个操作的信息
+	optional uint32 next_oper_value2 = 8;		//下一个操作的信息
 }
 
 

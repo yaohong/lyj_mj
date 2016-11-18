@@ -14,8 +14,7 @@
 	chi :: [integer()],				%%吃的牌
 	peng :: [integer()],			%%碰的牌
 	gang :: [integer()],			%%杠的牌
-	pai :: [integer()],				%%自己手里的牌
-	oper_flag :: integer()			%%当前能够进行的操作
+	pai :: [integer()]				%%自己手里的牌
 }).
 
 -record(hh_main_logic, {
