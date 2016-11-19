@@ -76,4 +76,6 @@ test_game_start() ->
 test_game_oper(SeatNumber, Type, V1, V2) ->
     GameBin = get(game_bin),
 	true = GameBin =/= undefined,
-    mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNumber, Type, V1, V2).
+    mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNumber, Type, V1, V2),
+	Logic = hh_mj_util:generate_main_logic(GameBin),
+	hh_mj_util:print(Logic).
