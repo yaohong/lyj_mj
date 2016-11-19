@@ -360,12 +360,6 @@ namespace hh
 			return;
 		}
 
-		logic->oldOperSeatNumber_ = operSeatNumber;
-		logic->oldOperFlag_ = logic->nextOperFlag_;
-		logic->oldOperType_ = operType;
-		logic->oldOperValue1_ = v1;
-		logic->oldOperValue2_ = v2;
-
 		Seat &operSeat = logic->seats_[operSeatNumber];
 
 		switch (operType)
@@ -722,6 +716,12 @@ namespace hh
 			default:
 				break;
 		}
+        
+        logic->oldOperSeatNumber_ = operSeatNumber;
+        logic->oldOperFlag_ = logic->nextOperFlag_;
+        logic->oldOperType_ = operType;
+        logic->oldOperValue1_ = v1;
+        logic->oldOperValue2_ = v2;
 	}
 }
 
