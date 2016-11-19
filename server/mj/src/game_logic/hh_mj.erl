@@ -45,13 +45,7 @@ encode_seat_data(BankerSeatNum, SeatList) ->
 
 encode_seat_data(_, [], Out) -> Out;
 encode_seat_data(BankerSeatNum, [{SeatNum, SeatData}|T], Out) ->
-	N1 = #qp_mj_game_start_notify{pai = SeatData#hh_seat.pai, banker_seat_number = BankerSeatNum},
-	Rsp =
-		if
-			BankerSeatNum =:= SeatNum ->
-				N1#qp_mj_game_start_notify{oper_flag = SeatData#hh_seat.oper_flag};
-			true -> N1
-		end,
+	Rsp = #qp_mj_game_start_notify{pai = SeatData#hh_seat.pai, banker_seat_number = BankerSeatNum},
 	Bin = hh_mj_proto:encode_packet(Rsp),
 	encode_seat_data(BankerSeatNum, T, [{SeatNum, Bin}|Out]).
 

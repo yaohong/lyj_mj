@@ -38,7 +38,7 @@
 	seat_number :: integer(),
 	flag :: integer(),
 	value1 :: integer(),
-	value2 :: intege()
+	value2 :: integer()
 }).
 
 -record(hh_error_log, {
