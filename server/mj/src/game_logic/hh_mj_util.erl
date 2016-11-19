@@ -82,7 +82,7 @@ generage_special(SpecialData) ->
 		ChuPaiSeatNum:?BIG_INT8, ChuPaiValue:?BIG_UINT8
 	>> = SpecialData,
     L1 = [{Oper0SeatNum, Oper0Flag},{Oper1SeatNum, Oper1Flag},{Oper2SeatNum, Oper2Flag}],
-	VaildQueue = lists:split(OperCount, L1),
+	{VaildQueue, _} = lists:split(OperCount, L1),
 	#hh_special {
 		oper_queue = VaildQueue,
 		oper_index = OperIndex,
@@ -156,8 +156,9 @@ generage_error_log(LogData) ->
 	<<
 		ErrorBuff:512/binary,LogLen:?BIG_INT32
 	>> = LogData,
+	{ValidLog , _} = lists:split(LogLen, binary_to_list(ErrorBuff)),
 	#hh_error_log{
-		log = lists:split(LogLen, binary_to_list(ErrorBuff))
+		log = ValidLog
 	}.
 
 
