@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		D81C12F71DDF51D90095D4DF /* common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D81C12F61DDF51D90095D4DF /* common.cpp */; };
 		D81C12FA1DDF51F80095D4DF /* hh_game_logic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D81C12F81DDF51F80095D4DF /* hh_game_logic.cpp */; };
+		D81C12FC1DDFF3740095D4DF /* mj_nif.c in Sources */ = {isa = PBXBuildFile; fileRef = D81C12FB1DDFF3740095D4DF /* mj_nif.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,6 +30,7 @@
 		D81C12F61DDF51D90095D4DF /* common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = common.cpp; path = ../../common.cpp; sourceTree = "<group>"; };
 		D81C12F81DDF51F80095D4DF /* hh_game_logic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hh_game_logic.cpp; path = ../../hh_game_logic.cpp; sourceTree = "<group>"; };
 		D81C12F91DDF51F80095D4DF /* hh_game_logic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hh_game_logic.h; path = ../../hh_game_logic.h; sourceTree = "<group>"; };
+		D81C12FB1DDFF3740095D4DF /* mj_nif.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mj_nif.c; path = ../../mj_nif.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 		D81C12ED1DDF51820095D4DF /* lyjmj */ = {
 			isa = PBXGroup;
 			children = (
+				D81C12FB1DDFF3740095D4DF /* mj_nif.c */,
 				D81C12F81DDF51F80095D4DF /* hh_game_logic.cpp */,
 				D81C12F91DDF51F80095D4DF /* hh_game_logic.h */,
 				D81C12F61DDF51D90095D4DF /* common.cpp */,
@@ -127,6 +130,7 @@
 			files = (
 				D81C12F71DDF51D90095D4DF /* common.cpp in Sources */,
 				D81C12FA1DDF51F80095D4DF /* hh_game_logic.cpp in Sources */,
+				D81C12FC1DDFF3740095D4DF /* mj_nif.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

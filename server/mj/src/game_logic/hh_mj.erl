@@ -11,6 +11,7 @@
 -include("hh_mj.hrl").
 -include("../../include/mj_pb.hrl").
 -include("../../deps/file_log/include/file_log.hrl").
+-export([test_game_start/0, test_game_oper/4]).
 %% API
 -export([
 		 init_private_data/0,
@@ -63,3 +64,16 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 	ok.
 
 undefine_transform(undefined) -> 0.
+
+
+test_game_start() ->
+	{success, GameBin} = mj_nif:game_start(?GAME_TYPE, 0, qp_util:timestamp()),
+	Logic = hh_mj_util:generate_main_logic(GameBin),
+	hh_mj_util:print(Logic),
+	put(game_bin, GameBin).
+
+
+test_game_oper(SeatNumber, Type, V1, V2) ->
+    GameBin = get(game_bin),
+	true = GameBin =/= undefined,
+    mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNumber, Type, V1, V2).

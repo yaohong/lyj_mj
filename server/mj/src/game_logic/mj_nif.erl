@@ -1,7 +1,7 @@
 -module(mj_nif).
 
 -export([init/0]).
--export([game_start/3, game_oper/2]).
+-export([game_start/3, game_oper/6]).
 
 -on_load(init/0).
 
@@ -20,5 +20,5 @@ game_start(GameType, BankerNumber, RandSeed) when is_integer(GameType) andalso i
 
 
 
-game_oper(V1, V2) ->
+game_oper(GameBin, GameType, OperSeatNumber, OperType, OperValue1, OperValue2) ->
 	exception.

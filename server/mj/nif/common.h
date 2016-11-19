@@ -24,7 +24,6 @@
 #define qp_uint32 unsigned int
 #define qp_int32 int
 
-
 //能够进行的操作
 #define OP_NONE 0				
 #define OP_CHI 1 				//1 << 0
