@@ -157,7 +157,7 @@ generage_error_log(LogData) ->
 		ErrorBuff:512/binary,LogLen:?BIG_INT32
 	>> = LogData,
 	#hh_error_log{
-		log = lists:split(LogLen, ErrorBuff)
+		log = lists:split(LogLen, binary_to_list(ErrorBuff))
 	}.
 
 
