@@ -4,4 +4,5 @@ var/log/
 var/pid/
 old_log/
 include/mj_pb.hrl
+include/common_pb.hrl
 __build.log
