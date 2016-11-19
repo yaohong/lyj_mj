@@ -222,7 +222,7 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 	?FILE_LOG_DEBUG("error_flag:~p", [Logic#hh_main_logic.error_flag]),
 	?FILE_LOG_DEBUG("last_time:~p", [Logic#hh_main_logic.last_time]),
 	?FILE_LOG_DEBUG("error_log:~p", [Logic#hh_main_logic.error_log#hh_error_log.log]),
-	ok,
+	ok.
 
 
 
