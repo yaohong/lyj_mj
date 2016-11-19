@@ -63,6 +63,7 @@ undefine_transform(undefined) -> 0.
 test_game_start() ->
 	{success, GameBin} = mj_nif:game_start(?GAME_TYPE, 0, qp_util:timestamp()),
 	Logic = hh_mj_util:generate_main_logic(GameBin),
+	?FILE_LOG_DEBUG("logic=~p", [Logic]),
 	hh_mj_util:print(Logic),
 	put(game_bin, GameBin).
 
