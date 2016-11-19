@@ -154,7 +154,7 @@ pai_value(Pai) -> Pai band 2#00001111.
 
 generage_error_log(LogData) ->
 	<<
-		ErrorBuff:512/binary,LogLen:?BIG_INT32
+		ErrorBuff:512/binary,LogLen:?LITTLE_INT32
 	>> = LogData,
 	{ValidLog , _} = lists:split(LogLen, binary_to_list(ErrorBuff)),
 	#hh_error_log{

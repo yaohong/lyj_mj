@@ -52,6 +52,8 @@
 
 -define(BIG_UINT32, 32/unsigned-integer-big).
 
+-define(LITTLE_INT32, 32/signed-integer-little).
+-define(LITTLE_UINT32, 32/unsigned-integer-little).
 
 
 -define(BIG_INT64, 64/signed-integer-big).
