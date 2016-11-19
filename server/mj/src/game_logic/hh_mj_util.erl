@@ -164,65 +164,105 @@ generage_error_log(LogData) ->
 
 
 print(Logic) when is_record(Logic, hh_main_logic) ->
-	?FILE_LOG_DEBUG("--------start print--------", []),
-	?FILE_LOG_DEBUG("pai_pool:~p", [ [str_pai(Pai) || Pai <- Logic#hh_main_logic.pool] ]),
-    ?FILE_LOG_DEBUG("seat0:", []),
 	Seat0 = Logic#hh_main_logic.seat0,
-	?FILE_LOG_DEBUG("chi:~p", [ [str_pai(Pai) || Pai <- Seat0#hh_seat.chi] ]),
-	?FILE_LOG_DEBUG("peng:~p", [ [str_pai(Pai) || Pai <- Seat0#hh_seat.peng] ]),
-	?FILE_LOG_DEBUG("gang:~p", [ [str_pai(Pai) || Pai <- Seat0#hh_seat.gang] ]),
-	?FILE_LOG_DEBUG("pai:~p", [ [str_pai(Pai) || Pai <- Seat0#hh_seat.pai] ]),
-
-	?FILE_LOG_DEBUG("seat1:", []),
 	Seat1 = Logic#hh_main_logic.seat1,
-	?FILE_LOG_DEBUG("chi:~p", [ [str_pai(Pai) || Pai <- Seat1#hh_seat.chi] ]),
-	?FILE_LOG_DEBUG("peng:~p", [ [str_pai(Pai) || Pai <- Seat1#hh_seat.peng] ]),
-	?FILE_LOG_DEBUG("gang:~p", [ [str_pai(Pai) || Pai <- Seat1#hh_seat.gang] ]),
-	?FILE_LOG_DEBUG("pai:~p", [ [str_pai(Pai) || Pai <- Seat1#hh_seat.pai] ]),
-
-	?FILE_LOG_DEBUG("seat2:", []),
 	Seat2 = Logic#hh_main_logic.seat2,
-	?FILE_LOG_DEBUG("chi:~p", [ [str_pai(Pai) || Pai <- Seat2#hh_seat.chi] ]),
-	?FILE_LOG_DEBUG("peng:~p", [ [str_pai(Pai) || Pai <- Seat2#hh_seat.peng] ]),
-	?FILE_LOG_DEBUG("gang:~p", [ [str_pai(Pai) || Pai <- Seat2#hh_seat.gang] ]),
-	?FILE_LOG_DEBUG("pai:~p", [ [str_pai(Pai) || Pai <- Seat2#hh_seat.pai] ]),
-
-	?FILE_LOG_DEBUG("seat3:", []),
 	Seat3 = Logic#hh_main_logic.seat3,
-	?FILE_LOG_DEBUG("chi:~p", [ [str_pai(Pai) || Pai <- Seat3#hh_seat.chi] ]),
-	?FILE_LOG_DEBUG("peng:~p", [ [str_pai(Pai) || Pai <- Seat3#hh_seat.peng] ]),
-	?FILE_LOG_DEBUG("gang:~p", [ [str_pai(Pai) || Pai <- Seat3#hh_seat.gang] ]),
-	?FILE_LOG_DEBUG("pai:~p", [ [str_pai(Pai) || Pai <- Seat3#hh_seat.pai] ]),
-
-
-    ?FILE_LOG_DEBUG("banker_seat_number:~p", [Logic#hh_main_logic.banker_seat_number]),
-
-	?FILE_LOG_DEBUG("special:", []),
 	Special = Logic#hh_main_logic.special,
-    ?FILE_LOG_DEBUG("oper_queue:~p", [ [{SeatNumber, str_oper_flag(OperFlag)} || {SeatNumber, OperFlag} <- Special#hh_special.oper_queue] ]),
-	?FILE_LOG_DEBUG("oper_index:~p", [Special#hh_special.oper_index]),
-    ?FILE_LOG_DEBUG("chupai_seatnumber:~p", [Special#hh_special.chupai_seat_number]),
-	?FILE_LOG_DEBUG("chupai_value:~p", [Special#hh_special.chupai_value]),
-
-    ?FILE_LOG_DEBUG("old:", []),
 	Old = Logic#hh_main_logic.old,
-	?FILE_LOG_DEBUG("seat_number:~p", [Old#hh_old_oper.seat_number]),
-	?FILE_LOG_DEBUG("flag:~p", [str_oper_flag(Old#hh_old_oper.flag)]),
-	?FILE_LOG_DEBUG("type:~p", [str_oper(Old#hh_old_oper.type)]),
-	?FILE_LOG_DEBUG("value1:~p", [str_pai(Old#hh_old_oper.value1)]),
-	?FILE_LOG_DEBUG("value2:~p", [str_pai(Old#hh_old_oper.value2)]),
-
-    ?FILE_LOG_DEBUG("next:", []),
 	Next = Logic#hh_main_logic.next,
-	?FILE_LOG_DEBUG("seat_number:~p", [Next#hh_next_oper.seat_number]),
-	?FILE_LOG_DEBUG("flag:~p", [str_oper_flag(Next#hh_next_oper.flag)]),
-	?FILE_LOG_DEBUG("value1:~p", [str_pai(Next#hh_next_oper.value1)]),
-	?FILE_LOG_DEBUG("value2:~p", [str_pai(Next#hh_next_oper.value2)]),
+	?FILE_LOG_DEBUG(
+		"--------start print--------\n"
+		"pai_pool:~p\n"
+		"seat0:\n"
+		"	chi:~p\n"
+		"	peng:~p\n"
+		"	gang:~p\n"
+		"	pai:~p\n"
+		"seat1:\n"
+		"	chi:~p\n"
+		"	peng:~p\n"
+		"	gang:~p\n"
+		"	pai:~p\n"
+		"seat2:\n"
+		"	chi:~p\n"
+		"	peng:~p\n"
+		"	gang:~p\n"
+		"	pai:~p\n"
+		"seat3:\n"
+		"	chi:~p\n"
+		"	peng:~p\n"
+		"	gang:~p\n"
+		"	pai:~p\n"
+	    "banker_seat_number:~p\n"
+		"special:\n"
+		"	oper_queue:~p\n"
+		"	oper_index:~p\n"
+		"	chupai_seatnumber:~p\n"
+		"	chupai_value:~p\n"
+		"old:\n"
+		"	seat_number:~p\n"
+		"	flag:~p\n"
+		"	type:~p\n"
+		"	value1:~p\n"
+		"	value2:~p\n"
+		"next:\n"
+		"	seat_number:~p\n"
+		"	flag:~p\n"
+		"	value1:~p\n"
+		"	value2:~p\n"
+		"state_flag:~p\n"
+		"error_flag:~p\n"
+		"last_time:~p\n"
+		"error_log:~p\n"
+		,
+		[
+			[str_pai(Pai) || Pai <- Logic#hh_main_logic.pool],
+			[str_pai(Pai) || Pai <- Seat0#hh_seat.chi],
+			[str_pai(Pai) || Pai <- Seat0#hh_seat.peng],
+			[str_pai(Pai) || Pai <- Seat0#hh_seat.gang],
+			[str_pai(Pai) || Pai <- Seat0#hh_seat.pai],
 
-	?FILE_LOG_DEBUG("state_flag:~p", [Logic#hh_main_logic.state_flag]),
-	?FILE_LOG_DEBUG("error_flag:~p", [Logic#hh_main_logic.error_flag]),
-	?FILE_LOG_DEBUG("last_time:~p", [Logic#hh_main_logic.last_time]),
-	?FILE_LOG_DEBUG("error_log:~p", [Logic#hh_main_logic.error_log#hh_error_log.log]),
+			[str_pai(Pai) || Pai <- Seat1#hh_seat.chi],
+			[str_pai(Pai) || Pai <- Seat1#hh_seat.peng],
+			[str_pai(Pai) || Pai <- Seat1#hh_seat.gang],
+			[str_pai(Pai) || Pai <- Seat1#hh_seat.pai],
+
+			[str_pai(Pai) || Pai <- Seat2#hh_seat.chi],
+			[str_pai(Pai) || Pai <- Seat2#hh_seat.peng],
+			[str_pai(Pai) || Pai <- Seat2#hh_seat.gang],
+			[str_pai(Pai) || Pai <- Seat2#hh_seat.pai],
+
+			[str_pai(Pai) || Pai <- Seat3#hh_seat.chi],
+			[str_pai(Pai) || Pai <- Seat3#hh_seat.peng],
+			[str_pai(Pai) || Pai <- Seat3#hh_seat.gang],
+			[str_pai(Pai) || Pai <- Seat3#hh_seat.pai],
+
+			Logic#hh_main_logic.banker_seat_number,
+
+			[{SeatNumber, str_oper_flag(OperFlag)} || {SeatNumber, OperFlag} <- Special#hh_special.oper_queue],
+			Special#hh_special.oper_index,
+			Special#hh_special.chupai_seat_number,
+			Special#hh_special.chupai_value,
+
+			Old#hh_old_oper.seat_number,
+			str_oper_flag(Old#hh_old_oper.flag),
+			str_oper(Old#hh_old_oper.type),
+			str_pai(Old#hh_old_oper.value1),
+			str_pai(Old#hh_old_oper.value2),
+
+			Next#hh_next_oper.seat_number,
+			str_oper_flag(Next#hh_next_oper.flag),
+			str_pai(Next#hh_next_oper.value1),
+			str_pai(Next#hh_next_oper.value2),
+
+
+			Logic#hh_main_logic.state_flag,
+			Logic#hh_main_logic.error_flag,
+			Logic#hh_main_logic.last_time,
+			Logic#hh_main_logic.error_log#hh_error_log.log
+		]
+	),
 	ok.
 
 
