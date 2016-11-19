@@ -173,27 +173,27 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 	Next = Logic#hh_main_logic.next,
 	?FILE_LOG_DEBUG(
 		"--------start print--------\n"
-		"pai_pool:~p\n"
+		"pai_pool:~p ~p\n"
 		"seat0:\n"
 		"	chi:~p\n"
 		"	peng:~p\n"
 		"	gang:~p\n"
-		"	pai:~p\n"
+		"	pai:~p ~p\n"
 		"seat1:\n"
 		"	chi:~p\n"
 		"	peng:~p\n"
 		"	gang:~p\n"
-		"	pai:~p\n"
+		"	pai:~p ~p\n"
 		"seat2:\n"
 		"	chi:~p\n"
 		"	peng:~p\n"
 		"	gang:~p\n"
-		"	pai:~p\n"
+		"	pai:~p ~p\n"
 		"seat3:\n"
 		"	chi:~p\n"
 		"	peng:~p\n"
 		"	gang:~p\n"
-		"	pai:~p\n"
+		"	pai:~p ~p\n"
 	    "banker_seat_number:~p\n"
 		"special:\n"
 		"	oper_queue:~p\n"
@@ -217,25 +217,30 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 		"error_log:~p\n"
 		,
 		[
+			length(Logic#hh_main_logic.pool),
 			[str_pai(Pai) || Pai <- Logic#hh_main_logic.pool],
 			[str_pai(Pai) || Pai <- Seat0#hh_seat.chi],
 			[str_pai(Pai) || Pai <- Seat0#hh_seat.peng],
 			[str_pai(Pai) || Pai <- Seat0#hh_seat.gang],
+			length(Seat0#hh_seat.pai),
 			[str_pai(Pai) || Pai <- Seat0#hh_seat.pai],
 
 			[str_pai(Pai) || Pai <- Seat1#hh_seat.chi],
 			[str_pai(Pai) || Pai <- Seat1#hh_seat.peng],
 			[str_pai(Pai) || Pai <- Seat1#hh_seat.gang],
+			length(Seat1#hh_seat.pai),
 			[str_pai(Pai) || Pai <- Seat1#hh_seat.pai],
 
 			[str_pai(Pai) || Pai <- Seat2#hh_seat.chi],
 			[str_pai(Pai) || Pai <- Seat2#hh_seat.peng],
 			[str_pai(Pai) || Pai <- Seat2#hh_seat.gang],
+			length(Seat2#hh_seat.pai),
 			[str_pai(Pai) || Pai <- Seat2#hh_seat.pai],
 
 			[str_pai(Pai) || Pai <- Seat3#hh_seat.chi],
 			[str_pai(Pai) || Pai <- Seat3#hh_seat.peng],
 			[str_pai(Pai) || Pai <- Seat3#hh_seat.gang],
+			length(Seat3#hh_seat.pai),
 			[str_pai(Pai) || Pai <- Seat3#hh_seat.pai],
 
 			Logic#hh_main_logic.banker_seat_number,
