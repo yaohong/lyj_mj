@@ -143,8 +143,8 @@ str_oper_flag(OperFlag) ->
 str_oper_flag([], _, Str) -> Str;
 str_oper_flag([Oper|T], OperFlag, Str) ->
 	case Oper band OperFlag of
-		1 -> str_oper_flag(T, OperFlag, Str ++"," ++ str_oper(Oper));
-		0 -> str_oper_flag(T, OperFlag, Str)
+		0 -> str_oper_flag(T, OperFlag, Str) ;
+		_ -> str_oper_flag(T, OperFlag, Str ++"," ++ str_oper(Oper))
 	end.
 
 
