@@ -149,7 +149,7 @@ str_oper_flag([Oper|T], OperFlag, Str) ->
 
 
 
-pai_type(Pai) -> Pai bsl 4.
+pai_type(Pai) -> Pai bsr 4.
 pai_value(Pai) -> Pai band 2#00001111.
 
 generage_error_log(LogData) ->
