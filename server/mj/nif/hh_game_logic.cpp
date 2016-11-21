@@ -666,6 +666,9 @@ namespace hh
 				}
 
 				//////////////////////////////////////////////////////////////////////////////
+				//保存出牌的座位号（所有特殊操作的玩家都选过了以后，让出牌的下一个玩家摸牌）
+				logic->chuPaiSeatNumber_ = operSeatNumber;
+				logic->chuPaiValue_ = v1;
 				//另外三家看谁能[杠 碰 吃] 
 				generateSpecialOper(logic, operSeatNumber, v1);
 				//选取一个能够做操作的玩家
@@ -673,9 +676,6 @@ namespace hh
 				qp_uint8 newOperFlag = 0;
 				if (pickingSpecialOper(logic, newOperSeat, newOperFlag))
 				{
-					//保存出牌的座位号（所有特殊操作的玩家都选过了以后，让出牌的下一个玩家摸牌）
-					logic->chuPaiSeatNumber_ = operSeatNumber;
-					logic->chuPaiValue_ = v1;
 					//有人可以做操作,设置下一个操作的相关信息(给erlang用的)
 					logic->nextOperSeatNumber_ = newOperSeat;			//下一个操作的座位号
 					logic->nextOperFlag_ = newOperFlag;					//下一个能够做的操作类型 gang peng chi
