@@ -360,6 +360,12 @@ namespace hh
 			return;
 		}
 
+		logic->oldOperSeatNumber_ = operSeatNumber;
+		logic->oldOperFlag_ = logic->nextOperFlag_;
+		logic->oldOperType_ = operType;
+		logic->oldOperValue1_ = v1;
+		logic->oldOperValue2_ = v2;
+
 		Seat &operSeat = logic->seats_[operSeatNumber];
 
 		switch (operType)
@@ -443,6 +449,7 @@ namespace hh
 
 				//////////////////////////////////////////////////////////////////////////////////////
 				logic->nextOperSeatNumber_ = operSeatNumber;
+				logic->nextOperFlag_ = 0;
 				//看自己能做的操作 杠？出
 				if (common::IsGang(operSeat.pai_, operSeat.writeIndex_))
 				{
@@ -480,6 +487,7 @@ namespace hh
 				/////////////////////////////////////////////////////////////////////////////////////////////////
 				logic->nextOperSeatNumber_ = operSeatNumber;
 				//看自己能做的操作 杠？出
+				logic->nextOperFlag_ = 0;
 				if (common::IsGang(operSeat.pai_, operSeat.writeIndex_))
 				{
 					logic->nextOperFlag_ |= OP_GANG;
@@ -565,6 +573,7 @@ namespace hh
 				common::AddSinglePai(operSeat.pai_, operSeat.writeIndex_, newPai);
 				assert(operSeat.writeIndex_ <= 14);
 
+				logic->nextOperFlag_ = 0;
 				if (common::IsGang(operSeat.pai_, operSeat.writeIndex_))
 				{
 					logic->nextOperFlag_ |= OP_GANG;
@@ -609,12 +618,14 @@ namespace hh
 					assert(!isEnd(logic));
 
 					//没有人可以操作,下家摸一张牌
+					
 					logic->nextOperSeatNumber_ = ((logic->chuPaiSeatNumber_ + 1) % 4);
-					logic->nextOperFlag_ = 0;
+					
 					Seat &nextSeat = logic->seats_[logic->nextOperSeatNumber_];
 					qp_uint8 newPai = getNewPaiByHead(logic);
 					common::AddSinglePai(nextSeat.pai_, nextSeat.writeIndex_, newPai);
 					assert(nextSeat.writeIndex_ <= 14);
+					logic->nextOperFlag_ = 0;
 					if (common::IsGang(nextSeat.pai_, nextSeat.writeIndex_))
 					{
 						logic->nextOperFlag_ |= OP_GANG;
@@ -686,11 +697,12 @@ namespace hh
 				{
 					//没有人可以做操作,下家摸一张牌
 					logic->nextOperSeatNumber_ = ((operSeatNumber + 1) % 4);
-					logic->nextOperFlag_ = 0;
+					
 					Seat &nextSeat = logic->seats_[logic->nextOperSeatNumber_];
 					qp_uint8 newPai = getNewPaiByHead(logic);
 					common::AddSinglePai(nextSeat.pai_, nextSeat.writeIndex_, newPai);
 					assert(nextSeat.writeIndex_ <= 14);
+					logic->nextOperFlag_ = 0;
 					if (common::IsGang(nextSeat.pai_, nextSeat.writeIndex_))
 					{
 						//可以暗杠
@@ -716,12 +728,7 @@ namespace hh
 			default:
 				break;
 		}
-        
-        logic->oldOperSeatNumber_ = operSeatNumber;
-        logic->oldOperFlag_ = logic->nextOperFlag_;
-        logic->oldOperType_ = operType;
-        logic->oldOperValue1_ = v1;
-        logic->oldOperValue2_ = v2;
+       
 	}
 }
 
