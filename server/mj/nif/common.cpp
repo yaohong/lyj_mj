@@ -173,28 +173,24 @@ namespace common {
 	bool CheckPai(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 dest[], qp_uint8 destLen)
 	{
 		assert(destLen <= 14);
-		qp_uint8 tmpDest[14];
-		memset(tmpDest, 0, 14 * sizeof(qp_uint8));
-		memcpy(tmpDest, dest, destLen * sizeof(qp_uint8));
+		qp_uint8 tmpSource[14];
+		memset(tmpSource, 0, 14 * sizeof(qp_uint8));
+		memcpy(tmpSource, source, sourceLen * sizeof(qp_uint8));
 
 		qp_uint8 count = 0;
-		for (qp_uint8 i = 0; i < sourceLen; i++)
+		for (qp_uint8 i = 0; i < destLen; i++)
 		{
-			if (source[i] != 0)
+			for (qp_uint8 j = 0; j < sourceLen; j++)
 			{
-				bool isRemove = false;
-				for (qp_uint8 j = 0; j < destLen; j++)
+				if (dest[i] == tmpSource[j])
 				{
-					if (source[i] == tmpDest[j])
-					{
-						tmpDest[j] = 0;
-						count++;
-						break;
-					}
+					tmpSource[i] = 0;
+					count++;
+					break;
 				}
 			}
 		}
-		return count == sourceLen;
+		return count == destLen;
 	}
 
 	qp_uint8 GetPaiCount(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 p)
@@ -237,7 +233,7 @@ namespace common {
 			}
 		}
 
-		if (value - 1 >= 1 && value + 1 <= 9)
+		if (value > 1 && value < 9)
 		{
 			//中间看两边是否存在
 			qp_uint8 p1 = PAI(type, value - 1);
