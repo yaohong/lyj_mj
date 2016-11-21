@@ -116,8 +116,8 @@ generage_next(NextData) ->
 		value2 = Value2
 	}.
 
-str_pai(0) -> "";
-str_pai(Pai)  -> str_pai(pai_type(Pai), pai_value(Pai)).
+str_pai(0) -> "(0)";
+str_pai(Pai)  -> str_pai(pai_type(Pai), pai_value(Pai)) ++ "(" ++ integer_to_list(Pai) ++ ")".
 
 str_pai(1, V) -> integer_to_list(V) ++ "-wan";
 str_pai(2, V) -> integer_to_list(V) ++ "-tiao";
@@ -130,13 +130,13 @@ str_pai(5, 1) -> "hongzhong";
 str_pai(5, 2) -> "facai";
 str_pai(5, 3) -> "baiban".
 
-str_oper(0) -> "none";
-str_oper(1) -> "chi";
-str_oper(2) -> "peng";
-str_oper(4) -> "gang";
-str_oper(8) -> "hu";
-str_oper(16) -> "chu";
-str_oper(32) -> "guo".
+str_oper(0) -> "none(0)";
+str_oper(1) -> "chi(1)";
+str_oper(2) -> "peng(2)";
+str_oper(4) -> "gang(4)";
+str_oper(8) -> "hu(8)";
+str_oper(16) -> "chu(16)";
+str_oper(32) -> "guo(32)".
 
 str_oper_flag(OperFlag) ->
 	str_oper_flag([1,2,4,8,16,32], OperFlag, "").
@@ -248,7 +248,7 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 			[{SeatNumber, str_oper_flag(OperFlag)} || {SeatNumber, OperFlag} <- Special#hh_special.oper_queue],
 			Special#hh_special.oper_index,
 			Special#hh_special.chupai_seat_number,
-			Special#hh_special.chupai_value,
+			str_pai(Special#hh_special.chupai_value),
 
 			Old#hh_old_oper.seat_number,
 			str_oper_flag(Old#hh_old_oper.flag),
