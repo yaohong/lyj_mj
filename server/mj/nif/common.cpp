@@ -313,16 +313,11 @@ namespace common {
 			results.push_back(result);
 			return;
 		}
-		assert(sourceLen <= 12);
-		qp_uint8 tmpSource[12];
-		qp_uint8 tmpSourceLen = sourceLen;
-		memset(tmpSource, 0, 12 * sizeof(qp_uint8));
-		memcpy(tmpSource, source, tmpSourceLen * sizeof(qp_uint8));
 
 		for (qp_uint8 i = 0; i < MAX_TITLE_INDEX; i++)
 		{
 			qp_uint8 currentPai = PAI_ARRAY[i];
-			qp_uint8 count = common::GetPaiCount(tmpSource, tmpSourceLen, currentPai);
+			qp_uint8 count = common::GetPaiCount(source, sourceLen, currentPai);
 			if (count == 0)
 			{
 				continue;
@@ -345,16 +340,16 @@ namespace common {
 				qp_uint8 nextPai1 = PAI(type, value + 1);
 				qp_uint8 nextPai2 = PAI(type, value + 2);
 				qp_uint8 checkPai[3] = { currentPai, nextPai1, nextPai2 };
-				if (!common::CheckPai(tmpSource, tmpSourceLen, checkPai, 3))
+				if (!common::CheckPai(source, sourceLen, checkPai, 3))
 				{
 					continue;
 				}
-				common::RemovePai(tmpSource, tmpSourceLen, checkPai, 3);
+				common::RemovePai(source, sourceLen, checkPai, 3);
 				result.sequence_[result.sequenceLen_][0] = currentPai;
 				result.sequence_[result.sequenceLen_][1] = nextPai1;
 				result.sequence_[result.sequenceLen_][2] = nextPai2;
 				result.sequenceLen_++;
-				GetBasicHuPaiItem(tmpSource, tmpSourceLen, result, results);
+				GetBasicHuPaiItem(source, sourceLen, result, results);
 			} 
 			else if (count == 3)
 			{
@@ -365,14 +360,14 @@ namespace common {
 					result1.sequence_[result1.sequenceLen_][1] = currentPai;
 					result1.sequence_[result1.sequenceLen_][2] = currentPai;
 
-					qp_uint8 tmpSource1[12];
-					qp_uint8 tmpSourceLen1 = tmpSourceLen;
-					memset(tmpSource1, 0, 12 * sizeof(qp_uint8));
-					memcpy(tmpSource1, tmpSource, tmpSourceLen1 * sizeof(qp_uint8));
+					qp_uint8 tmpSource[12];
+					qp_uint8 tmpSourceLen = sourceLen;
+					memset(tmpSource, 0, 12 * sizeof(qp_uint8));
+					memcpy(tmpSource, source, tmpSourceLen * sizeof(qp_uint8));
 
-					common::RemovePai(tmpSource1, tmpSourceLen1, result1.sequence_[result1.sequenceLen_], 3);
+					common::RemovePai(tmpSource, tmpSourceLen, result1.sequence_[result1.sequenceLen_], 3);
 					result1.sequenceLen_++;
-					GetBasicHuPaiItem(tmpSource1, tmpSourceLen1, result1, results);
+					GetBasicHuPaiItem(tmpSource, tmpSourceLen, result1, results);
 				}
 
 				//当作顺子
@@ -391,16 +386,16 @@ namespace common {
 				qp_uint8 nextPai1 = PAI(type, value + 1);
 				qp_uint8 nextPai2 = PAI(type, value + 2);
 				qp_uint8 checkPai[3] = { currentPai, nextPai1, nextPai2 };
-				if (!common::CheckPai(tmpSource, tmpSourceLen, checkPai, 3))
+				if (!common::CheckPai(source, sourceLen, checkPai, 3))
 				{
 					continue;
 				}
-				common::RemovePai(tmpSource, tmpSourceLen, checkPai, 3);
+				common::RemovePai(source, sourceLen, checkPai, 3);
 				result.sequence_[result.sequenceLen_][0] = currentPai;
 				result.sequence_[result.sequenceLen_][1] = nextPai1;
 				result.sequence_[result.sequenceLen_][2] = nextPai2;
 				result.sequenceLen_++;
-				GetBasicHuPaiItem(tmpSource, tmpSourceLen, result, results);
+				GetBasicHuPaiItem(source, sourceLen, result, results);
 			}
 			else 
 			{
