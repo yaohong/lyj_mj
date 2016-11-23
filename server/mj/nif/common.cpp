@@ -306,17 +306,154 @@ namespace common {
 		return gangCount > 0;
 	}
 
-	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result)
+	void GetBasicHuPaiItem(qp_uint8 source[], qp_uint8 sourceLen, HuBasicResult result, std::vector<HuBasicResult> &results)
 	{
-		//看总数是否为3n + 2
+		if (sourceLen == 0)
+		{
+			results.push_back(result);
+			return;
+		}
+		assert(sourceLen <= 12);
+		qp_uint8 tmpSource[12];
+		qp_uint8 tmpSourceLen = sourceLen;
+		memset(tmpSource, 0, 12 * sizeof(qp_uint8));
+		memcpy(tmpSource, source, tmpSourceLen * sizeof(qp_uint8));
+
+		for (qp_uint8 i = 0; i < MAX_TITLE_INDEX; i++)
+		{
+			qp_uint8 currentPai = PAI_ARRAY[i];
+			qp_uint8 count = common::GetPaiCount(tmpSource, tmpSourceLen, currentPai);
+			if (count == 0)
+			{
+				continue;
+			} 
+			else if (count == 1 || count == 2 || count == 4)
+			{
+				//必须和后面的两张牌组成顺子
+				qp_uint8 type = TYPE(currentPai);
+				qp_uint8 value = VALUE(currentPai);
+				if (type == FENG || type == FA)
+				{
+					continue;
+				}
+				if (value > 7)
+				{
+					//8,9不能和后面两张牌组成顺子
+					continue;
+				}
+
+				qp_uint8 nextPai1 = PAI(type, value + 1);
+				qp_uint8 nextPai2 = PAI(type, value + 2);
+				qp_uint8 checkPai[3] = { currentPai, nextPai1, nextPai2 };
+				if (!common::CheckPai(tmpSource, tmpSourceLen, checkPai, 3))
+				{
+					continue;
+				}
+				common::RemovePai(tmpSource, tmpSourceLen, checkPai, 3);
+				result.sequence_[result.sequenceLen_][0] = currentPai;
+				result.sequence_[result.sequenceLen_][1] = nextPai1;
+				result.sequence_[result.sequenceLen_][2] = nextPai2;
+				result.sequenceLen_++;
+				GetBasicHuPaiItem(tmpSource, tmpSourceLen, result, results);
+			} 
+			else if (count == 3)
+			{
+				{
+					//当作暗刻
+					HuBasicResult result1 = result;
+					result1.sequence_[result1.sequenceLen_][0] = currentPai;
+					result1.sequence_[result1.sequenceLen_][1] = currentPai;
+					result1.sequence_[result1.sequenceLen_][2] = currentPai;
+
+					qp_uint8 tmpSource1[12];
+					qp_uint8 tmpSourceLen1 = tmpSourceLen;
+					memset(tmpSource1, 0, 12 * sizeof(qp_uint8));
+					memcpy(tmpSource1, tmpSource, tmpSourceLen1 * sizeof(qp_uint8));
+
+					common::RemovePai(tmpSource1, tmpSourceLen1, result1.sequence_[result1.sequenceLen_], 3);
+					result1.sequenceLen_++;
+					GetBasicHuPaiItem(tmpSource1, tmpSourceLen1, result1, results);
+				}
+
+				//当作顺子
+				qp_uint8 type = TYPE(currentPai);
+				qp_uint8 value = VALUE(currentPai);
+				if (type == FENG || type == FA)
+				{
+					continue;
+				}
+				if (value > 7)
+				{
+					//8,9不能和后面两张牌组成顺子
+					continue;
+				}
+
+				qp_uint8 nextPai1 = PAI(type, value + 1);
+				qp_uint8 nextPai2 = PAI(type, value + 2);
+				qp_uint8 checkPai[3] = { currentPai, nextPai1, nextPai2 };
+				if (!common::CheckPai(tmpSource, tmpSourceLen, checkPai, 3))
+				{
+					continue;
+				}
+				common::RemovePai(tmpSource, tmpSourceLen, checkPai, 3);
+				result.sequence_[result.sequenceLen_][0] = currentPai;
+				result.sequence_[result.sequenceLen_][1] = nextPai1;
+				result.sequence_[result.sequenceLen_][2] = nextPai2;
+				result.sequenceLen_++;
+				GetBasicHuPaiItem(tmpSource, tmpSourceLen, result, results);
+			}
+			else 
+			{
+				assert(false);
+			}
+		}
+	}
+
+
+	void GetBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &results)
+	{
+		assert(sourceLen >= 1 && sourceLen <= 14);
 		if (sourceLen == 2)
 		{
-			
+			if (source[0] == source[1])
+			{
+				HuBasicResult result;
+				result.pair_[0] = source[0];
+				result.pair_[1] = source[1];
+				results.push_back(result);
+			}
+			return;
 		}
+
 		if (sourceLen % 3 != 2)
 		{
 			return;
 		}
-		return;
+
+		for (qp_uint8 i = 0; i < MAX_TITLE_INDEX; i++)
+		{
+			if (common::GetPaiCount(source, sourceLen, PAI_ARRAY[i]) >= 2)
+			{
+				qp_uint8 tmpSource[14];
+				qp_uint8 tmpSourceLen = sourceLen;
+				memset(tmpSource, 0, 14 * sizeof(qp_uint8));
+				memcpy(tmpSource, source, tmpSourceLen);
+
+				HuBasicResult result;
+				result.pair_[0] = PAI_ARRAY[i];
+				result.pair_[1] = PAI_ARRAY[i];
+				common::RemovePai(tmpSource, tmpSourceLen, result.pair_, 2);
+				assert(tmpSourceLen > 0);
+				GetBasicHuPaiItem(tmpSource, tmpSourceLen, result, results);
+			}
+		}
+	}
+
+	bool CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen)
+	{
+		assert(sourceLen >= 1 && sourceLen <= 14);
+		std::vector<HuBasicResult> result;
+		GetBasicHuPai(source, sourceLen, result);
+		return result.size() > 0;
 	}
 }

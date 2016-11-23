@@ -749,58 +749,76 @@ int main( int argc, const char * argv[] )
 //	int v3 = *((int *)a + 2);
 //	int v4 = *((int *)a + 3);
 //	insert code here...
-	hh::MainLogic logic;
-	hh::Init(&logic, -1, (qp_uint32)time(NULL));
-	printf("banker_seat_number=%d\n", logic.bankerSeatNumber_);
-	for (int i = 0; i < 4; i++)
-	{
-		hh::Seat &seat = logic.seats_[i];
-		printf("seat_number[%d]:", i);
-		for (int j = 0; j < seat.writeIndex_; j++)
-		{
-			std::string v = common::getPaiString(seat.pai_[j]);
-			printf("%s ", v.c_str());
-		}
-		printf("\n");
-		printf("chi:   ");
-		for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
-		{
-			qp_uint8 chi[3][2];
-			qp_uint8 chiCount = 0;
-			common::GetChi(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k], chi, chiCount);
-			if (chiCount > 0)
-			{
-				std::string v = common::getPaiString(common::PAI_ARRAY[k]);
-				printf("%s ", v.c_str());
-			}
-		}
-		printf("\n");
+	//hh::MainLogic logic;
+	//hh::Init(&logic, -1, (qp_uint32)time(NULL));
+	//printf("banker_seat_number=%d\n", logic.bankerSeatNumber_);
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	hh::Seat &seat = logic.seats_[i];
+	//	printf("seat_number[%d]:", i);
+	//	for (int j = 0; j < seat.writeIndex_; j++)
+	//	{
+	//		std::string v = common::getPaiString(seat.pai_[j]);
+	//		printf("%s ", v.c_str());
+	//	}
+	//	printf("\n");
+	//	printf("chi:   ");
+	//	for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
+	//	{
+	//		qp_uint8 chi[3][2];
+	//		qp_uint8 chiCount = 0;
+	//		common::GetChi(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k], chi, chiCount);
+	//		if (chiCount > 0)
+	//		{
+	//			std::string v = common::getPaiString(common::PAI_ARRAY[k]);
+	//			printf("%s ", v.c_str());
+	//		}
+	//	}
+	//	printf("\n");
 
-		printf("peng:   ");
-		for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
-		{
-			if (common::IsPeng(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k]))
-			{
-				std::string v = common::getPaiString(common::PAI_ARRAY[k]);
-				printf("%s ", v.c_str());
-			}
-		}
-		printf("\n");
+	//	printf("peng:   ");
+	//	for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
+	//	{
+	//		if (common::IsPeng(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k]))
+	//		{
+	//			std::string v = common::getPaiString(common::PAI_ARRAY[k]);
+	//			printf("%s ", v.c_str());
+	//		}
+	//	}
+	//	printf("\n");
 
-		printf("gang:   ");
-		for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
-		{
-			if (common::IsGang1(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k]))
-			{
-				std::string v = common::getPaiString(common::PAI_ARRAY[k]);
-				printf("%s ", v.c_str());
-			}
-		}
-		printf("\n");
-	}
+	//	printf("gang:   ");
+	//	for (qp_uint8 k = 0; k < common::MAX_TITLE_INDEX; k++)
+	//	{
+	//		if (common::IsGang1(seat.pai_, seat.writeIndex_, common::PAI_ARRAY[k]))
+	//		{
+	//			std::string v = common::getPaiString(common::PAI_ARRAY[k]);
+	//			printf("%s ", v.c_str());
+	//		}
+	//	}
+	//	printf("\n");
+	//}
 	////qp_uint8 dest[16] = {1,2,3,4,15,5,5,6,7,8,9,10,11,13,14};
 	////qp_uint8 source[5] = { 4, 15, 5, 5,14};
 	////bool ret = common::CheckPai(source, 5, dest, 14);
+	qp_uint8 pai[14] = { 18, 18, 18, 18, 19, 19, 19, 19, 20,20,20,20, 21,21 };
+	std::vector<common::HuBasicResult> results;
+	common::GetBasicHuPai(pai, 14, results);
+	std::vector<common::HuBasicResult>::iterator p_it = results.begin();
+	for (; p_it != results.end(); ++p_it)
+	{
+		common::HuBasicResult &result = (*p_it);
+		printf("pair: %s-%s\n", common::getPaiString(result.pair_[0]).c_str(), common::getPaiString(result.pair_[1]).c_str());
+		printf("sequence: ");
+		for (qp_uint8 i = 0; i < result.sequenceLen_; i++)
+		{
+			qp_uint8 p0 = result.sequence_[i][0];
+			qp_uint8 p1 = result.sequence_[i][1];
+			qp_uint8 p2 = result.sequence_[i][2];
+			printf("%s-%s-%s ", common::getPaiString(p0).c_str(), common::getPaiString(p1).c_str(), common::getPaiString(p2).c_str());
+		}
+		printf("\n");
+	}
     return 0;
 }
 #endif

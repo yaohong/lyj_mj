@@ -89,8 +89,8 @@ namespace common {
 	void GetGang(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 gang[3], qp_uint8 &gangCount);
 	bool IsGang(qp_uint8 pool[], qp_uint8 poolLen);
 
-	bool IsHu(qp_uint8 pool[], qp_uint8 poolLen, qp_uint8 p);
-	void CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &result);
+	void GetBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &results);
+	bool CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen);
 }
 
 #endif
