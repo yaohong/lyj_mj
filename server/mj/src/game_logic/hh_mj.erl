@@ -78,7 +78,7 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 			v2 = Old#hh_old_oper.value1
 		},
 	SendSeatData = encode_oper_seat_data(Next, Notify1, [0,1,2,3], []),
-	{success, {GameBin, {<<>>, SendSeatData, <<>>}}}.
+	{success, {<<>>, SendSeatData, <<>>}}.
 
 encode_oper_seat_data(_Next, _Notify, [], Out) -> Out;
 encode_oper_seat_data(Next, Notify, [SeatNum|T], Out) when Next#hh_next_oper.seat_number =:= SeatNum ->
