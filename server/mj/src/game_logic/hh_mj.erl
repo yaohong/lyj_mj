@@ -66,7 +66,7 @@ encode_seat_data(Logic, [{SeatNum, SeatData}|T], Out) ->
 game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(SeatNum) andalso is_binary(OperBin) ->
 	#qp_mj_oper_req{type = Type, v1 = V1, v2 = V2} = hh_mj_proto:decode_packet(OperBin),
 	?FILE_LOG_DEBUG("game_data seat_num=~p, type=~p, v1=~p, v2=~p", [SeatNum, Type, V1, V2]),
-	success = mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNum, Type ,undefine_transform(V1), undefine_transform(V2)),
+	{success} = mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNum, Type ,undefine_transform(V1), undefine_transform(V2)),
 	Logic = hh_mj_util:generate_main_logic(GameBin),
 	Old = Logic#hh_main_logic.old,
 	Next = Logic#hh_main_logic.next,
