@@ -334,7 +334,7 @@ namespace hh
 
 	void setError(MainLogic *logic, const char *fmt, ...)
 	{
-		assert(logic->errorFlag_ == 0);
+//		assert(logic->errorFlag_ == 0);
 		va_list va;
 		va_start(va, fmt);
 		qp_int32 rt = vsnprintf(logic->errorLogBuff_, HH_LOG_LEN, fmt, va);
