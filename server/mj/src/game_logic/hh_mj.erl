@@ -50,12 +50,12 @@ encode_seat_data(Logic, [{SeatNum, SeatData}|T], Out) ->
 			Logic#hh_main_logic.banker_seat_number =:= SeatNum ->
 				#qp_mj_game_start_notify{
 					pai = SeatData#hh_seat.pai,
-					banker_seat_number = SeatNum,
+					banker_seat_number = Logic#hh_main_logic.banker_seat_number,
 					oper_flag = Logic#hh_main_logic.next#hh_next_oper.flag};
 			true ->
 				#qp_mj_game_start_notify{
 					pai = SeatData#hh_seat.pai,
-					banker_seat_number = SeatNum}
+					banker_seat_number = Logic#hh_main_logic.banker_seat_number}
 		end,
 
 	Bin = hh_mj_proto:encode_packet(Rsp),
