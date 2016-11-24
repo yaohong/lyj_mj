@@ -94,7 +94,8 @@ encode_oper_seat_data(Next, Notify, [SeatNum|T], Out) ->
 	encode_oper_seat_data(Next, Notify, T, [{SeatNum, Bin}|Out]).
 
 
-undefine_transform(undefined) -> 0.
+undefine_transform(undefined) -> 0;
+undefine_transform(V) -> V.
 
 
 test_game_start() ->
