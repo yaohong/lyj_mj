@@ -50,12 +50,12 @@ encode_seat_data(Logic, [{SeatNum, SeatData}|T], Out) ->
 			Logic#hh_main_logic.banker_seat_number =:= SeatNum ->
 				#qp_mj_game_start_notify{
 					pai = SeatData#hh_seat.pai,
-					banker_seat_number = SeatNum,
+					banker_seat_number = Logic#hh_main_logic.banker_seat_number,
 					oper_flag = Logic#hh_main_logic.next#hh_next_oper.flag};
 			true ->
 				#qp_mj_game_start_notify{
 					pai = SeatData#hh_seat.pai,
-					banker_seat_number = SeatNum}
+					banker_seat_number = Logic#hh_main_logic.banker_seat_number}
 		end,
 
 	Bin = hh_mj_proto:encode_packet(Rsp),
@@ -66,7 +66,7 @@ encode_seat_data(Logic, [{SeatNum, SeatData}|T], Out) ->
 game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(SeatNum) andalso is_binary(OperBin) ->
 	#qp_mj_oper_req{type = Type, v1 = V1, v2 = V2} = hh_mj_proto:decode_packet(OperBin),
 	?FILE_LOG_DEBUG("game_data seat_num=~p, type=~p, v1=~p, v2=~p", [SeatNum, Type, V1, V2]),
-	success = mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNum, Type ,undefine_transform(V1), undefine_transform(V2)),
+	{success} = mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNum, Type ,undefine_transform(V1), undefine_transform(V2)),
 	Logic = hh_mj_util:generate_main_logic(GameBin),
 	Old = Logic#hh_main_logic.old,
 	Next = Logic#hh_main_logic.next,
@@ -78,7 +78,7 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 			v2 = Old#hh_old_oper.value2
 		},
 	SendSeatData = encode_oper_seat_data(Next, Notify1, [0,1,2,3], []),
-	{success, {GameBin, {<<>>, SendSeatData, <<>>}}}.
+	{success, {<<>>, SendSeatData, <<>>}}.
 
 encode_oper_seat_data(_Next, _Notify, [], Out) -> Out;
 encode_oper_seat_data(Next, Notify, [SeatNum|T], Out) when Next#hh_next_oper.seat_number =:= SeatNum ->
@@ -94,7 +94,8 @@ encode_oper_seat_data(Next, Notify, [SeatNum|T], Out) ->
 	encode_oper_seat_data(Next, Notify, T, [{SeatNum, Bin}|Out]).
 
 
-undefine_transform(undefined) -> 0.
+undefine_transform(undefined) -> 0;
+undefine_transform(V) -> V.
 
 
 test_game_start() ->
