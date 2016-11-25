@@ -68,6 +68,7 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 	?FILE_LOG_DEBUG("game_data seat_num=~p, type=~p, v1=~p, v2=~p", [SeatNum, Type, V1, V2]),
 	{success} = mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNum, Type ,undefine_transform(V1), undefine_transform(V2)),
 	Logic = hh_mj_util:generate_main_logic(GameBin),
+	hh_mj_util:print(Logic),
 	Old = Logic#hh_main_logic.old,
 	Next = Logic#hh_main_logic.next,
 	Notify1 =
