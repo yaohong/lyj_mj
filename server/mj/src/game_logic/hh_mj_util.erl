@@ -207,6 +207,7 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 		"	type:~p\n"
 		"	value1:~p\n"
 		"	value2:~p\n"
+		"	value3:~p\n"
 		"next:\n"
 		"	seat_number:~p\n"
 		"	flag:~p\n"
@@ -255,7 +256,8 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 			str_oper_flag(Old#hh_old_oper.flag),
 			str_oper(Old#hh_old_oper.type),
 			str_pai(Old#hh_old_oper.value1),
-			str_pai(Old#hh_old_oper.value2),
+			Old#hh_old_oper.value2,
+			Old#hh_old_oper.value3,
 
 			Next#hh_next_oper.seat_number,
 			str_oper_flag(Next#hh_next_oper.flag),
