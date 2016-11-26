@@ -31,7 +31,8 @@
 	flag :: integer(),
 	type :: integer(),
 	value1 :: integer(),
-	value2 :: integer()
+	value2 :: integer(),
+	value3 :: integer()
 }).
 
 -record(hh_next_oper, {

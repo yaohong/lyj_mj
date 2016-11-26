@@ -38,11 +38,12 @@ message qp_mj_oper_notify {						//有人操作的通知(所有人都会收到)
 	required uint32 type = 2;					//操作类型 （吃，碰，杠，过，出，胡）
 	optional uint32 v1 = 3;						//操作对应的值1
 	optional uint32 v2 = 4;						//操作对应的值和返回的值(比如杠牌是有返回值的)
+	optional int32  v3 = 5;                     //座位号
 
-	optional int32 next_oper_seat_num = 5;		//下一个操作的座位号
-	optional uint32 next_oper_flag = 6;			//下一个操作的信息
-	optional uint32 next_oper_value1 = 7;		//下一个操作的信息
-	optional uint32 next_oper_value2 = 8;		//下一个操作的信息
+	optional int32 next_oper_seat_num = 6;		//下一个操作的座位号
+	optional uint32 next_oper_flag = 7;			//下一个操作的信息
+	optional uint32 next_oper_value1 = 8;		//下一个操作的信息
+	optional uint32 next_oper_value2 = 9;		//下一个操作的信息
 }
 
 

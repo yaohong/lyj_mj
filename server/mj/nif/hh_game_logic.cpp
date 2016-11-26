@@ -51,7 +51,7 @@ namespace hh
         }
 
         logic->nextOperSeatNumber_ = logic->bankerSeatNumber_;
-
+		logic->oldOperValueSeatNumber_ = -1;
         //发三轮四张
         for (int i = 0; i < 3; i++)
         {
@@ -360,6 +360,8 @@ namespace hh
 			return;
 		}
 
+		logic->oldOperValueSeatNumber_ = -1;
+
 		logic->oldOperSeatNumber_ = operSeatNumber;
 		logic->oldOperFlag_ = logic->nextOperFlag_;
 		logic->oldOperType_ = operType;
@@ -444,6 +446,8 @@ namespace hh
 				//牌从手里移除
 				common::RemovePai(operSeat.pai_, operSeat.writeIndex_, tmpChiPai, 2);
 				assert(operSeat.writeIndex_ > 0);
+
+				logic->oldOperValueSeatNumber_ = logic->chuPaiSeatNumber_;
 				//添加到吃里面
 				addChi(logic, operSeatNumber, chiSmallValue);
 
@@ -481,6 +485,8 @@ namespace hh
 				qp_uint8 removePai[2] = {v1, v1};
 				common::RemovePai(operSeat.pai_, operSeat.writeIndex_, removePai, 2);
 				assert(operSeat.writeIndex_ > 0);
+
+				logic->oldOperValueSeatNumber_ = logic->chuPaiSeatNumber_;
 				//添加到吃里面
 				addPeng(logic, operSeatNumber, v1);
 
@@ -566,6 +572,7 @@ namespace hh
 					addGang(logic, operSeatNumber, v1);
 
 				}
+				logic->oldOperValueSeatNumber_ = logic->chuPaiSeatNumber_;
 
 				//屁股摸一张牌
 				assert(!isEnd(logic));
@@ -603,6 +610,7 @@ namespace hh
 				//获取下一个做操作的玩家
 				qp_int8 newOperSeatNumber = -1;
 				qp_uint8 newOperFlag = 0;
+				logic->oldOperValueSeatNumber_ = logic->chuPaiSeatNumber_;
 				if (pickingSpecialOper(logic, newOperSeatNumber, newOperFlag))
 				{
 					//有人可以做操作,设置下一个操作的相关信息(给erlang用的)

@@ -19,7 +19,7 @@ generate_main_logic(Bin) ->
 	<<
 		PaiPool:120/binary, PoolHeadReadIndex:?BIG_UINT8, PoolTailReadIndex:?BIG_UINT8,
 		Seat0:27/binary, Seat1:27/binary,Seat2:27/binary,Seat3:27/binary,
-		BrankerNumber:?BIG_UINT8,SpecialData:10/binary,OldData:5/binary,
+		BrankerNumber:?BIG_UINT8,SpecialData:10/binary,OldData:6/binary,
 		NextData:4/binary,StateFlag:?BIG_UINT8,ErrorFlag:?BIG_UINT8,
 		LastTime:?BIG_UINT32,ErrorLogData:516/binary
 	>> = Bin,
@@ -94,14 +94,15 @@ generage_old(OldData) ->
 	<<
 		SeatNumber:?BIG_INT8,Flag:?BIG_UINT8,
 		Type:?BIG_UINT8, Value1:?BIG_UINT8,
-		Value2:?BIG_UINT8
+		Value2:?BIG_UINT8, Value3:?BIG_INT8
 	>> = OldData,
 	#hh_old_oper{
 		seat_number = SeatNumber,
 		flag = Flag,
 		type = Type,
 		value1 = Value1,
-		value2 = Value2
+		value2 = Value2,
+		value3 = Value3
 	}.
 
 generage_next(NextData) ->

@@ -34,6 +34,7 @@ namespace hh
 		qp_uint8	oldOperType_;				//之前做的类型
 		qp_uint8	oldOperValue1_;				//之前操作的值1
 		qp_uint8	oldOperValue2_;				//之前操作的值2
+		qp_int8		oldOperValueSeatNumber_;	//粗放chuPaiSeatNumber_的值，默认为-1供erlang调用
 
 		qp_int8		nextOperSeatNumber_;		//下一个操作的座位号
 		qp_uint8	nextOperFlag_;				//下一个能够做的操作
