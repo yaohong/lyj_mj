@@ -809,6 +809,7 @@ int main( int argc, const char * argv[] )
 	////qp_uint8 dest[16] = {1,2,3,4,15,5,5,6,7,8,9,10,11,13,14};
 	////qp_uint8 source[5] = { 4, 15, 5, 5,14};
 	////bool ret = common::CheckPai(source, 5, dest, 14);
+	printf("size=%d\n", sizeof(hh::MainLogic));
 	qp_uint8 pai[14] = { 18, 18, 18, 18, 19, 19, 19, 19, 20,20,20,20, 21,21 };
 	std::vector<common::HuBasicResult> results;
 	common::GetBasicHuPai(pai, 14, results);
