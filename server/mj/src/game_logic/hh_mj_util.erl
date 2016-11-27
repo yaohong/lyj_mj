@@ -214,7 +214,6 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 		"	value2:~p\n"
 		"state_flag:~p\n"
 		"error_flag:~p\n"
-		"last_time:~p\n"
 		"error_log:~p\n"
 		,
 		[
@@ -266,7 +265,6 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 
 			Logic#hh_main_logic.state_flag,
 			Logic#hh_main_logic.error_flag,
-			Logic#hh_main_logic.last_time,
 			Logic#hh_main_logic.error_log#hh_error_log.log
 		]
 	),
