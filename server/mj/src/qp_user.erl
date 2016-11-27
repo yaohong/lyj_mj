@@ -505,7 +505,7 @@ packet_handle(#qp_game_data{game_data = GameData}=Request, game, #state{room_dat
 		success ->
 %%			?FILE_LOG_DEBUG("user_id[~p] [room] qp_exit_room success", [UserId]),
 %%			send_packet(#qp_exit_room_rsp{result = 0}, State),
-			{game, State#state{room_data = undefined}, true};
+			{game, State, true};
 		failed ->
 			?FILE_LOG_DEBUG("user_id[~p] [room] qp_exit_room failed", [UserId]),
 			{game, State, true}
