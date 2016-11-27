@@ -58,7 +58,6 @@
 	next :: #hh_next_oper{},
 	state_flag :: integer(),
 	error_flag :: integer(),
-	last_time :: integer(),
 	error_log :: #hh_error_log{}
 }).
 

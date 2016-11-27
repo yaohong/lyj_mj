@@ -21,7 +21,7 @@ generate_main_logic(Bin) ->
 		Seat0:27/binary, Seat1:27/binary,Seat2:27/binary,Seat3:27/binary,
 		BrankerNumber:?BIG_UINT8,SpecialData:10/binary,OldData:6/binary,
 		NextData:4/binary,StateFlag:?BIG_UINT8,ErrorFlag:?BIG_UINT8,
-		LastTime:?BIG_UINT32,ErrorLogData:516/binary
+		ErrorLogData:256/binary
 	>> = Bin,
 	HeadLen = PoolHeadReadIndex,
 	TailLen = ?HH_POOL_COUNT - 1 - PoolTailReadIndex,
@@ -40,7 +40,6 @@ generate_main_logic(Bin) ->
 		next = generage_next(NextData),
 		state_flag = StateFlag,
 		error_flag = ErrorFlag,
-		last_time = LastTime ,
 		error_log = generage_error_log(ErrorLogData)
 	}.
 
@@ -155,7 +154,7 @@ pai_value(Pai) -> Pai band 2#00001111.
 
 generage_error_log(LogData) ->
 	<<
-		ErrorBuff:512/binary,LogLen:?LITTLE_INT32
+		ErrorBuff:255/binary,LogLen:?BIG_UINT8
 	>> = LogData,
 	{ValidLog , _} = lists:split(LogLen, binary_to_list(ErrorBuff)),
 	#hh_error_log{

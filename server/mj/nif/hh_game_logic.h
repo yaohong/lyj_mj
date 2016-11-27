@@ -3,7 +3,7 @@
 #include "common.h"
 //最大麻将牌数
 #define HH_MAX_COUNT 3 * 9 * 4 + 3*4
-#define HH_LOG_LEN 512
+#define HH_LOG_LEN 255
 namespace hh
 {
     struct Seat
@@ -45,10 +45,9 @@ namespace hh
 
 		qp_uint8    stateFlag_;					//状态标志(0为游戏中,大于0为结束原因）
 		qp_uint8	errorFlag_;					//1表示出错了
-		qp_uint32	lastTime_;                  //开始操作的时间
 
 		char		errorLogBuff_[HH_LOG_LEN];		//存放日志的buff
-		qp_int32	errorLogLen;			//日志的写入偏移
+		qp_uint8	errorLogLen;			//日志的写入偏移
 
     };
 	void clearSpecialOper(MainLogic *logic);
