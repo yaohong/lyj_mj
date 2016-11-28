@@ -810,8 +810,10 @@ int main( int argc, const char * argv[] )
 	////qp_uint8 source[5] = { 4, 15, 5, 5,14};
 	////bool ret = common::CheckPai(source, 5, dest, 14);
 	printf("size=%u\n", sizeof(hh::MainLogic));
-	//qp_uint8 pai[14] = { 18, 18, 18, 18, 19, 19, 19, 19, 20,20,20,20, 21,21 };
-	qp_uint8 pai[14] = { 18, 18, 19, 19, 20, 20, 21, 21, 22,22,22,23,23,23};
+	qp_uint8 pai[14] = { 18, 18, 18, 18, 19, 19, 19, 19, 20,20,20,20, 21,21 };
+	//qp_uint8 pai[14] = { 18, 18, 19, 19, 20, 20, 21, 21, 22,22,22,23,23,23};
+	//qp_uint8 pai[14] = { 18, 18 };
+	//qp_uint8 pai[14] = { 18, 18, 18, 19, 20, 21, 22, 23, 23, 23, 22, 23, 23, 23 };
 	std::vector<common::HuBasicResult> results;
 	common::GetBasicHuPai(pai, 14, results);
 	std::vector<common::HuBasicResult>::iterator p_it = results.begin();
