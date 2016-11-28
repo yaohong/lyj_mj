@@ -329,12 +329,12 @@ namespace common {
 				qp_uint8 value = VALUE(currentPai);
 				if (type == FENG || type == FA)
 				{
-					continue;
+					return;
 				}
 				if (value > 7)
 				{
 					//8,9不能和后面两张牌组成顺子
-					continue;
+					return;
 				}
 
 				qp_uint8 nextPai1 = PAI(type, value + 1);
@@ -342,7 +342,7 @@ namespace common {
 				qp_uint8 checkPai[3] = { currentPai, nextPai1, nextPai2 };
 				if (!common::CheckPai(source, sourceLen, checkPai, 3))
 				{
-					continue;
+					return;
 				}
 				common::RemovePai(source, sourceLen, checkPai, 3);
 				result.sequence_[result.sequenceLen_][0] = currentPai;
@@ -350,6 +350,8 @@ namespace common {
 				result.sequence_[result.sequenceLen_][2] = nextPai2;
 				result.sequenceLen_++;
 				GetBasicHuPaiItem(source, sourceLen, result, results);
+				return;
+
 			} 
 			else if (count == 3)
 			{
@@ -375,12 +377,12 @@ namespace common {
 				qp_uint8 value = VALUE(currentPai);
 				if (type == FENG || type == FA)
 				{
-					continue;
+					return;
 				}
 				if (value > 7)
 				{
 					//8,9不能和后面两张牌组成顺子
-					continue;
+					return;
 				}
 
 				qp_uint8 nextPai1 = PAI(type, value + 1);
@@ -388,7 +390,7 @@ namespace common {
 				qp_uint8 checkPai[3] = { currentPai, nextPai1, nextPai2 };
 				if (!common::CheckPai(source, sourceLen, checkPai, 3))
 				{
-					continue;
+					return;
 				}
 				common::RemovePai(source, sourceLen, checkPai, 3);
 				result.sequence_[result.sequenceLen_][0] = currentPai;
@@ -396,6 +398,7 @@ namespace common {
 				result.sequence_[result.sequenceLen_][2] = nextPai2;
 				result.sequenceLen_++;
 				GetBasicHuPaiItem(source, sourceLen, result, results);
+				return;
 			}
 			else 
 			{
