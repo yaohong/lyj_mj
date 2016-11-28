@@ -94,6 +94,12 @@ namespace hh
 			logic->nextOperFlag_ |= OP_GANG;
 		}
 
+		//是否能胡
+		if (common::IsHu(bankerSeat.pai_, bankerSeat.writeIndex_))
+		{
+			logic->nextOperFlag_ |= OP_HU;
+		}
+
 		logic->nextOperFlag_ |= OP_CHU;
 		logic->nextOperValue1_ = 0;
 		logic->nextOperValue2_ = 0;
@@ -675,7 +681,7 @@ namespace hh
 				//
 
 
-				//
+				//没有人可以胡牌
 				//看还能不能摸牌
 				if (isEnd(logic))
 				{

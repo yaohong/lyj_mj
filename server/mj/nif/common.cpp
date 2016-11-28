@@ -454,4 +454,9 @@ namespace common {
 		GetBasicHuPai(source, sourceLen, result);
 		return result.size() > 0;
 	}
+
+	bool IsHu(qp_uint8 source[], qp_uint8 sourceLen)
+	{
+		return CheckBasicHuPai(source, sourceLen);
+	}
 }
