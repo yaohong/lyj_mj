@@ -189,6 +189,12 @@ namespace hh
 		logic->huOperIndex_ = 0;
 		memset(logic->huOperQueue_, 0, 3);
 
+		for (qp_uint8 i = 1; i < 4; i++)
+		{
+			qp_uint8 nextSeatNum = (operSeatNum + i) % 4;
+			Seat &nextSeat = logic->seats_[nextSeatNum];
+
+		}
 
 	}
 
