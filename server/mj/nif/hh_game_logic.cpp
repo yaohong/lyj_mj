@@ -857,11 +857,11 @@ int main( int argc, const char * argv[] )
 	//	printf("\n");
 	//}
 	//qp_uint8 pai[13] = {17,17,17, 18, 19, 20, 21, 22, 23, 24, 25, 25, 25 };
-	qp_uint8 pai[13] = { 18, 18, 18, 19, 20, 21, 22, 23, 23, 23 };
+	qp_uint8 pai[10] = { 18, 18, 18, 19, 20, 21, 22, 23, 23, 23 };
 	printf("ting: \n");
 	for (qp_uint8 i = 0; i < common::MAX_TITLE_INDEX; i++)
 	{
-		if (common::IsTing(pai, 13, common::PAI_ARRAY[i]))
+		if (common::IsTing(pai, 10, common::PAI_ARRAY[i]))
 		{
 			printf("%s ", common::getPaiString(common::PAI_ARRAY[i]).c_str());
 		}
