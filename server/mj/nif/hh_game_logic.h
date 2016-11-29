@@ -23,10 +23,15 @@ namespace hh
         Seat		seats_[4];                  //四个座位
 		qp_int8		bankerSeatNumber_;          //庄家的座位号
 
-		qp_uint8	specialOperQueue_[3][2];	//特殊操作队列
-		qp_uint8	specialOperCount_;			//特殊操作的人数
+		qp_uint8	specialOperQueue_[3][2];	//特殊操作队列 (吃，碰，杠)
+		qp_uint8	specialOperCount_;			//特殊操作队列元素的数量
 		qp_uint8	specialOperIndex_;			//当前进行特殊操作的索引
-		qp_int8		chuPaiSeatNumber_;			//开启特殊操作之前保存出牌的座位号
+
+		qp_uint8	huOperQueue_[3];			//胡牌的队列
+		qp_uint8	huOperCount_;				//胡牌队列的数量
+		qp_uint8	huOperIndex_;				//当前胡牌操作的索引
+		
+		qp_int8		chuPaiSeatNumber_;			//开启特殊操作或者胡牌之前保存出牌的座位号
 		qp_uint8	chuPaiValue_;				//出的牌
 
 		qp_int8		oldOperSeatNumber_;			//之前操作的座位
@@ -34,7 +39,7 @@ namespace hh
 		qp_uint8	oldOperType_;				//之前做的类型
 		qp_uint8	oldOperValue1_;				//之前操作的值1
 		qp_uint8	oldOperValue2_;				//之前操作的值2
-		qp_int8		oldOperValueSeatNumber_;	//粗放chuPaiSeatNumber_的值，默认为-1供erlang调用
+		qp_int8		oldOperValueSeatNumber_;	//存放chuPaiSeatNumber_的值，默认为-1供erlang调用
 
 		qp_int8		nextOperSeatNumber_;		//下一个操作的座位号
 		qp_uint8	nextOperFlag_;				//下一个能够做的操作
@@ -51,6 +56,7 @@ namespace hh
 
     };
 	void clearSpecialOper(MainLogic *logic);
+	void clearHuOper(MainLogic *logic);
 	void Init(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint32 randSeed);
 	void Oper(MainLogic *logic, qp_int8 operSeatNumber, qp_uint8 operType, qp_uint8 v1, qp_uint8 v2);
 }

@@ -459,4 +459,17 @@ namespace common {
 	{
 		return CheckBasicHuPai(source, sourceLen);
 	}
+
+
+	bool IsTing(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 pai)
+	{
+		assert(sourceLen <= 13);
+		qp_uint8 tmp[14];
+		memset(tmp, 0, 14);
+		memcpy(tmp, source, sourceLen);
+		tmp[sourceLen] = pai;
+		common::Sort(tmp, sourceLen + 1);
+
+		return common::IsHu(tmp, sourceLen + 1);
+	}
 }

@@ -36,7 +36,6 @@ namespace hh
 		InitPool(logic);
 		common::Random(logic->pool_, HH_MAX_COUNT);
 		common::Crc(logic->pool_, HH_MAX_COUNT);
-		logic->chuPaiSeatNumber_ = -1;
         //随即一个庄家
         logic->poolHeadReadIndex_ = 0;
         logic->poolTailReadIndex_ = HH_MAX_COUNT - 1;
@@ -49,9 +48,7 @@ namespace hh
 			assert(bankerSeatNumber >= 0 && bankerSeatNumber <= 3);
             logic->bankerSeatNumber_ = bankerSeatNumber;
         }
-
-        logic->nextOperSeatNumber_ = logic->bankerSeatNumber_;
-		logic->oldOperValueSeatNumber_ = -1;
+		
         //发三轮四张
         for (int i = 0; i < 3; i++)
         {
@@ -100,11 +97,15 @@ namespace hh
 			logic->nextOperFlag_ |= OP_HU;
 		}
 
+		logic->oldOperValueSeatNumber_ = -1;
+
+		logic->nextOperSeatNumber_ = logic->bankerSeatNumber_;
 		logic->nextOperFlag_ |= OP_CHU;
 		logic->nextOperValue1_ = 0;
 		logic->nextOperValue2_ = 0;
 
 		clearSpecialOper(logic);
+		clearHuOper(logic);
     }
 
 	bool isEnd(MainLogic *logic)
@@ -182,12 +183,30 @@ namespace hh
 
 	}
 
+	void generateHuOper(MainLogic *logic, qp_uint8 operSeatNum, qp_uint8 cp)
+	{
+		logic->huOperCount_ = 0;
+		logic->huOperIndex_ = 0;
+		memset(logic->huOperQueue_, 0, 3);
+
+
+	}
+
 	void clearSpecialOper(MainLogic *logic)
 	{
 		//清理特殊操作
 		logic->specialOperCount_ = 0;
 		logic->specialOperIndex_ = 0;
 		memset(logic->specialOperQueue_, 0, 3 * 2);
+		logic->chuPaiSeatNumber_ = -1;
+		logic->chuPaiValue_ = 0;
+	}
+
+	void clearHuOper(MainLogic *logic)
+	{
+		logic->huOperCount_ = 0;
+		logic->huOperIndex_ = 0;
+		memset(logic->huOperQueue_, 0, 3);
 		logic->chuPaiSeatNumber_ = -1;
 		logic->chuPaiValue_ = 0;
 	}
@@ -816,27 +835,37 @@ int main( int argc, const char * argv[] )
 	////qp_uint8 source[5] = { 4, 15, 5, 5,14};
 	////bool ret = common::CheckPai(source, 5, dest, 14);
 	printf("size=%u\n", sizeof(hh::MainLogic));
-	qp_uint8 pai[14] = { 18, 18, 18, 18, 19, 19, 19, 19, 20,20,20,20, 21,21 };
-	//qp_uint8 pai[14] = { 18, 18, 19, 19, 20, 20, 21, 21, 22,22,22,23,23,23};
-	//qp_uint8 pai[14] = { 18, 18 };
-	//qp_uint8 pai[14] = { 18, 18, 18, 19, 20, 21, 22, 23, 23, 23, 22, 23, 23, 23 };
-	std::vector<common::HuBasicResult> results;
-	common::GetBasicHuPai(pai, 14, results);
-	std::vector<common::HuBasicResult>::iterator p_it = results.begin();
-	for (; p_it != results.end(); ++p_it)
+	//qp_uint8 pai[14] = { 18, 18, 18, 18, 19, 19, 19, 19, 20,20,20,20, 21,21 };
+	////qp_uint8 pai[14] = { 18, 18, 19, 19, 20, 20, 21, 21, 22,22,22,23,23,23};
+	////qp_uint8 pai[14] = { 18, 18 };
+	////qp_uint8 pai[14] = { 18, 18, 18, 19, 20, 21, 22, 23, 23, 23, 22, 23, 23, 23 };
+	//std::vector<common::HuBasicResult> results;
+	//common::GetBasicHuPai(pai, 14, results);
+	//std::vector<common::HuBasicResult>::iterator p_it = results.begin();
+	//for (; p_it != results.end(); ++p_it)
+	//{
+	//	common::HuBasicResult &result = (*p_it);
+	//	printf("pair: %s-%s\n", common::getPaiString(result.pair_[0]).c_str(), common::getPaiString(result.pair_[1]).c_str());
+	//	printf("sequence: ");
+	//	for (qp_uint8 i = 0; i < result.sequenceLen_; i++)
+	//	{
+	//		qp_uint8 p0 = result.sequence_[i][0];
+	//		qp_uint8 p1 = result.sequence_[i][1];
+	//		qp_uint8 p2 = result.sequence_[i][2];
+	//		printf("%s-%s-%s ", common::getPaiString(p0).c_str(), common::getPaiString(p1).c_str(), common::getPaiString(p2).c_str());
+	//	}
+	//	printf("\n");
+	//}
+	qp_uint8 pai[13] = {17,17,17, 18, 19, 20, 21, 22, 23, 24, 25, 25, 25 };
+	printf("ting: \n");
+	for (qp_uint8 i = 0; i < common::MAX_TITLE_INDEX; i++)
 	{
-		common::HuBasicResult &result = (*p_it);
-		printf("pair: %s-%s\n", common::getPaiString(result.pair_[0]).c_str(), common::getPaiString(result.pair_[1]).c_str());
-		printf("sequence: ");
-		for (qp_uint8 i = 0; i < result.sequenceLen_; i++)
+		if (common::IsTing(pai, 13, common::PAI_ARRAY[i]))
 		{
-			qp_uint8 p0 = result.sequence_[i][0];
-			qp_uint8 p1 = result.sequence_[i][1];
-			qp_uint8 p2 = result.sequence_[i][2];
-			printf("%s-%s-%s ", common::getPaiString(p0).c_str(), common::getPaiString(p1).c_str(), common::getPaiString(p2).c_str());
+			printf("%s ", common::getPaiString(common::PAI_ARRAY[i]));
 		}
-		printf("\n");
 	}
+	printf("\n");
     return 0;
 }
 #endif

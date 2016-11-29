@@ -92,6 +92,9 @@ namespace common {
 	void GetBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen, std::vector<HuBasicResult> &results);
 	bool CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen);
 	bool IsHu(qp_uint8 source[], qp_uint8 sourceLen);
+
+
+	bool IsTing(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 pai);
 }
 
 #endif
