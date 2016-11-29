@@ -862,7 +862,7 @@ int main( int argc, const char * argv[] )
 	{
 		if (common::IsTing(pai, 13, common::PAI_ARRAY[i]))
 		{
-			printf("%s ", common::getPaiString(common::PAI_ARRAY[i]));
+			printf("%s ", common::getPaiString(common::PAI_ARRAY[i]).c_str());
 		}
 	}
 	printf("\n");
