@@ -735,7 +735,27 @@ namespace hh
 			case OP_HU:
 			{
 				//吃胡或者自摸胡
-
+				if (logic->nextOperValue1_ == 0)
+				{
+					//自摸胡
+					assert(operSeat.writeIndex_ % 3 == 2);
+					assert(common::IsHu(operSeat.pai_, operSeat.writeIndex_));
+					logic->stateFlag_ = 2;
+				}
+				else 
+				{
+					//吃胡
+					if (logic->nextOperValue1_ != v1)
+					{
+						setError(logic, "seatNumber[%d] oper[hu] , nextOperValue1_=%d v1=%d\n", operSeatNumber, logic->nextOperValue1_, v1);
+						return;
+					}
+					//手牌肯定是3n+1
+					assert(operSeat.writeIndex_ % 3 == 1);
+					assert(common::IsTing(operSeat.pai_, operSeat.writeIndex_, v1));
+					common::AddSinglePai(operSeat.pai_, operSeat.writeIndex_, v1);
+					logic->stateFlag_ = 2;
+				}
 			}
 				break;
 			case OP_CHU:
