@@ -19,8 +19,9 @@ generate_main_logic(Bin) ->
 	<<
 		PaiPool:120/binary, PoolHeadReadIndex:?BIG_UINT8, PoolTailReadIndex:?BIG_UINT8,
 		Seat0:27/binary, Seat1:27/binary,Seat2:27/binary,Seat3:27/binary,
-		BrankerNumber:?BIG_UINT8,SpecialData:8/binary, HuData:5/binary, ChuPaiSeatNum:?BIG_INT8, ChuPaiValue:?BIG_UINT8, OldData:5/binary,
-		NextData:4/binary,StateFlag:?BIG_UINT8,ErrorFlag:?BIG_UINT8,
+		BrankerNumber:?BIG_UINT8,SpecialData:8/binary, HuData:5/binary,
+		ChuPaiSeatNum:?BIG_INT8, ChuPaiValue:?BIG_UINT8,
+		OldData:5/binary, NextData:4/binary,StateFlag:?BIG_UINT8,ErrorFlag:?BIG_UINT8,
 		ErrorLogData:256/binary
 	>> = Bin,
 	HeadLen = PoolHeadReadIndex,
