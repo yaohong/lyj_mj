@@ -19,7 +19,7 @@ generate_main_logic(Bin) ->
 	<<
 		PaiPool:120/binary, PoolHeadReadIndex:?BIG_UINT8, PoolTailReadIndex:?BIG_UINT8,
 		Seat0:27/binary, Seat1:27/binary,Seat2:27/binary,Seat3:27/binary,
-		BrankerNumber:?BIG_UINT8,SpecialData:10/binary,OldData:6/binary,
+		BrankerNumber:?BIG_UINT8,SpecialData:8/binary, HuData:5/binary, ChuPaiSeatNum:?BIG_INT8, ChuPaiValue:?BIG_UINT8, OldData:5/binary,
 		NextData:4/binary,StateFlag:?BIG_UINT8,ErrorFlag:?BIG_UINT8,
 		ErrorLogData:256/binary
 	>> = Bin,
@@ -36,6 +36,9 @@ generate_main_logic(Bin) ->
 		seat3 = generate_seat(Seat3),
 		banker_seat_number = BrankerNumber,
 		special = generage_special(SpecialData),
+		hu = generage_hu(HuData),
+		chupai_seatnumber = ChuPaiSeatNum,
+		chupai_value = ChuPaiValue,
 		old = generage_old(OldData),
 		next = generage_next(NextData),
 		state_flag = StateFlag,
@@ -77,31 +80,39 @@ generage_special(SpecialData) ->
 		Oper0SeatNum:?BIG_UINT8,Oper0Flag:?BIG_UINT8,
 		Oper1SeatNum:?BIG_UINT8,Oper1Flag:?BIG_UINT8,
 		Oper2SeatNum:?BIG_UINT8,Oper2Flag:?BIG_UINT8,
-		OperCount:?BIG_UINT8, OperIndex:?BIG_UINT8,
-		ChuPaiSeatNum:?BIG_INT8, ChuPaiValue:?BIG_UINT8
+		OperCount:?BIG_UINT8, OperIndex:?BIG_UINT8
 	>> = SpecialData,
     L1 = [{Oper0SeatNum, Oper0Flag},{Oper1SeatNum, Oper1Flag},{Oper2SeatNum, Oper2Flag}],
 	{VaildQueue, _} = lists:split(OperCount, L1),
 	#hh_special {
 		oper_queue = VaildQueue,
-		oper_index = OperIndex,
-		chupai_seat_number = ChuPaiSeatNum,
-		chupai_value = ChuPaiValue
+		oper_index = OperIndex
+	}.
+
+generage_hu(HuData) ->
+	<<
+		SeatNum0:?BIG_UINT8,SeatNum1:?BIG_UINT8, SeatNum3:?BIG_UINT8,
+		OperCount:?BIG_UINT8, OperIndex:?BIG_UINT8
+	>> = HuData,
+	L1 = [SeatNum0,SeatNum1,SeatNum3],
+	{VaildQueue, _} = lists:split(OperCount, L1),
+	#hh_hu {
+		queue = VaildQueue,
+		index = OperIndex
 	}.
 
 generage_old(OldData) ->
 	<<
 		SeatNumber:?BIG_INT8,Flag:?BIG_UINT8,
 		Type:?BIG_UINT8, Value1:?BIG_UINT8,
-		Value2:?BIG_UINT8, Value3:?BIG_INT8
+		Value2:?BIG_UINT8
 	>> = OldData,
 	#hh_old_oper{
 		seat_number = SeatNumber,
 		flag = Flag,
 		type = Type,
 		value1 = Value1,
-		value2 = Value2,
-		value3 = Value3
+		value2 = Value2
 	}.
 
 generage_next(NextData) ->
@@ -169,6 +180,7 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 	Seat2 = Logic#hh_main_logic.seat2,
 	Seat3 = Logic#hh_main_logic.seat3,
 	Special = Logic#hh_main_logic.special,
+	Hu = Logic#hh_main_logic.hu,
 	Old = Logic#hh_main_logic.old,
 	Next = Logic#hh_main_logic.next,
 	?FILE_LOG_DEBUG(
@@ -198,15 +210,17 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 		"special:\n"
 		"	oper_queue:~p\n"
 		"	oper_index:~p\n"
-		"	chupai_seatnumber:~p\n"
-		"	chupai_value:~p\n"
+		"hu:\n"
+		"	queue:~p\n"
+		"	index:~p\n"
+		"chupai_seatnumber:~p\n"
+		"chupai_value:~p\n"
 		"old:\n"
 		"	seat_number:~p\n"
 		"	flag:~p\n"
 		"	type:~p\n"
 		"	value1:~p\n"
 		"	value2:~p\n"
-		"	value3:~p\n"
 		"next:\n"
 		"	seat_number:~p\n"
 		"	flag:~p\n"
@@ -247,15 +261,19 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 
 			[{SeatNumber, str_oper_flag(OperFlag)} || {SeatNumber, OperFlag} <- Special#hh_special.oper_queue],
 			Special#hh_special.oper_index,
-			Special#hh_special.chupai_seat_number,
-			str_pai(Special#hh_special.chupai_value),
+
+			[SeatNumber || SeatNumber <- Hu#hh_hu.queue],
+			Hu#hh_hu.index,
+
+			Logic#hh_main_logic.chupai_seatnumber,
+			str_pai(Logic#hh_main_logic.chupai_value),
+
 
 			Old#hh_old_oper.seat_number,
 			str_oper_flag(Old#hh_old_oper.flag),
 			str_oper(Old#hh_old_oper.type),
 			str_pai(Old#hh_old_oper.value1),
 			Old#hh_old_oper.value2,
-			Old#hh_old_oper.value3,
 
 			Next#hh_next_oper.seat_number,
 			str_oper_flag(Next#hh_next_oper.flag),

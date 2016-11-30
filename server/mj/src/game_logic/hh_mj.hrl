@@ -21,9 +21,13 @@
 %%特殊操作相关的数据
 -record(hh_special, {
 	oper_queue :: [{SeatNum :: integer(), OperFlag :: integer()}],
-	oper_index :: integer(),
-	chupai_seat_number :: integer(),
-	chupai_value :: integer()
+	oper_index :: integer()
+}).
+
+
+-record(hh_hu, {
+	queue :: [integer()],
+	index :: integer()
 }).
 
 -record(hh_old_oper, {
@@ -31,8 +35,7 @@
 	flag :: integer(),
 	type :: integer(),
 	value1 :: integer(),
-	value2 :: integer(),
-	value3 :: integer()
+	value2 :: integer()
 }).
 
 -record(hh_next_oper, {
@@ -54,6 +57,9 @@
 	seat3 :: #hh_seat{},				%%3号座位的数据
 	banker_seat_number :: integer(),	%%庄家的座位号
 	special :: #hh_special{},   		%%
+	hu :: #hh_hu{},
+	chupai_seatnumber :: integer(),
+	chupai_value :: integer(),
 	old :: #hh_old_oper{},
 	next :: #hh_next_oper{},
 	state_flag :: integer(),
