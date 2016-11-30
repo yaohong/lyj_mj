@@ -31,7 +31,7 @@ namespace hh
 		qp_uint8	huOperCount_;				//胡牌队列的数量
 		qp_uint8	huOperIndex_;				//当前胡牌操作的索引
 		
-		qp_int8		chuPaiSeatNumber_;			//开启特殊操作或者胡牌之前保存出牌的座位号
+		qp_int8		chuPaiSeatNumber_;			//保存出牌的座位号
 		qp_uint8	chuPaiValue_;				//出的牌
 
 		qp_int8		oldOperSeatNumber_;			//之前操作的座位
@@ -39,7 +39,7 @@ namespace hh
 		qp_uint8	oldOperType_;				//之前做的类型
 		qp_uint8	oldOperValue1_;				//之前操作的值1
 		qp_uint8	oldOperValue2_;				//之前操作的值2
-		qp_int8		oldOperValueSeatNumber_;	//存放chuPaiSeatNumber_的值，默认为-1供erlang调用
+		//qp_int8		oldOperValueSeatNumber_;	//存放chuPaiSeatNumber_的值，默认为-1供erlang调用
 
 		qp_int8		nextOperSeatNumber_;		//下一个操作的座位号
 		qp_uint8	nextOperFlag_;				//下一个能够做的操作

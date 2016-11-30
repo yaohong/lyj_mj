@@ -97,8 +97,6 @@ namespace hh
 			logic->nextOperFlag_ |= OP_HU;
 		}
 
-		logic->oldOperValueSeatNumber_ = -1;
-
 		logic->nextOperSeatNumber_ = logic->bankerSeatNumber_;
 		logic->nextOperFlag_ |= OP_CHU;
 		logic->nextOperValue1_ = 0;
@@ -135,9 +133,7 @@ namespace hh
 	//杠吃碰 (不考虑暗杠)
 	void generateSpecialOper(MainLogic *logic, qp_uint8 operSeatNum, qp_uint8 cp)
 	{
-		logic->specialOperCount_ = 0;
-		logic->specialOperIndex_ = 0;
-		memset(logic->specialOperQueue_, 0, 3 * 2);
+		clearSpecialOper(logic);
 
 		//查找能够杠牌的玩家
 		for (qp_uint8 i = 0; i < 4; i++)
@@ -183,39 +179,6 @@ namespace hh
 
 	}
 
-	void generateHuOper(MainLogic *logic, qp_uint8 operSeatNum, qp_uint8 cp)
-	{
-		logic->huOperCount_ = 0;
-		logic->huOperIndex_ = 0;
-		memset(logic->huOperQueue_, 0, 3);
-
-		for (qp_uint8 i = 1; i < 4; i++)
-		{
-			qp_uint8 nextSeatNum = (operSeatNum + i) % 4;
-			Seat &nextSeat = logic->seats_[nextSeatNum];
-
-		}
-
-	}
-
-	void clearSpecialOper(MainLogic *logic)
-	{
-		//清理特殊操作
-		logic->specialOperCount_ = 0;
-		logic->specialOperIndex_ = 0;
-		memset(logic->specialOperQueue_, 0, 3 * 2);
-		logic->chuPaiSeatNumber_ = -1;
-		logic->chuPaiValue_ = 0;
-	}
-
-	void clearHuOper(MainLogic *logic)
-	{
-		logic->huOperCount_ = 0;
-		logic->huOperIndex_ = 0;
-		memset(logic->huOperQueue_, 0, 3);
-		logic->chuPaiSeatNumber_ = -1;
-		logic->chuPaiValue_ = 0;
-	}
 
 	bool pickingSpecialOper(MainLogic *logic, qp_int8 &operSeatNumber, qp_uint8 &operType)
 	{
@@ -228,6 +191,48 @@ namespace hh
 		operType = logic->specialOperQueue_[logic->specialOperIndex_][1];
 		logic->specialOperIndex_++;
 		return true;
+	}
+
+	void clearSpecialOper(MainLogic *logic)
+	{
+		//清理特殊操作
+		logic->specialOperCount_ = 0;
+		logic->specialOperIndex_ = 0;
+		memset(logic->specialOperQueue_, 0, 3 * 2);
+	}
+
+	void generateHuOper(MainLogic *logic, qp_uint8 operSeatNum, qp_uint8 cp)
+	{
+		clearHuOper(logic);
+
+		for (qp_uint8 i = 1; i < 4; i++)
+		{
+			qp_uint8 nextSeatNum = (operSeatNum + i) % 4;
+			Seat &nextSeat = logic->seats_[nextSeatNum];
+			if (common::IsTing(nextSeat.pai_, nextSeat.writeIndex_, cp))
+			{
+				logic->huOperQueue_[logic->huOperCount_++] = operSeatNum;
+			}
+		}
+	}
+
+	bool pickingHuOper(MainLogic *logic, qp_int8 &operSeatNumber)
+	{
+		if (logic->specialOperCount_ == logic->specialOperIndex_)
+		{
+			return false;
+		}
+		operSeatNumber = logic->huOperQueue_[logic->huOperIndex_];
+		logic->huOperIndex_++;
+		return true;
+
+	}
+
+	void clearHuOper(MainLogic *logic)
+	{
+		logic->huOperCount_ = 0;
+		logic->huOperIndex_ = 0;
+		memset(logic->huOperQueue_, 0, 3);
 	}
 
 	qp_uint8 getNewPaiByHead(MainLogic *logic)
@@ -391,8 +396,6 @@ namespace hh
 			return;
 		}
 
-		logic->oldOperValueSeatNumber_ = -1;
-
 		logic->oldOperSeatNumber_ = operSeatNumber;
 		logic->oldOperFlag_ = logic->nextOperFlag_;
 		logic->oldOperType_ = operType;
@@ -407,6 +410,10 @@ namespace hh
 			{
 				//特殊操作
 				assert(logic->specialOperCount_ > 0);
+
+				assert(logic->chuPaiSeatNumber_ != -1);
+				assert(logic->chuPaiValue_ != 0);
+
 				if (logic->nextOperValue1_ != v1)
 				{
 					//操作值1不对
@@ -478,7 +485,7 @@ namespace hh
 				common::RemovePai(operSeat.pai_, operSeat.writeIndex_, tmpChiPai, 2);
 				assert(operSeat.writeIndex_ > 0);
 
-				logic->oldOperValueSeatNumber_ = logic->chuPaiSeatNumber_;
+				//logic->oldOperValueSeatNumber_ = logic->chuPaiSeatNumber_;
 				//添加到吃里面
 				addChi(logic, operSeatNumber, chiSmallValue);
 
@@ -502,6 +509,9 @@ namespace hh
 			{
 				//特殊操作
 				assert(logic->specialOperCount_ > 0);
+
+				assert(logic->chuPaiSeatNumber_ != -1);
+				assert(logic->chuPaiValue_ != 0);
 				if (logic->nextOperValue1_ != v1)
 				{
 					//操作值1不对
@@ -517,8 +527,7 @@ namespace hh
 				common::RemovePai(operSeat.pai_, operSeat.writeIndex_, removePai, 2);
 				assert(operSeat.writeIndex_ > 0);
 
-				logic->oldOperValueSeatNumber_ = logic->chuPaiSeatNumber_;
-				//添加到吃里面
+				//添加到碰里面
 				addPeng(logic, operSeatNumber, v1);
 
 				/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -564,7 +573,7 @@ namespace hh
 					else 
 					{
 						//检查是否能补杠,补杠的这张牌必须是之前摸的牌
-						
+						assert(logic->nextOperValue2_ != 0);
 						if (v1 != logic->nextOperValue2_)
 						{
 							setError(logic, "seatNumber[%d] bugang, pai error, logic->nextOperValue2_=%d, v2=%d\n", operSeatNumber, logic->nextOperValue2_, v1);
@@ -585,6 +594,12 @@ namespace hh
 				{
 					//明杠
 					assert(logic->specialOperCount_ > 0);
+
+					assert(logic->chuPaiSeatNumber_ != -1);
+					assert(logic->chuPaiValue_ != 0);
+
+
+					assert(logic->nextOperValue1_ != 0);
 					if (logic->nextOperValue1_ != v1)
 					{
 						//明杠杠的牌必须和服务器指定的相等
@@ -601,9 +616,7 @@ namespace hh
 					common::RemovePai(operSeat.pai_, operSeat.writeIndex_, removePai, 3);
 					assert(operSeat.writeIndex_ > 0);
 					addGang(logic, operSeatNumber, v1);
-
 				}
-				logic->oldOperValueSeatNumber_ = logic->chuPaiSeatNumber_;
 
 				//屁股摸一张牌
 				assert(!isEnd(logic));
@@ -624,6 +637,12 @@ namespace hh
 						logic->nextOperFlag_ |= OP_GANG;
 					}
 				}
+
+				if (common::IsHu(operSeat.pai_, operSeat.writeIndex_))
+				{
+					logic->nextOperFlag_ |= OP_HU;
+				}
+
 				logic->nextOperFlag_ |= OP_CHU;
 				logic->nextOperValue1_ = 0;
 				logic->nextOperValue2_ = newPai;					//摸的牌放在V2
@@ -634,14 +653,37 @@ namespace hh
 				break;
 			case OP_GUO:
 			{
-				//特殊操作
-				assert(logic->specialOperCount_ > 0);
 				assert(logic->chuPaiSeatNumber_ != -1);
 				assert(logic->chuPaiValue_ != 0);
+				//可能是胡牌的过也可能是特殊操作的过
+				if (logic->huOperCount_ > 0)
+				{
+					//胡牌的过
+					qp_int8 nextHuSeatNumber = -1;
+					if (pickingHuOper(logic, nextHuSeatNumber))
+					{
+						logic->nextOperSeatNumber_ = nextHuSeatNumber;			
+						logic->nextOperFlag_ = OP_HU | OP_GUO;
+						logic->nextOperValue1_ = logic->chuPaiValue_;
+						logic->nextOperValue2_ = 0;
+						return;
+					}
+					clearHuOper(logic);
+					if (isEnd(logic)) {
+						//结束了
+						logic->stateFlag_ = 1;
+						return;
+					}
+					//没有人选择胡牌
+					//那么构建特殊操作
+					generateSpecialOper(logic, logic->chuPaiSeatNumber_, logic->chuPaiValue_);
+				}
+				//特殊操作的过
+				//assert(logic->specialOperCount_ > 0);
+
 				//获取下一个做操作的玩家
 				qp_int8 newOperSeatNumber = -1;
 				qp_uint8 newOperFlag = 0;
-				logic->oldOperValueSeatNumber_ = logic->chuPaiSeatNumber_;
 				if (pickingSpecialOper(logic, newOperSeatNumber, newOperFlag))
 				{
 					//有人可以做操作,设置下一个操作的相关信息(给erlang用的)
@@ -676,6 +718,12 @@ namespace hh
 							logic->nextOperFlag_ |= OP_GANG;
 						}
 					}
+
+					if (common::IsHu(nextSeat.pai_, nextSeat.writeIndex_))
+					{
+						logic->nextOperFlag_ |= OP_HU;
+					}
+
 					logic->nextOperFlag_ |= OP_CHU;
 					logic->nextOperValue1_ = 0;						//补杠或者暗杠不指定杠的牌
 					logic->nextOperValue2_ = newPai;				//摸的牌放在v2
@@ -686,12 +734,13 @@ namespace hh
 				break;
 			case OP_HU:
 			{
+				//吃胡或者自摸胡
 
 			}
 				break;
 			case OP_CHU:
 			{
-				assert(-1 == logic->chuPaiSeatNumber_);
+				//assert(-1 == logic->chuPaiSeatNumber_);
 				if (common::GetPaiCount(operSeat.pai_, operSeat.writeIndex_, v1) == 0)
 				{
 					//自己没有这张牌
@@ -702,9 +751,22 @@ namespace hh
 				common::RemoveSinglePai(operSeat.pai_, operSeat.writeIndex_, v1);
 				assert(operSeat.writeIndex_ > 0);
 
+				//保存出牌的座位号（所有特殊操作的玩家都选过了以后，让出牌的下一个玩家摸牌）
+				logic->chuPaiSeatNumber_ = operSeatNumber;
+				logic->chuPaiValue_ = v1;
 				//看有没谁能胡牌
 				//
-
+				generateHuOper(logic, operSeatNumber, v1);
+				qp_int8 huSeatNumber = -1;
+				if (pickingHuOper(logic, huSeatNumber))
+				{
+					logic->nextOperSeatNumber_ = huSeatNumber;
+					logic->nextOperFlag_ = OP_HU | OP_GUO;
+					logic->nextOperValue1_ = v1;
+					logic->nextOperValue2_ = 0;
+					return;
+				}
+				//clearHuOper(logic);
 
 				//没有人可以胡牌
 				//看还能不能摸牌
@@ -716,18 +778,15 @@ namespace hh
 				}
 
 				//////////////////////////////////////////////////////////////////////////////
-				//保存出牌的座位号（所有特殊操作的玩家都选过了以后，让出牌的下一个玩家摸牌）
-				logic->chuPaiSeatNumber_ = operSeatNumber;
-				logic->chuPaiValue_ = v1;
 				//另外三家看谁能[杠 碰 吃] 
 				generateSpecialOper(logic, operSeatNumber, v1);
 				//选取一个能够做操作的玩家
-				qp_int8 newOperSeat = -1;
+				qp_int8 newOperSeatNumber = -1;
 				qp_uint8 newOperFlag = 0;
-				if (pickingSpecialOper(logic, newOperSeat, newOperFlag))
+				if (pickingSpecialOper(logic, newOperSeatNumber, newOperFlag))
 				{
 					//有人可以做操作,设置下一个操作的相关信息(给erlang用的)
-					logic->nextOperSeatNumber_ = newOperSeat;			//下一个操作的座位号
+					logic->nextOperSeatNumber_ = newOperSeatNumber;			//下一个操作的座位号
 					logic->nextOperFlag_ = newOperFlag;					//下一个能够做的操作类型 gang peng chi
 					logic->nextOperValue1_ = v1;						//下一个操作的值 操作对应的牌，也就是上家出的那张牌(用来存放明杠,吃，碰的牌)
 					logic->nextOperValue2_ = 0;							//为0
@@ -756,11 +815,14 @@ namespace hh
 						}
 					}
 
+					if (common::IsHu(nextSeat.pai_, nextSeat.writeIndex_))
+					{
+						logic->nextOperFlag_ |= OP_HU;
+					}
+
 					logic->nextOperFlag_ |= OP_CHU;
 					logic->nextOperValue1_ = 0;					//暗杠和补杠不指定杠的牌
 					logic->nextOperValue2_ = newPai;			//新摸的牌放在V2
-
-					clearSpecialOper(logic);
 				}
 			}
 				break;
