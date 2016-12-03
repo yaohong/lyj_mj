@@ -45,6 +45,13 @@
 	value2 :: integer()
 }).
 
+-record(hh_hupai_result, {
+	seat_number :: integer(),
+	value :: integer(),
+	type :: integer(),
+	fangpao_set_number :: integer()
+}).
+
 -record(hh_error_log, {
 	log :: list()
 }).
@@ -64,6 +71,7 @@
 	next :: #hh_next_oper{},
 	state_flag :: integer(),
 	error_flag :: integer(),
+	hupai_result :: #hh_hupai_result{},
 	error_log :: #hh_error_log{}
 }).
 

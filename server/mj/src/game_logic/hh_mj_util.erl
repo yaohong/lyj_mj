@@ -22,7 +22,7 @@ generate_main_logic(Bin) ->
 		BrankerNumber:?BIG_UINT8,SpecialData:8/binary, HuData:5/binary,
 		ChuPaiSeatNum:?BIG_INT8, ChuPaiValue:?BIG_UINT8,
 		OldData:5/binary, NextData:4/binary,StateFlag:?BIG_UINT8,ErrorFlag:?BIG_UINT8,
-		ErrorLogData:256/binary
+		HupaiResult:4/binary, ErrorLogData:256/binary
 	>> = Bin,
 	HeadLen = PoolHeadReadIndex,
 	TailLen = ?HH_POOL_COUNT - 1 - PoolTailReadIndex,
@@ -44,6 +44,7 @@ generate_main_logic(Bin) ->
 		next = generage_next(NextData),
 		state_flag = StateFlag,
 		error_flag = ErrorFlag,
+		hupai_result = generage_hupai_result(HupaiResult),
 		error_log = generage_error_log(ErrorLogData)
 	}.
 
@@ -128,6 +129,18 @@ generage_next(NextData) ->
 		value2 = Value2
 	}.
 
+generage_hupai_result(Data) ->
+	<<
+		SeatNumber:?BIG_INT8, Value:?BIG_UINT8,
+		Type:?BIG_UINT8, FangpaoSeatNumber:?BIG_INT8
+	>> = Data,
+	#hh_hupai_result{
+		seat_number = SeatNumber,
+		value = Value,
+		type = Type,
+		fangpao_set_number = FangpaoSeatNumber
+	}.
+
 str_pai(0) -> "(0)";
 str_pai(Pai)  -> str_pai(pai_type(Pai), pai_value(Pai)) ++ "(" ++ integer_to_list(Pai) ++ ")".
 
@@ -184,6 +197,7 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 	Hu = Logic#hh_main_logic.hu,
 	Old = Logic#hh_main_logic.old,
 	Next = Logic#hh_main_logic.next,
+	Result = Logic#hh_main_logic.hupai_result,
 	?FILE_LOG_DEBUG(
 		"--------start print--------\n"
 		"pai_pool:~p ~p\n"
@@ -229,6 +243,11 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 		"	value2:~p\n"
 		"state_flag:~p\n"
 		"error_flag:~p\n"
+		"hupai_result:\n"
+		"	seat_number:~p\n"
+		"	value:~p\n"
+		"	type:~p\n"
+		"	fangpao_set_number:~p\n"
 		"error_log:~p\n"
 		,
 		[
@@ -284,6 +303,12 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 
 			Logic#hh_main_logic.state_flag,
 			Logic#hh_main_logic.error_flag,
+
+			Result#hh_hupai_result.seat_number,
+			str_pai(Result#hh_hupai_result.value),
+			Result#hh_hupai_result.type,
+			Result#hh_hupai_result.fangpao_set_number,
+
 			Logic#hh_main_logic.error_log#hh_error_log.log
 		]
 	),

@@ -751,6 +751,13 @@ namespace hh
 					//自摸胡
 					assert(operSeat.writeIndex_ % 3 == 2);
 					assert(common::IsHu(operSeat.pai_, operSeat.writeIndex_));
+					assert(logic->nextOperValue2_ != 0);
+
+					logic->hupaiSeatNumber_ = operSeatNumber;
+					logic->hupaiValue_ = logic->nextOperValue2_;
+					logic->hupaiType_ = 0;
+					logic->fangpaoSeatNumber_ = -1;
+
 					logic->stateFlag_ = 2;
 				}
 				else 
@@ -764,7 +771,14 @@ namespace hh
 					//手牌肯定是3n+1
 					assert(operSeat.writeIndex_ % 3 == 1);
 					assert(common::IsTing(operSeat.pai_, operSeat.writeIndex_, v1));
+					assert(logic->chuPaiSeatNumber_ != -1);
 					common::AddSinglePai(operSeat.pai_, operSeat.writeIndex_, v1);
+
+					logic->hupaiSeatNumber_ = operSeatNumber;
+					logic->hupaiValue_ = logic->nextOperValue1_;
+					logic->hupaiType_ = 1;
+					logic->fangpaoSeatNumber_ = logic->chuPaiSeatNumber_;
+
 					logic->stateFlag_ = 2;
 				}
 			}

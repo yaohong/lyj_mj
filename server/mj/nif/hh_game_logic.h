@@ -51,6 +51,12 @@ namespace hh
 		qp_uint8    stateFlag_;					//状态标志(0为游戏中,大于0为结束原因）
 		qp_uint8	errorFlag_;					//1表示出错了
 
+
+		qp_int8		hupaiSeatNumber_;			//胡牌的座位号
+		qp_uint8	hupaiValue_;				//胡牌的值
+		qp_uint8	hupaiType_;					//胡牌类型(0：自摸，1：吃胡)
+		qp_int8		fangpaoSeatNumber_;			//如果是吃胡则是放炮的座位号
+
 		char		errorLogBuff_[HH_LOG_LEN];		//存放日志的buff
 		qp_uint8	errorLogLen;			//日志的写入偏移
 
