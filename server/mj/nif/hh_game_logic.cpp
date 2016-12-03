@@ -106,6 +106,27 @@ namespace hh
 		clearHuOper(logic);
     }
 
+	void setError(MainLogic *logic, const char *fmt, ...)
+	{
+		//		assert(logic->errorFlag_ == 0);
+		va_list va;
+		va_start(va, fmt);
+		qp_int32 rt = vsnprintf(logic->errorLogBuff_ + logic->errorLogLen, HH_LOG_LEN - logic->errorLogLen, fmt, va);
+		va_end(va);
+		logic->errorLogLen += rt;
+		logic->errorFlag_ = 1;
+	}
+
+
+	void writeLog(MainLogic *logic, const char *fmt, ...)
+	{
+		va_list va;
+		va_start(va, fmt);
+		qp_int32 rt = vsnprintf(logic->errorLogBuff_ + logic->errorLogLen, HH_LOG_LEN - logic->errorLogLen, fmt, va);
+		va_end(va);
+		logic->errorLogLen += rt;
+	}
+
 	bool isEnd(MainLogic *logic)
 	{
 		return (logic->poolHeadReadIndex_ == 0 && logic->poolTailReadIndex_ == 0);
@@ -367,27 +388,6 @@ namespace hh
 		}
 
 		return false;
-	}
-
-	void setError(MainLogic *logic, const char *fmt, ...)
-	{
-//		assert(logic->errorFlag_ == 0);
-		va_list va;
-		va_start(va, fmt);
-		qp_int32 rt = vsnprintf(logic->errorLogBuff_ + logic->errorLogLen, HH_LOG_LEN - logic->errorLogLen, fmt, va);
-		va_end(va);
-		logic->errorLogLen += rt;
-		logic->errorFlag_ = 1;
-	}
-
-
-	void writeLog(MainLogic *logic, const char *fmt, ...)
-	{
-		va_list va;
-		va_start(va, fmt);
-		qp_int32 rt = vsnprintf(logic->errorLogBuff_ + logic->errorLogLen, HH_LOG_LEN - logic->errorLogLen, fmt, va);
-		va_end(va);
-		logic->errorLogLen += rt;
 	}
 
 	void Oper(MainLogic *logic, qp_int8 operSeatNumber, qp_uint8 operType, qp_uint8 v1, qp_uint8 v2)
