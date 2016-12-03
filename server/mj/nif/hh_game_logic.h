@@ -49,7 +49,7 @@ namespace hh
 
 
 		qp_uint8    stateFlag_;					//状态标志(0为游戏中,大于0为结束原因）
-		qp_uint8	errorFlag_;					//1表示出错了
+		qp_uint8	errorFlag_;					//0游戏中，1表示出错了
 
 
 		qp_int8		hupaiSeatNumber_;			//胡牌的座位号

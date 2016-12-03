@@ -68,19 +68,43 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 	?FILE_LOG_DEBUG("game_data seat_num=~p, type=~p, v1=~p, v2=~p", [SeatNum, Type, V1, V2]),
 	{success} = mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNum, Type ,undefine_transform(V1), undefine_transform(V2)),
 	Logic = hh_mj_util:generate_main_logic(GameBin),
+	Result = Logic#hh_main_logic.hupai_result,
 	hh_mj_util:print(Logic),
-	Old = Logic#hh_main_logic.old,
-	Next = Logic#hh_main_logic.next,
-	Notify1 =
-		#qp_mj_oper_notify{
-			seat_numer = Old#hh_old_oper.seat_number,
-			type = Old#hh_old_oper.type,
-			v1 = Old#hh_old_oper.value1,
-			v2 = Old#hh_old_oper.value2,
-			v3 = Logic#hh_main_logic.chupai_seatnumber
-		},
-	SendSeatData = encode_oper_seat_data(Next, Notify1, [0,1,2,3], []),
-	{success, {<<>>, SendSeatData, <<>>}}.
+	if
+		Logic#hh_main_logic.state_flag =:= 0 ->
+			Old = Logic#hh_main_logic.old,
+			Next = Logic#hh_main_logic.next,
+			Notify1 =
+				#qp_mj_oper_notify{
+					seat_numer = Old#hh_old_oper.seat_number,
+					type = Old#hh_old_oper.type,
+					v1 = Old#hh_old_oper.value1,
+					v2 = Old#hh_old_oper.value2,
+					v3 = Logic#hh_main_logic.chupai_seatnumber
+				},
+			SendSeatData = encode_oper_seat_data(Next, Notify1, [0,1,2,3], []),
+			{success, {<<>>, SendSeatData, <<>>}};
+		Logic#hh_main_logic.state_flag =:= 1 ->
+			%%穿掉了
+			ok;
+		Logic#hh_main_logic.state_flag =:= 2 ->
+			%%游戏结束了
+			QpEndResult =
+				#qp_mj_game_end_notify {
+					end_type = 2,
+					hupai_seatnumber = Result#hh_hupai_result.seat_number,
+					hupai_value = Result#hh_hupai_result.value,
+					hupai_type = Result#hh_hupai_result.type,
+					fangpao_seatnumber = Result#hh_hupai_result.fangpao_set_number,
+					seat0_pai = Logic#hh_main_logic.seat0#hh_seat.pai,
+					seat1_pai = Logic#hh_main_logic.seat1#hh_seat.pai,
+					seat2_pai = Logic#hh_main_logic.seat2#hh_seat.pai,
+					seat3_pai = Logic#hh_main_logic.seat3#hh_seat.pai
+				},
+			HuPaiResultBin = hh_mj_proto:encode_packet(QpEndResult),
+			{success, {HuPaiResultBin, [], <<>>}}
+	end.
+
 
 encode_oper_seat_data(_Next, _Notify, [], Out) -> Out;
 encode_oper_seat_data(Next, Notify, [SeatNum|T], Out) when Next#hh_next_oper.seat_number =:= SeatNum ->

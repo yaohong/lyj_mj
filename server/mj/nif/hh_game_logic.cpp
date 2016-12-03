@@ -403,7 +403,6 @@ namespace hh
 		{
 			//操作类型不对
 			setError(logic, "logic->nextOperFlag_=%d, operType=%d\n", logic->nextOperFlag_, operType);
-			logic->errorFlag_ = 1;
 			return;
 		}
 

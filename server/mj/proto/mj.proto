@@ -24,7 +24,15 @@ message qp_mj_game_start_notify {
 }
 
 message qp_mj_game_end_notify {
-    required uint32 a = 1;
+    required uint32 end_type = 1;               //0：中途有人退出了 1：游戏穿掉了 2：游戏正常结束
+    required int32  hupai_seatnumber = 2;       //end_type=2时，胡牌的座位号
+    required uint32 hupai_value = 3;            //end_type=2时，胡牌的值
+    required uint32 hupai_type = 4;             //end_type=2时，0自摸 1吃胡
+    required int32  fangpao_seatnumber = 5;     //end_type=2时, 吃胡时，放炮的座位号
+    repeated uint32 seat0_pai = 6;
+    repeated uint32 seat1_pai = 7;
+    repeated uint32 seat2_pai = 8;
+    repeated uint32 seat3_pai = 9;
 }
 
 message qp_mj_oper_req {
