@@ -209,9 +209,10 @@ namespace hh
 		{
 			qp_uint8 nextSeatNum = (operSeatNum + i) % 4;
 			Seat &nextSeat = logic->seats_[nextSeatNum];
+			writeLog(logic, "generateHuOper nextSeatNum=%d cp=%d\n", nextSeatNum, cp);
 			if (common::IsTing(nextSeat.pai_, nextSeat.writeIndex_, cp))
 			{
-				logic->huOperQueue_[logic->huOperCount_++] = operSeatNum;
+				logic->huOperQueue_[logic->huOperCount_++] = nextSeatNum;
 			}
 		}
 	}
@@ -373,10 +374,20 @@ namespace hh
 //		assert(logic->errorFlag_ == 0);
 		va_list va;
 		va_start(va, fmt);
-		qp_int32 rt = vsnprintf(logic->errorLogBuff_, HH_LOG_LEN, fmt, va);
+		qp_int32 rt = vsnprintf(logic->errorLogBuff_ + logic->errorLogLen, HH_LOG_LEN - logic->errorLogLen, fmt, va);
 		va_end(va);
-		logic->errorLogLen = rt;
+		logic->errorLogLen += rt;
 		logic->errorFlag_ = 1;
+	}
+
+
+	void writeLog(MainLogic *logic, const char *fmt, ...)
+	{
+		va_list va;
+		va_start(va, fmt);
+		qp_int32 rt = vsnprintf(logic->errorLogBuff_ + logic->errorLogLen, HH_LOG_LEN - logic->errorLogLen, fmt, va);
+		va_end(va);
+		logic->errorLogLen += rt;
 	}
 
 	void Oper(MainLogic *logic, qp_int8 operSeatNumber, qp_uint8 operType, qp_uint8 v1, qp_uint8 v2)
@@ -945,11 +956,12 @@ int main( int argc, const char * argv[] )
 	//	printf("\n");
 	//}
 	//qp_uint8 pai[13] = {17,17,17, 18, 19, 20, 21, 22, 23, 24, 25, 25, 25 };
-	qp_uint8 pai[10] = { 18, 18, 18, 19, 20, 21, 22, 23, 23, 23 };
+	//qp_uint8 pai[10] = { 18, 18, 18, 19, 20, 21, 22, 23, 23, 23 };
+	qp_uint8 pai[4] = { 21, 22, 34, 34};
 	printf("ting: \n");
 	for (qp_uint8 i = 0; i < common::MAX_TITLE_INDEX; i++)
 	{
-		if (common::IsTing(pai, 10, common::PAI_ARRAY[i]))
+		if (common::IsTing(pai, 4, common::PAI_ARRAY[i]))
 		{
 			printf("%s ", common::getPaiString(common::PAI_ARRAY[i]).c_str());
 		}
