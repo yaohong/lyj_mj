@@ -240,7 +240,7 @@ namespace hh
 
 	bool pickingHuOper(MainLogic *logic, qp_int8 &operSeatNumber)
 	{
-		if (logic->specialOperCount_ == logic->specialOperIndex_)
+		if (logic->huOperCount_ == logic->huOperIndex_)
 		{
 			return false;
 		}
