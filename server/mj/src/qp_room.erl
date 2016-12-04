@@ -379,8 +379,8 @@ game({game_data, {UserKey, SeatNum, GameData}}, _From, #state{seat_list = SeatLi
 							broadcast(SeatList, {room_bin_msg, BrocastBin}),
 							NewSeatList =
 								lists:map(
-									fun({SeatNumber, SeatData}) ->
-										{SeatNumber, SeatData#seat_data{is_ready = false}}
+									fun({TmpSeatNumber, TmpSeatData}) ->
+										{TmpSeatNumber, TmpSeatData#seat_data{is_ready = false}}
 									end, SeatList),
 							?FILE_LOG_DEBUG("game_end.", []),
 							{reply, success, idle, State#state{game_private_data = NewPriveData, seat_list = NewSeatList}}
