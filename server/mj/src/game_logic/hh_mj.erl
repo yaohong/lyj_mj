@@ -31,8 +31,9 @@ game_start(OldGameBin) when is_binary(OldGameBin) ->
 	Logic = hh_mj_util:generate_main_logic(OldGameBin),
 	BankerSeatNumber =
 		if
-			Logic#hh_main_logic.state_flag =:= 1->
-				?FILE_LOG_DEBUG("game_start, old game_end state_flag=1, banker_seat_number=~p", [Logic#hh_main_logic.chupai_seatnumber]),
+			Logic#hh_main_logic.state_flag =:= 2->
+				Result = Logic#hh_main_logic.hupai_result,
+				?FILE_LOG_DEBUG("game_start, old game_end state_flag=2, banker_seat_number=~p", [Result#hh_hupai_result.seat_number]),
 				Logic#hh_main_logic.chupai_seatnumber;
 			true ->
 				?FILE_LOG_DEBUG("game_start, old game_end state_flag=~p, banker_seat_number=~p", [Logic#hh_main_logic.state_flag, Logic#hh_main_logic.chupai_seatnumber]),
