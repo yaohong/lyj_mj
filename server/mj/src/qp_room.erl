@@ -308,7 +308,7 @@ idle({ready, {UserKey, SeatNum, ReadyState}}, _From, #state{seat_list = SeatList
 							?FILE_LOG_DEBUG("check_all_ready true", []),
 							broadcast(NewSeatList, {change_game_state, RoomId}),
 							LogicMod = qp_logic_cfg:get_logic_mod(RoomType),
-							{success, {NewGamePrivateData, SendGameData}} = LogicMod:game_start(GamePrivateData),
+							{continue, {NewGamePrivateData, SendGameData}} = LogicMod:game_start(GamePrivateData),
 							send_game_data(SendGameData, NewSeatList),
 							%%所有玩家切换到游戏状态
 							{reply, {success, ReadyState}, game, State#state{seat_list = NewSeatList, game_private_data = NewGamePrivateData}};
@@ -371,11 +371,11 @@ game({game_data, {UserKey, SeatNum, GameData}}, _From, #state{seat_list = SeatLi
 				true ->
 					LogicMod = qp_logic_cfg:get_logic_mod(RoomType),
 					case LogicMod:game_oper(GamePrivateData, SeatNum, GameData) of
-						{continue, SendGameData} ->
+						{continue, {NewGamePrivateData, SendGameData}} ->
 							send_game_data(SendGameData, SeatList),
 							?FILE_LOG_DEBUG("game_continue.", []),
-							{reply, success, game, State};
-						{game_end, {BrocastBin, NewPriveData}} ->
+							{reply, success, game, State#state{game_private_data = NewGamePrivateData}};
+						{game_end, {NewGamePrivateData1, BrocastBin}} ->
 							broadcast(SeatList, {room_bin_msg, BrocastBin}),
 							NewSeatList =
 								lists:map(
@@ -383,7 +383,7 @@ game({game_data, {UserKey, SeatNum, GameData}}, _From, #state{seat_list = SeatLi
 										{TmpSeatNumber, TmpSeatData#seat_data{is_ready = false}}
 									end, SeatList),
 							?FILE_LOG_DEBUG("game_end.", []),
-							{reply, success, idle, State#state{game_private_data = NewPriveData, seat_list = NewSeatList}}
+							{reply, success, idle, State#state{game_private_data = NewGamePrivateData1, seat_list = NewSeatList}}
 					end;
 				false ->
 					%%不是同一个人
@@ -392,6 +392,49 @@ game({game_data, {UserKey, SeatNum, GameData}}, _From, #state{seat_list = SeatLi
 						[UserKey:get(user_id), UserKey:get(user_pid), SeatNum, SeatUserData:get(user_id), SeatUserData:get(user_pid)]),
 					{reply, failed, game, State}
 			end
+	end;
+game({quit, {UserKey, SeatNum}}, _From, #state{seat_list = SeatList, room_id = RoomId, room_type = RoomType, game_private_data = GamePrivateData} = State) ->
+	case quit_user_from_seat(UserKey, SeatNum, SeatList) of
+		failed -> {reply, failed, game, State};
+		{success, NewSeatList} ->
+			%%广播游戏数据
+			LogicMod = qp_logic_cfg:get_logic_mod(RoomType),
+			{BrocastBin, NewGamePrivateData} = LogicMod:game_quit(GamePrivateData, SeatNum),
+			broadcast(NewSeatList, {room_bin_msg, BrocastBin}),
+			%%广播退出房间的数据
+			?FILE_LOG_DEBUG("room_id[~p] user_id[~p] exit_room state[game=>idle].", [RoomId, UserKey:get(user_id)]),
+			ExitPushBin = qp_proto:encode_qp_packet(#qp_exit_room_push{seat_number = SeatNum}),
+			broadcast(NewSeatList, {room_bin_msg, ExitPushBin}),
+
+			NewSeatList1 =
+				lists:map(
+					fun({TmpSeatNumber, TmpSeatData}) ->
+						{TmpSeatNumber, TmpSeatData#seat_data{is_ready = false}}
+					end, NewSeatList),
+			{reply, success, idle, State#state{seat_list = NewSeatList1, game_private_data = NewGamePrivateData}}
+%%			%%广播给其他人
+%%			RoomUsers = extract_room_users(NewSeatList),
+%%			if
+%%				length(RoomUsers) =:= 0 ->
+%%					%%房间没人了
+%%					?FILE_LOG_DEBUG("room_id[~p] user_id[~p] exit_room, room empty.", [RoomId, UserKey:get(user_id)]),
+%%					{stop, normal, success, NewState};
+%%				true ->
+%%					if
+%%						SeatNum =:= 0 ->
+%%							%%房主退出了，房间解散
+%%							%%发送房间解散的消息
+%%							?FILE_LOG_DEBUG("room_id[~p] banker_user_Id[~p] exit_room, room dismiss.", [RoomId, UserKey:get(user_id)]),
+%%							broadcast(NewSeatList, {room_dismiss, RoomId}),
+%%							{stop, normal, success, NewState};
+%%						true ->
+%%							%%广播其他用户，有人退出房间了
+%%							?FILE_LOG_DEBUG("room_id[~p] user_id[~p] exit_room.", [RoomId, UserKey:get(user_id)]),
+%%							ExitPushBin = qp_proto:encode_qp_packet(#qp_exit_room_push{seat_number = SeatNum}),
+%%							broadcast(NewSeatList, {room_bin_msg, ExitPushBin}),
+%%							{reply, success, idle, NewState}
+%%					end
+%%			end
 	end;
 game(Event, _From, State) ->
 	?FILE_LOG_WARNING("room [game] event=~p", [Event]),
