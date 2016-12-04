@@ -370,9 +370,21 @@ game({game_data, {UserKey, SeatNum, GameData}}, _From, #state{seat_list = SeatLi
 			case UserKey:compare(SeatUserData) of
 				true ->
 					LogicMod = qp_logic_cfg:get_logic_mod(RoomType),
-					{success,  SendGameData} = LogicMod:game_oper(GamePrivateData, SeatNum, GameData),
-					send_game_data(SendGameData, SeatList),
-					{reply, success, game, State#state{seat_list = SeatList}};
+					case LogicMod:game_oper(GamePrivateData, SeatNum, GameData) of
+						{continue, SendGameData} ->
+							send_game_data(SendGameData, SeatList),
+							?FILE_LOG_DEBUG("game_continue.", []),
+							{reply, success, game, State};
+						{game_end, {BrocastBin, NewPriveData}} ->
+							broadcast(SeatList, {room_bin_msg, BrocastBin}),
+							NewSeatList =
+								lists:map(
+									fun({SeatNumber, SeatData}) ->
+										{SeatNumber, SeatData#seat_data{is_ready = false}}
+									end, SeatList),
+							?FILE_LOG_DEBUG("game_end.", []),
+							{reply, success, idle, State#state{game_private_data = NewPriveData, seat_list = NewSeatList}}
+					end;
 				false ->
 					%%不是同一个人
 					?FILE_LOG_WARNING(

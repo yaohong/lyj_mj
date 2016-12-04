@@ -14,21 +14,29 @@
 -export([test_game_start/0, test_game_oper/4]).
 %% API
 -export([
-		 init_private_data/0,
-		 game_start/1,
-		 game_oper/3]).
+	init_private_data/0,
+	game_start/1,
+	game_oper/3]).
 -define(GAME_TYPE, 0).
 
 init_private_data() ->
 	undefined.
 
 game_start(undefined) ->
-	{success, GameBin} = mj_nif:game_start(?GAME_TYPE, 0, qp_util:timestamp()),
+	{success, GameBin} = mj_nif:game_start(?GAME_TYPE, -1, qp_util:timestamp()),
 	game_start1(GameBin);
 game_start(OldGameBin) when is_binary(OldGameBin) ->
 	Logic = hh_mj_util:generate_main_logic(OldGameBin),
-	_OldBankerSeatNumber = Logic#hh_main_logic.banker_seat_number,
-	{success, GameBin} = mj_nif:game_start(?GAME_TYPE, 0, qp_util:timestamp()),
+	BankerSeatNumber =
+		if
+			Logic#hh_main_logic.state_flag =:= 1->
+				?FILE_LOG_DEBUG("game_start, old game_end state_flag=1, banker_seat_number=~p", [Logic#hh_main_logic.chupai_seatnumber]),
+				Logic#hh_main_logic.chupai_seatnumber;
+			true ->
+				?FILE_LOG_DEBUG("game_start, old game_end state_flag=~p, banker_seat_number=~p", [Logic#hh_main_logic.state_flag, Logic#hh_main_logic.chupai_seatnumber]),
+				Logic#hh_main_logic.banker_seat_number
+		end,
+	{success, GameBin} = mj_nif:game_start(?GAME_TYPE, BankerSeatNumber, qp_util:timestamp()),
 	game_start1(GameBin).
 
 game_start1(GameBin) when is_binary(GameBin) ->
@@ -38,7 +46,7 @@ game_start1(GameBin) when is_binary(GameBin) ->
 	Seat2 = Logic#hh_main_logic.seat2,
 	Seat3 = Logic#hh_main_logic.seat3,
 	SendSeatData = encode_seat_data(Logic, [{0, Seat0},{1, Seat1},{2, Seat2},{3, Seat3}]),
-	{success, {GameBin, {<<>>, SendSeatData, <<>>}}}.
+	{continue, {GameBin, {<<>>, SendSeatData, <<>>}}}.
 
 encode_seat_data(BankerSeatNum, SeatList) ->
 	encode_seat_data(BankerSeatNum, SeatList, []).
@@ -83,13 +91,28 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 					v3 = Logic#hh_main_logic.chupai_seatnumber
 				},
 			SendSeatData = encode_oper_seat_data(Next, Notify1, [0,1,2,3], []),
-			{success, {<<>>, SendSeatData, <<>>}};
+			{continue, {<<>>, SendSeatData, <<>>}};
 		Logic#hh_main_logic.state_flag =:= 1 ->
+			?FILE_LOG_DEBUG("state_flag=1 game_end.", []),
 			%%穿掉了
-			ok;
+			QpEndResult1 =
+				#qp_mj_game_end_notify {
+					end_type = 1,
+					hupai_seatnumber = -1,
+					hupai_value = 0,
+					hupai_type = 0,
+					fangpao_seatnumber = -1,
+					seat0_pai = Logic#hh_main_logic.seat0#hh_seat.pai,
+					seat1_pai = Logic#hh_main_logic.seat1#hh_seat.pai,
+					seat2_pai = Logic#hh_main_logic.seat2#hh_seat.pai,
+					seat3_pai = Logic#hh_main_logic.seat3#hh_seat.pai
+				},
+			HuPaiResultBin1 = hh_mj_proto:encode_packet(QpEndResult1),
+			{game_end, {HuPaiResultBin1, GameBin}};
 		Logic#hh_main_logic.state_flag =:= 2 ->
 			%%游戏结束了
-			QpEndResult =
+			?FILE_LOG_DEBUG("state_flag=2 game_end.", []),
+			QpEndResult2 =
 				#qp_mj_game_end_notify {
 					end_type = 2,
 					hupai_seatnumber = Result#hh_hupai_result.seat_number,
@@ -101,8 +124,8 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 					seat2_pai = Logic#hh_main_logic.seat2#hh_seat.pai,
 					seat3_pai = Logic#hh_main_logic.seat3#hh_seat.pai
 				},
-			HuPaiResultBin = hh_mj_proto:encode_packet(QpEndResult),
-			{success, {HuPaiResultBin, [], <<>>}}
+			HuPaiResultBin2 = hh_mj_proto:encode_packet(QpEndResult2),
+			{game_end, {HuPaiResultBin2, GameBin}}
 	end.
 
 
@@ -133,8 +156,8 @@ test_game_start() ->
 
 
 test_game_oper(SeatNumber, Type, V1, V2) ->
-    GameBin = get(game_bin),
+	GameBin = get(game_bin),
 	true = GameBin =/= undefined,
-    mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNumber, Type, V1, V2),
+	mj_nif:game_oper(GameBin, ?GAME_TYPE, SeatNumber, Type, V1, V2),
 	Logic = hh_mj_util:generate_main_logic(GameBin),
 	hh_mj_util:print(Logic).
