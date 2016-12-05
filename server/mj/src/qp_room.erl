@@ -209,7 +209,7 @@ quit_user_from_seat(UserKey, 2, [S0, S1, {2, SeatData}|T]) when is_record(SeatDa
 		false -> failed;
 		true -> {success, [S0, S1, {2, undefined}|T]}
 	end;
-quit_user_from_seat(UserKey, 3, [S0, S1, S2, {0, SeatData}]) when is_record(SeatData, seat_data) ->
+quit_user_from_seat(UserKey, 3, [S0, S1, S2, {3, SeatData}]) when is_record(SeatData, seat_data) ->
 	case UserKey:compare(SeatData#seat_data.user_data) of
 		false -> failed;
 		true -> {success, [S0, S1, S2, {3, undefined}]}
@@ -377,11 +377,7 @@ game({game_data, {UserKey, SeatNum, GameData}}, _From, #state{seat_list = SeatLi
 							{reply, success, game, State#state{game_private_data = NewGamePrivateData}};
 						{game_end, {NewGamePrivateData1, BrocastBin}} ->
 							broadcast(SeatList, {room_bin_msg, BrocastBin}),
-							NewSeatList =
-								lists:map(
-									fun({TmpSeatNumber, TmpSeatData}) ->
-										{TmpSeatNumber, TmpSeatData#seat_data{is_ready = false}}
-									end, SeatList),
+							NewSeatList = set_all_seat_ready_state(SeatList, false),
 							?FILE_LOG_DEBUG("game_end.", []),
 							{reply, success, idle, State#state{game_private_data = NewGamePrivateData1, seat_list = NewSeatList}}
 					end;
@@ -406,11 +402,7 @@ game({quit, {UserKey, SeatNum}}, _From, #state{seat_list = SeatList, room_id = R
 			ExitPushBin = qp_proto:encode_qp_packet(#qp_exit_room_push{seat_number = SeatNum}),
 			broadcast(NewSeatList, {room_bin_msg, ExitPushBin}),
 
-			NewSeatList1 =
-				lists:map(
-					fun({TmpSeatNumber, TmpSeatData}) ->
-						{TmpSeatNumber, TmpSeatData#seat_data{is_ready = false}}
-					end, NewSeatList),
+			NewSeatList1 = set_all_seat_ready_state(NewSeatList, false),
 			{reply, success, idle, State#state{seat_list = NewSeatList1, game_private_data = NewGamePrivateData}}
 %%			%%广播给其他人
 %%			RoomUsers = extract_room_users(NewSeatList),
@@ -586,3 +578,16 @@ send_game_data({BroadcastHeadBinData, SendSeatData, BroadcastTailBinData}, SeatL
 		end,  SendSeatData),
 	broadcast(SeatList, {room_bin_msg, BroadcastTailBinData}),
 	ok.
+
+
+set_all_seat_ready_state(SeatList, ReadyState) when is_boolean(ReadyState) ->
+	lists:map(
+		fun({TmpSeatNumber, TmpSeatData}) ->
+			if
+				TmpSeatData =:= undefined -> {TmpSeatNumber, TmpSeatData};
+				true ->
+					true = is_record(TmpSeatData, seat_data),
+					{TmpSeatNumber, TmpSeatData#seat_data{is_ready = ReadyState}}
+			end
+		end, SeatList).
+
