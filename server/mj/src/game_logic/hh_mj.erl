@@ -91,7 +91,8 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 					type = Old#hh_old_oper.type,
 					v1 = Old#hh_old_oper.value1,
 					v2 = Old#hh_old_oper.value2,
-					v3 = Logic#hh_main_logic.chupai_seatnumber
+					v3 = Logic#hh_main_logic.chupai_seatnumber,
+					next_oper_seat_num = Next#hh_next_oper.seat_number
 				},
 			SendSeatData = encode_oper_seat_data(Next, Notify1, [0,1,2,3], []),
 			{continue, {GameBin, {<<>>, SendSeatData, <<>>}}};
@@ -152,7 +153,6 @@ game_quit(GameBin, SeatNum) when is_binary(GameBin) andalso is_integer(SeatNum) 
 encode_oper_seat_data(_Next, _Notify, [], Out) -> Out;
 encode_oper_seat_data(Next, Notify, [SeatNum|T], Out) when Next#hh_next_oper.seat_number =:= SeatNum ->
 	NewNotify = Notify#qp_mj_oper_notify{
-		next_oper_seat_num = Next#hh_next_oper.seat_number,
 		next_oper_flag = Next#hh_next_oper.flag,
 		next_oper_value1 = Next#hh_next_oper.value1,
 		next_oper_value2 = Next#hh_next_oper.value2},
