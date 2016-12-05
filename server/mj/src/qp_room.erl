@@ -357,7 +357,7 @@ idle(Event, _From, State) ->
 	?FILE_LOG_WARNING("room [idle] event=~p", [Event]),
 	{reply, failed, idle, State}.
 
-game({game_data, {UserKey, SeatNum, GameData}}, _From, #state{seat_list = SeatList, room_type = RoomType, game_private_data = GamePrivateData} = State) ->
+game({game_data, {UserKey, SeatNum, GameData}}, _From, #state{seat_list = SeatList, room_type = RoomType, room_id = RoomId, game_private_data = GamePrivateData} = State) ->
 	case proplists:get_value(SeatNum, SeatList, none) of
 		undefined ->
 			?FILE_LOG_WARNING("user_id[~p] game_data seat_num[~p] undefined", [UserKey:get(user_id), SeatNum]),
@@ -377,6 +377,7 @@ game({game_data, {UserKey, SeatNum, GameData}}, _From, #state{seat_list = SeatLi
 							{reply, success, game, State#state{game_private_data = NewGamePrivateData}};
 						{game_end, {NewGamePrivateData1, BrocastBin}} ->
 							broadcast(SeatList, {room_bin_msg, BrocastBin}),
+							broadcast(SeatList, {change_room_state, RoomId}),
 							NewSeatList = set_all_seat_ready_state(SeatList, false),
 							?FILE_LOG_DEBUG("game_end.", []),
 							{reply, success, idle, State#state{game_private_data = NewGamePrivateData1, seat_list = NewSeatList}}
@@ -399,34 +400,22 @@ game({quit, {UserKey, SeatNum}}, _From, #state{seat_list = SeatList, room_id = R
 			broadcast(NewSeatList, {room_bin_msg, BrocastBin}),
 			%%广播退出房间的数据
 			?FILE_LOG_DEBUG("room_id[~p] user_id[~p] exit_room state[game=>idle].", [RoomId, UserKey:get(user_id)]),
-			ExitPushBin = qp_proto:encode_qp_packet(#qp_exit_room_push{seat_number = SeatNum}),
-			broadcast(NewSeatList, {room_bin_msg, ExitPushBin}),
-
-			NewSeatList1 = set_all_seat_ready_state(NewSeatList, false),
-			{reply, success, idle, State#state{seat_list = NewSeatList1, game_private_data = NewGamePrivateData}}
-%%			%%广播给其他人
-%%			RoomUsers = extract_room_users(NewSeatList),
-%%			if
-%%				length(RoomUsers) =:= 0 ->
-%%					%%房间没人了
-%%					?FILE_LOG_DEBUG("room_id[~p] user_id[~p] exit_room, room empty.", [RoomId, UserKey:get(user_id)]),
-%%					{stop, normal, success, NewState};
-%%				true ->
-%%					if
-%%						SeatNum =:= 0 ->
-%%							%%房主退出了，房间解散
-%%							%%发送房间解散的消息
-%%							?FILE_LOG_DEBUG("room_id[~p] banker_user_Id[~p] exit_room, room dismiss.", [RoomId, UserKey:get(user_id)]),
-%%							broadcast(NewSeatList, {room_dismiss, RoomId}),
-%%							{stop, normal, success, NewState};
-%%						true ->
-%%							%%广播其他用户，有人退出房间了
-%%							?FILE_LOG_DEBUG("room_id[~p] user_id[~p] exit_room.", [RoomId, UserKey:get(user_id)]),
-%%							ExitPushBin = qp_proto:encode_qp_packet(#qp_exit_room_push{seat_number = SeatNum}),
-%%							broadcast(NewSeatList, {room_bin_msg, ExitPushBin}),
-%%							{reply, success, idle, NewState}
-%%					end
-%%			end
+			if
+				SeatNum =:= 0 ->
+					%%房主退出了，房间解散
+					%%发送房间解散的消息
+					?FILE_LOG_DEBUG("room_id[~p] banker_user_Id[~p] exit_room, room dismiss.", [RoomId, UserKey:get(user_id)]),
+					broadcast(NewSeatList, {room_dismiss, RoomId}),
+					{stop, normal, success, State#state{seat_list = NewSeatList}};
+				true ->
+					%%广播其他用户，有人退出房间了
+					?FILE_LOG_DEBUG("room_id[~p] user_id[~p] exit_room.", [RoomId, UserKey:get(user_id)]),
+					ExitPushBin = qp_proto:encode_qp_packet(#qp_exit_room_push{seat_number = SeatNum}),
+					broadcast(NewSeatList, {room_bin_msg, ExitPushBin}),
+					broadcast(NewSeatList, {change_room_state, RoomId}),
+					NewSeatList1 = set_all_seat_ready_state(NewSeatList, false),
+					{reply, success, idle, State#state{seat_list = NewSeatList1, game_private_data = NewGamePrivateData}}
+			end
 	end;
 game(Event, _From, State) ->
 	?FILE_LOG_WARNING("room [game] event=~p", [Event]),

@@ -158,19 +158,14 @@ hall(Event, #state{user_data = UserData} = State) ->
 room({room_bin_msg, Bin}, State) ->
 	send_bin(Bin, State),
 	{next_state, room, State};
-room({room_dismiss, RoomId}, #state{user_data = UserData, room_data = RoomData} = State) ->
+room({room_dismiss, RoomId}, #state{user_data = UserData, room_data = #room_data{room_id = RoomId}} = State) ->
 	#user_data{user_id = UserId} = UserData,
-	#room_data{room_id = CurrentRoomId} = RoomData,
-	if
-		RoomId =:= CurrentRoomId ->
-			?FILE_LOG_DEBUG("user_id[~p] [room] room_dismiss,state_name => hall", [UserId]),
-			send_packet(#qp_room_dismiss_push{room_id = RoomId}, State),
-			{next_state, hall, State#state{room_data = undefined}};
-		true -> {next_state, room, State}
-	end;
+	?FILE_LOG_DEBUG("user_id[~p] [room] room_dismiss,state_name => hall", [UserId]),
+	send_packet(#qp_room_dismiss_push{room_id = RoomId}, State),
+	{next_state, hall, State#state{room_data = undefined}};
 room({change_game_state, RoomId}, #state{room_data = #room_data{room_id = RoomId}, user_data = UserData} = State) ->
 	#user_data{user_id = UserId} = UserData,
-	?FILE_LOG_WARNING("user_id=~p change_game_state", [UserId]),
+	?FILE_LOG_DEBUG("user_id=~p change_game_state state_name => game", [UserId]),
 	{next_state, game, State};
 room(Event, State) ->
 	?FILE_LOG_WARNING("~p ~p", [Event, State]),
@@ -180,16 +175,15 @@ room(Event, State) ->
 game({room_bin_msg, Bin}, State) when is_binary(Bin) ->
 	send_bin(Bin, State),
 	{next_state, game, State};
-game({room_dismiss, RoomId}, #state{user_data = UserData, room_data = RoomData} = State) ->
+game({change_room_state, RoomId}, #state{user_data = UserData, room_data = #room_data{room_id = RoomId}} = State) ->
 	#user_data{user_id = UserId} = UserData,
-	#room_data{room_id = CurrentRoomId} = RoomData,
-	if
-		RoomId =:= CurrentRoomId ->
-			?FILE_LOG_DEBUG("user_id[~p] [game] room_dismiss,state_name => hall ", [UserId]),
-			send_packet(#qp_room_dismiss_push{room_id = RoomId}, State),
-			{next_state, hall, State#state{room_data = undefined}};
-		true -> {next_state, room, State}
-	end;
+	?FILE_LOG_DEBUG("user_id[~p] [game] change_room_state,state_name => room ", [UserId]),
+	{next_state, room, State};
+game({room_dismiss, RoomId}, #state{user_data = UserData, room_data = #room_data{room_id = RoomId}} = State) ->
+	#user_data{user_id = UserId} = UserData,
+	?FILE_LOG_DEBUG("user_id[~p] [game] room_dismiss,state_name => hall ", [UserId]),
+	send_packet(#qp_room_dismiss_push{room_id = RoomId}, State),
+	{next_state, hall, State#state{room_data = undefined}};
 game(Event, State) ->
 	?FILE_LOG_WARNING("~p", [Event]),
 	{next_state, game, State}.
@@ -497,14 +491,12 @@ packet_handle(Request, room, State) ->
 	{room, State, false};
 
 
-packet_handle(#qp_game_data{game_data = GameData}=Request, game, #state{room_data = RoomData, user_data = UserData} = State) ->
+packet_handle(#qp_game_data{game_data = GameData}, game, #state{room_data = RoomData, user_data = UserData} = State) ->
 	#room_data{room_id = _, seat_num = SeatNum, room_pid = RoomPid} = RoomData,
 	#user_data{user_id = UserId} = UserData,
 	?FILE_LOG_DEBUG("user_id[~p] [game] qp_game_data", [UserId]),
 	case qp_room:game_data(RoomPid, qp_user_key:new(UserId, self()), SeatNum, GameData) of
 		success ->
-%%			?FILE_LOG_DEBUG("user_id[~p] [room] qp_exit_room success", [UserId]),
-%%			send_packet(#qp_exit_room_rsp{result = 0}, State),
 			{game, State, true};
 		failed ->
 			?FILE_LOG_DEBUG("user_id[~p] [room] qp_exit_room failed", [UserId]),
