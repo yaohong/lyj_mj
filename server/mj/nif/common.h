@@ -24,6 +24,18 @@
 #define qp_uint32 unsigned int
 #define qp_int32 int
 
+
+//杠的类型
+#define MING_GANG 0		//明杠
+#define BU_GANG 1		//补杠
+#define AN_GANG 2		//暗杠
+
+
+//吃的类型
+#define LEFT_CHI 0			//左吃
+#define MIDDLE_CHI 1		//中间吃
+#define RIGHT_CHI 2			//右边吃
+
 //能够进行的操作
 #define OP_NONE 0				
 #define OP_CHI 1 				//1 << 0

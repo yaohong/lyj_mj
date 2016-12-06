@@ -10,10 +10,14 @@
 -ifndef(_hh_mj_h__).
 -define(_hh_mj_h__, 0).
 
+-record(hh_seat_chi, {pai :: integer(), type :: integer()}).
+-record(hh_seat_peng, {pai :: integer(), seat_number :: integer()}).
+-record(hh_seat_gang, {pai :: integer(), type :: integer(), seat_number :: integer()}).
+
 -record(hh_seat, {
-	chi :: [integer()],				%%吃的牌
-	peng :: [integer()],			%%碰的牌
-	gang :: [integer()],			%%杠的牌
+	chi :: [#hh_seat_chi{}],				%%吃的牌
+	peng :: [#hh_seat_peng{}],			%%碰的牌
+	gang :: [#hh_seat_gang{}],			%%杠的牌
 	pai :: [integer()]				%%自己手里的牌
 }).
 

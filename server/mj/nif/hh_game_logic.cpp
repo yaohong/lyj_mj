@@ -132,27 +132,27 @@ namespace hh
 		return (logic->poolHeadReadIndex_ == 0 && logic->poolTailReadIndex_ == 0);
 	}
 
-	void addSpecialOper(MainLogic *logic, qp_uint8 seatNum, qp_uint8 operType)
+	void addSpecialOper(MainLogic *logic, qp_int8 seatNum, qp_uint8 operType)
 	{
 		assert(logic->specialOperCount_ < 3);
 		for (qp_uint8 i = 0; i < logic->specialOperCount_; i++)
 		{
-			if (logic->specialOperQueue_[i][0] == seatNum)
+			if (logic->specialOperQueue_[i].seatNumber_ == seatNum)
 			{
-				logic->specialOperQueue_[i][1] |= operType;
+				logic->specialOperQueue_[i].operType_ |= operType;
 				return;
 			}
 		}
 
 		//没有找到则添加到末尾
-		logic->specialOperQueue_[logic->specialOperCount_][0] = seatNum;
-		logic->specialOperQueue_[logic->specialOperCount_][1] = operType;
+		logic->specialOperQueue_[logic->specialOperCount_].seatNumber_ = seatNum;
+		logic->specialOperQueue_[logic->specialOperCount_].operType_ = operType;
 		logic->specialOperCount_++;
 		
 	}
 
 	//杠吃碰 (不考虑暗杠)
-	void generateSpecialOper(MainLogic *logic, qp_uint8 operSeatNum, qp_uint8 cp)
+	void generateSpecialOper(MainLogic *logic, qp_int8 operSeatNum, qp_uint8 pai)
 	{
 		clearSpecialOper(logic);
 
@@ -162,7 +162,7 @@ namespace hh
 			if (i != operSeatNum)
 			{
 				Seat &tmpSeat = logic->seats_[i];
-				if (common::IsGang1(tmpSeat.pai_, tmpSeat.writeIndex_, cp))
+				if (common::IsGang1(tmpSeat.pai_, tmpSeat.writeIndex_, pai))
 				{
 					//可以杠
 					addSpecialOper(logic, i, OP_GANG | OP_GUO);
@@ -178,7 +178,7 @@ namespace hh
 			if (i != operSeatNum)
 			{
 				Seat &tmpSeat = logic->seats_[i];
-				if (common::IsPeng(tmpSeat.pai_, tmpSeat.writeIndex_, cp))
+				if (common::IsPeng(tmpSeat.pai_, tmpSeat.writeIndex_, pai))
 				{
 					//可以杠
 					addSpecialOper(logic, i, OP_PENG | OP_GUO);
@@ -192,7 +192,7 @@ namespace hh
 		{
 			qp_uint8 nextSeatNumber = (operSeatNum + 1) % 4;
 			Seat &nextSeat = logic->seats_[nextSeatNumber];
-			if (common::IsChi(nextSeat.pai_, nextSeat.writeIndex_, cp))
+			if (common::IsChi(nextSeat.pai_, nextSeat.writeIndex_, pai))
 			{
 				addSpecialOper(logic, nextSeatNumber, OP_CHI | OP_GUO);
 			}
@@ -208,8 +208,8 @@ namespace hh
 			return false;
 		}
 
-		operSeatNumber = logic->specialOperQueue_[logic->specialOperIndex_][0];
-		operType = logic->specialOperQueue_[logic->specialOperIndex_][1];
+		operSeatNumber = logic->specialOperQueue_[logic->specialOperIndex_].seatNumber_;
+		operType = logic->specialOperQueue_[logic->specialOperIndex_].operType_;
 		logic->specialOperIndex_++;
 		return true;
 	}
@@ -292,16 +292,17 @@ namespace hh
 	}
 
 
-	void addChi(MainLogic *logic, qp_int8 seatNumber, qp_uint8 v)
+	void addChi(MainLogic *logic, qp_int8 seatNumber, qp_uint8 v, qp_uint8 type)
 	{
 		assert(seatNumber >= 0 && seatNumber < 4);
 		assert(v > 0);
 		Seat &seat = logic->seats_[seatNumber];
 		for (qp_uint8 i = 0; i < 4; i++)
 		{
-			if (seat.chi_[i] == 0)
+			if (seat.chi_[i].pai_ == 0)
 			{
-				seat.chi_[i] = v;
+				seat.chi_[i].pai_ = v;
+				seat.chi_[i].type_ = type;
 				return;
 			}
 		}
@@ -309,16 +310,17 @@ namespace hh
 		assert(false);
 	}
 
-	void addPeng(MainLogic *logic, qp_int8 seatNumber, qp_uint8 v)
+	void addPeng(MainLogic *logic, qp_int8 seatNumber, qp_uint8 v, qp_int8 fangpengSeatNumber)
 	{
 		assert(seatNumber >= 0 && seatNumber < 4);
 		assert(v > 0);
 		Seat &seat = logic->seats_[seatNumber];
 		for (qp_uint8 i = 0; i < 4; i++)
 		{
-			if (seat.peng_[i] == 0)
+			if (seat.peng_[i].pai_ == 0)
 			{
-				seat.peng_[i] = v;
+				seat.peng_[i].pai_ = v;
+				seat.peng_[i].seatNumber_ = fangpengSeatNumber;
 				return;
 			}
 		}
@@ -334,9 +336,9 @@ namespace hh
 		Seat &seat = logic->seats_[seatNumber];
 		for (qp_uint8 i = 0; i < 4; i++)
 		{
-			if (seat.peng_[i] == v)
+			if (seat.peng_[i].pai_ == v)
 			{
-				seat.peng_[i] = 0;
+				seat.peng_[i].pai_ = 0;
 				removeIndex = i;
 				break;
 			}
@@ -346,8 +348,9 @@ namespace hh
 		{
 			for (qp_uint8 i = removeIndex; i < 3; i++)
 			{
-				seat.peng_[i] = seat.peng_[i+1];
-				seat.peng_[i + 1] = 0;
+				seat.peng_[i].pai_ = seat.peng_[i+1].pai_;
+				seat.peng_[i].seatNumber_ = seat.peng_[i + 1].seatNumber_;
+				seat.peng_[i + 1].pai_ = 0;
 			}
 
 			return;
@@ -356,16 +359,18 @@ namespace hh
 		assert(false);
 	}
 
-	void addGang(MainLogic *logic, qp_int8 seatNumber, qp_uint8 v)
+	void addGang(MainLogic *logic, qp_int8 seatNumber, qp_uint8 v, qp_uint8 gangType, qp_int8 fanggangSeatNumber)
 	{
 		assert(seatNumber >= 0 && seatNumber < 4);
 		assert(v > 0);
 		Seat &seat = logic->seats_[seatNumber];
 		for (qp_uint8 i = 0; i < 4; i++)
 		{
-			if (seat.gang_[i] == 0)
+			if (seat.gang_[i].pai_ == 0)
 			{
-				seat.gang_[i] = v;
+				seat.gang_[i].pai_ = v;
+				seat.gang_[i].type_ = gangType;
+				seat.gang_[i].seatNumber_ = fanggangSeatNumber;
 				return;
 			}
 		}
@@ -381,7 +386,7 @@ namespace hh
 		Seat &seat = logic->seats_[seatNumber];
 		for (qp_uint8 i = 0; i < 4; i++)
 		{
-			if (seat.peng_[i] == v)
+			if (seat.peng_[i].pai_ == v)
 			{
 				return true;
 			}
@@ -439,6 +444,7 @@ namespace hh
 
 				qp_uint8 tmpChiPai[2] = { 0, 0 };
 				qp_uint8 chiSmallValue = 0;
+				qp_uint8 chiType = 0;
 				if (0 == v2)
 				{
 					//左chi
@@ -451,6 +457,7 @@ namespace hh
 					tmpChiPai[0] = PAI(paiType, paiValue + 1);
 					tmpChiPai[1] = PAI(paiType, paiValue + 2);
 					chiSmallValue = v1;
+					chiType = LEFT_CHI;
 				}
 				else if (1 == v2) 
 				{
@@ -464,6 +471,7 @@ namespace hh
 					tmpChiPai[0] = PAI(paiType, paiValue - 1);
 					tmpChiPai[1] = PAI(paiType, paiValue + 1);
 					chiSmallValue = tmpChiPai[0];
+					chiType = MIDDLE_CHI;
 				}
 				else if (2 == v2)
 				{
@@ -477,6 +485,7 @@ namespace hh
 					tmpChiPai[0] = PAI(paiType, paiValue - 2);
 					tmpChiPai[1] = PAI(paiType, paiValue - 1);
 					chiSmallValue = tmpChiPai[0];
+					chiType = RIGHT_CHI;
 				}
 				else 
 				{
@@ -497,7 +506,7 @@ namespace hh
 
 				//logic->oldOperValueSeatNumber_ = logic->chuPaiSeatNumber_;
 				//添加到吃里面
-				addChi(logic, operSeatNumber, chiSmallValue);
+				addChi(logic, operSeatNumber, chiSmallValue, chiType);
 
 				//////////////////////////////////////////////////////////////////////////////////////
 				logic->nextOperSeatNumber_ = operSeatNumber;
@@ -538,7 +547,7 @@ namespace hh
 				assert(operSeat.writeIndex_ > 0);
 
 				//添加到碰里面
-				addPeng(logic, operSeatNumber, v1);
+				addPeng(logic, operSeatNumber, v1, logic->chuPaiSeatNumber_);
 
 				/////////////////////////////////////////////////////////////////////////////////////////////////
 				logic->nextOperSeatNumber_ = operSeatNumber;
@@ -578,7 +587,7 @@ namespace hh
 						qp_uint8 removePai[4] = { v1, v1, v1, v1 };
 						common::RemovePai(operSeat.pai_, operSeat.writeIndex_, removePai, 4);
 						assert(operSeat.writeIndex_ > 0);
-						addGang(logic, operSeatNumber, v1);
+						addGang(logic, operSeatNumber, v1, AN_GANG, -1);
 					}
 					else 
 					{
@@ -596,7 +605,7 @@ namespace hh
 						assert(operSeat.writeIndex_ > 0);
 						//补杠成功，将碰的牌放到杠
 						removePeng(logic, operSeatNumber, v1);
-						addGang(logic, operSeatNumber, v1);
+						addGang(logic, operSeatNumber, v1, BU_GANG, -1);
 					}
 
 				}
@@ -625,7 +634,7 @@ namespace hh
 					qp_uint8 removePai[3] = { v1, v1, v1 };
 					common::RemovePai(operSeat.pai_, operSeat.writeIndex_, removePai, 3);
 					assert(operSeat.writeIndex_ > 0);
-					addGang(logic, operSeatNumber, v1);
+					addGang(logic, operSeatNumber, v1, MING_GANG, logic->chuPaiSeatNumber_);
 				}
 
 				//屁股摸一张牌
@@ -810,7 +819,7 @@ namespace hh
 					logic->nextOperValue2_ = 0;
 					return;
 				}
-				//clearHuOper(logic);
+				clearHuOper(logic);
 
 				//没有人可以胡牌
 				//看还能不能摸牌

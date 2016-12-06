@@ -6,14 +6,39 @@
 #define HH_LOG_LEN 255
 namespace hh
 {
+	struct SeatGang
+	{
+		qp_uint8 pai_;
+		qp_uint8 type_;
+		qp_int8 seatNumber_;
+	};
+
+	struct SeatChi
+	{
+		qp_uint8 pai_;
+		qp_uint8 type_;
+	};
+
+	struct SeatPeng
+	{
+		qp_uint8 pai_;
+		qp_int8 seatNumber_;
+	};
+
     struct Seat
     {
-		qp_uint8   chi_[4];					//吃的牌，存小数字
-		qp_uint8   peng_[4];				//碰的牌
-		qp_uint8   gang_[4];				//杠的牌
-		qp_uint8   pai_[14];				//手里的牌
-		qp_uint8   writeIndex_;				//写入的索引(手牌数量)
+		SeatChi		chi_[4];					//吃的牌，存小数字 8
+		SeatPeng	peng_[4];					//碰的牌	8
+		SeatGang	gang_[4];					//杠的牌,杠的类型,如果是明杠则是放杠的座位号	12
+		qp_uint8	pai_[14];					//手里的牌	14
+		qp_uint8	writeIndex_;				//写入的索引(手牌数量) 1
     };
+
+	struct SpecialOperItem
+	{
+		qp_int8 seatNumber_;
+		qp_uint8 operType_;
+	};
 
     struct MainLogic
     {
@@ -23,7 +48,7 @@ namespace hh
         Seat		seats_[4];                  //四个座位
 		qp_int8		bankerSeatNumber_;          //庄家的座位号
 
-		qp_uint8	specialOperQueue_[3][2];	//特殊操作队列 (吃，碰，杠)
+		SpecialOperItem	specialOperQueue_[3];	//特殊操作队列 (吃，碰，杠)
 		qp_uint8	specialOperCount_;			//特殊操作队列元素的数量
 		qp_uint8	specialOperIndex_;			//当前进行特殊操作的索引
 

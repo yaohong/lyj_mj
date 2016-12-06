@@ -18,7 +18,7 @@
 generate_main_logic(Bin) ->
 	<<
 		PaiPool:120/binary, PoolHeadReadIndex:?BIG_UINT8, PoolTailReadIndex:?BIG_UINT8,
-		Seat0:27/binary, Seat1:27/binary,Seat2:27/binary,Seat3:27/binary,
+		Seat0:43/binary, Seat1:43/binary,Seat2:43/binary,Seat3:43/binary,
 		BrankerNumber:?BIG_UINT8,SpecialData:8/binary, HuData:5/binary,
 		ChuPaiSeatNum:?BIG_INT8, ChuPaiValue:?BIG_UINT8,
 		OldData:5/binary, NextData:4/binary,StateFlag:?BIG_UINT8,ErrorFlag:?BIG_UINT8,
@@ -52,14 +52,14 @@ generate_main_logic(Bin) ->
 %%根据二进制数据生成seat
 generate_seat(Bin) ->
 	<<
-		C0:?BIG_UINT8, C1:?BIG_UINT8, C2:?BIG_UINT8, C3:?BIG_UINT8,
-		P0:?BIG_UINT8, P1:?BIG_UINT8, P2:?BIG_UINT8, P3:?BIG_UINT8,
-		G0:?BIG_UINT8, G1:?BIG_UINT8, G2:?BIG_UINT8, G3:?BIG_UINT8,
+		C0:2/binary, C1:2/binary, C2:2/binary, C3:2/binary,
+		P0:2/binary, P1:2/binary, P2:2/binary, P3:2/binary,
+		G0:3/binary, G1:3/binary, G2:3/binary, G3:3/binary,
 		PaiBin:14/binary, WriteIndex:?BIG_UINT8
 	>> = Bin,
-	Chi = generate_seat_pai(C0, C1, C2, C3),
-	Peng = generate_seat_pai(P0, P1, P2, P3),
-	Gang = generate_seat_pai(G0, G1, G2, G3),
+	Chi = generate_seat_chi_list(generate_seat_chi(C0), generate_seat_chi(C1), generate_seat_chi(C2), generate_seat_chi(C3)),
+	Peng = generate_seat_peng_list(generate_seat_peng(P0), generate_seat_peng(P1), generate_seat_peng(P2), generate_seat_peng(P3)),
+	Gang = generate_seat_gang_list(generate_seat_gang(G0), generate_seat_gang(G1), generate_seat_gang(G2), generate_seat_gang(G3)),
 	ValidPaiLen = WriteIndex,
 	<<ValidPoolBin:ValidPaiLen/binary, _/binary>> = PaiBin,
 	ValidPoolList = binary_to_list(ValidPoolBin),
@@ -70,11 +70,36 @@ generate_seat(Bin) ->
 		pai = ValidPoolList
 	}.
 
-generate_seat_pai(0, _, _, _) -> [];
-generate_seat_pai(P1, 0, _, _) -> [P1];
-generate_seat_pai(P1,P2, 0, _) -> [P1, P2];
-generate_seat_pai(P1,P2, P3, 0) -> [P1, P2, P3];
-generate_seat_pai(P1,P2, P3, P4) -> [P1, P2, P3, P4].
+generate_seat_chi(Bin) when is_binary(Bin) ->
+	<<Pai:?BIG_UINT8, Type:?BIG_UINT8>> = Bin,
+	#hh_seat_chi{pai = Pai, type = Type}.
+
+generate_seat_peng(Bin) when is_binary(Bin) ->
+	<<Pai:?BIG_UINT8, SeatNumber:?BIG_INT8>> = Bin,
+	#hh_seat_peng{pai = Pai, seat_number = SeatNumber}.
+
+generate_seat_gang(Bin) when is_binary(Bin) ->
+	<<Pai:?BIG_UINT8, Type:?BIG_UINT8, SeatNumber:?BIG_INT8>> = Bin,
+	#hh_seat_gang{pai = Pai, type = Type, seat_number = SeatNumber}.
+
+
+generate_seat_chi_list(#hh_seat_chi{pai = 0}, _, _, _) -> [];
+generate_seat_chi_list(P1, #hh_seat_chi{pai = 0}, _, _) -> [P1];
+generate_seat_chi_list(P1,P2, #hh_seat_chi{pai = 0}, _) -> [P1, P2];
+generate_seat_chi_list(P1,P2, P3, #hh_seat_chi{pai = 0}) -> [P1, P2, P3];
+generate_seat_chi_list(P1,P2, P3, P4) -> [P1, P2, P3, P4].
+
+generate_seat_peng_list(#hh_seat_peng{pai = 0}, _, _, _) -> [];
+generate_seat_peng_list(P1, #hh_seat_peng{pai = 0}, _, _) -> [P1];
+generate_seat_peng_list(P1,P2, #hh_seat_peng{pai = 0}, _) -> [P1, P2];
+generate_seat_peng_list(P1,P2, P3, #hh_seat_peng{pai = 0}) -> [P1, P2, P3];
+generate_seat_peng_list(P1,P2, P3, P4) -> [P1, P2, P3, P4].
+
+generate_seat_gang_list(#hh_seat_gang{pai = 0}, _, _, _) -> [];
+generate_seat_gang_list(P1, #hh_seat_gang{pai = 0}, _, _) -> [P1];
+generate_seat_gang_list(P1,P2, #hh_seat_gang{pai = 0}, _) -> [P1, P2];
+generate_seat_gang_list(P1,P2, P3, #hh_seat_gang{pai = 0}) -> [P1, P2, P3];
+generate_seat_gang_list(P1,P2, P3, P4) -> [P1, P2, P3, P4].
 
 
 generage_special(SpecialData) ->
@@ -253,27 +278,27 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 		[
 			length(Logic#hh_main_logic.pool),
 			[str_pai(Pai) || Pai <- Logic#hh_main_logic.pool],
-			[str_pai(Pai) || Pai <- Seat0#hh_seat.chi],
-			[str_pai(Pai) || Pai <- Seat0#hh_seat.peng],
-			[str_pai(Pai) || Pai <- Seat0#hh_seat.gang],
+			[{str_pai(Pai), Type} || #hh_seat_chi{pai = Pai,type = Type} <- Seat0#hh_seat.chi],
+			[{str_pai(Pai),  SeatNumber} || #hh_seat_peng{pai = Pai, seat_number = SeatNumber} <- Seat0#hh_seat.peng],
+			[{str_pai(Pai), Type, SeatNumber} || #hh_seat_gang{pai = Pai, type = Type, seat_number = SeatNumber} <- Seat0#hh_seat.gang],
 			length(Seat0#hh_seat.pai),
 			[str_pai(Pai) || Pai <- Seat0#hh_seat.pai],
 
-			[str_pai(Pai) || Pai <- Seat1#hh_seat.chi],
-			[str_pai(Pai) || Pai <- Seat1#hh_seat.peng],
-			[str_pai(Pai) || Pai <- Seat1#hh_seat.gang],
+			[{str_pai(Pai), Type} || #hh_seat_chi{pai = Pai,type = Type} <- Seat1#hh_seat.chi],
+			[{str_pai(Pai),  SeatNumber} || #hh_seat_peng{pai = Pai, seat_number = SeatNumber} <- Seat1#hh_seat.peng],
+			[{str_pai(Pai), Type, SeatNumber} || #hh_seat_gang{pai = Pai, type = Type, seat_number = SeatNumber} <- Seat1#hh_seat.gang],
 			length(Seat1#hh_seat.pai),
 			[str_pai(Pai) || Pai <- Seat1#hh_seat.pai],
 
-			[str_pai(Pai) || Pai <- Seat2#hh_seat.chi],
-			[str_pai(Pai) || Pai <- Seat2#hh_seat.peng],
-			[str_pai(Pai) || Pai <- Seat2#hh_seat.gang],
+			[{str_pai(Pai), Type} || #hh_seat_chi{pai = Pai,type = Type}  <- Seat2#hh_seat.chi],
+			[{str_pai(Pai),  SeatNumber} || #hh_seat_peng{pai = Pai, seat_number = SeatNumber}  <- Seat2#hh_seat.peng],
+			[{str_pai(Pai), Type, SeatNumber} || #hh_seat_gang{pai = Pai, type = Type, seat_number = SeatNumber} <- Seat2#hh_seat.gang],
 			length(Seat2#hh_seat.pai),
 			[str_pai(Pai) || Pai <- Seat2#hh_seat.pai],
 
-			[str_pai(Pai) || Pai <- Seat3#hh_seat.chi],
-			[str_pai(Pai) || Pai <- Seat3#hh_seat.peng],
-			[str_pai(Pai) || Pai <- Seat3#hh_seat.gang],
+			[{str_pai(Pai), Type} || #hh_seat_chi{pai = Pai,type = Type}  <- Seat3#hh_seat.chi],
+			[{str_pai(Pai),  SeatNumber} || #hh_seat_peng{pai = Pai, seat_number = SeatNumber}   <- Seat3#hh_seat.peng],
+			[{str_pai(Pai), Type, SeatNumber} || #hh_seat_gang{pai = Pai, type = Type, seat_number = SeatNumber} <- Seat3#hh_seat.gang],
 			length(Seat3#hh_seat.pai),
 			[str_pai(Pai) || Pai <- Seat3#hh_seat.pai],
 
