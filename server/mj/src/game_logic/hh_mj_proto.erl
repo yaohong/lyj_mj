@@ -32,7 +32,9 @@ encode_packet(Packet) when is_record(Packet, qp_mj_game_start_notify) ->
 encode_packet(Packet) when is_record(Packet, qp_mj_game_end_notify) ->
 	encode_packet(?CMD_MJ_GAME_END_NOTIFY, mj_pb:encode_qp_mj_game_end_notify(Packet));
 encode_packet(Packet) when is_record(Packet, qp_mj_oper_notify) ->
-	encode_packet(?CMD_MJ_OPER_NOTIFY, mj_pb:encode_qp_mj_oper_notify(Packet)).
+	encode_packet(?CMD_MJ_OPER_NOTIFY, mj_pb:encode_qp_mj_oper_notify(Packet));
+encode_packet(Packet) when is_record(Packet, qp_mj_oper_error) ->
+	encode_packet(?CMD_MJ_OPER_ERROR, mj_pb:encode_qp_mj_oper_error(Packet)).
 
 encode_packet(Cmd, Body) ->
 	Packet = #qp_logic{cmd = Cmd, serialized = Body},

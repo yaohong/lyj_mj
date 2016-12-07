@@ -89,7 +89,7 @@
 -define(CMD_MJ_GAME_END_NOTIFY, 10002).
 -define(CMD_MJ_OPER_REQ, 10003).
 -define(CMD_MJ_OPER_NOTIFY, 10004).
-
+-define(CMD_MJ_OPER_ERROR, 10005).
 
 
 
