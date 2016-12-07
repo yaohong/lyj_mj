@@ -14,6 +14,8 @@ enum ws_cmd {
 
     CMD_MJ_OPER_REQ = 10003;				//游戏操作
 	CMD_MJ_OPER_NOTIFY = 10004;			//游戏操作的通知
+
+	CMD_MJ_OPER_ERROR = 10005;          //操作错误
 	
 }
 
@@ -54,4 +56,12 @@ message qp_mj_oper_notify {						//有人操作的通知(所有人都会收到)
 	optional uint32 next_oper_value2 = 9;		//下一个操作的信息
 }
 
+message qp_mj_oper_error {
+    required uint32 error_type = 1;             //错误的操作类型
+    optional uint32 error_value1 = 2;            //错误的操作值1
+    optional uint32 error_value2 = 3;            //错误的操作值2
 
+    optional uint32 oper_flag = 4;              //正确的可操作类型
+    optional uint32 oper_value1 = 5;            //正确的操作值1
+    optional uint32 oper_value2 = 6;            //正确的操作值2
+}

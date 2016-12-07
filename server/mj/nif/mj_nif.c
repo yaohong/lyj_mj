@@ -98,6 +98,7 @@ static ERL_NIF_TERM game_oper(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[
 	if (0 == gameType) {
 		hh::MainLogic *foo = (hh::MainLogic *)(nifBin.data);
 		foo->errorLogLen = 0;
+		foo->errorFlag_ = 0;
 		hh::Oper(foo, (qp_int8)seatNumber, (qp_uint8)operType, (qp_uint8)v1, (qp_uint8)v2);
 		return MakeSuccess0(env);
 	} else if (1 == gameType) {

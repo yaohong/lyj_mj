@@ -230,7 +230,6 @@ namespace hh
 		{
 			qp_uint8 nextSeatNum = (operSeatNum + i) % 4;
 			Seat &nextSeat = logic->seats_[nextSeatNum];
-			writeLog(logic, "generateHuOper nextSeatNum=%d cp=%d\n", nextSeatNum, cp);
 			if (common::IsTing(nextSeat.pai_, nextSeat.writeIndex_, cp))
 			{
 				logic->huOperQueue_[logic->huOperCount_++] = nextSeatNum;
