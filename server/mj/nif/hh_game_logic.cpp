@@ -587,6 +587,7 @@ namespace hh
 						common::RemovePai(operSeat.pai_, operSeat.writeIndex_, removePai, 4);
 						assert(operSeat.writeIndex_ > 0);
 						addGang(logic, operSeatNumber, v1, AN_GANG, -1);
+						logic->oldOperValue2_ = 0;
 					}
 					else 
 					{
@@ -605,6 +606,7 @@ namespace hh
 						//补杠成功，将碰的牌放到杠
 						removePeng(logic, operSeatNumber, v1);
 						addGang(logic, operSeatNumber, v1, BU_GANG, -1);
+						logic->oldOperValue2_ = 1;
 					}
 
 				}
@@ -634,6 +636,7 @@ namespace hh
 					common::RemovePai(operSeat.pai_, operSeat.writeIndex_, removePai, 3);
 					assert(operSeat.writeIndex_ > 0);
 					addGang(logic, operSeatNumber, v1, MING_GANG, logic->chuPaiSeatNumber_);
+					logic->oldOperValue2_ = 2;
 				}
 
 				//屁股摸一张牌
