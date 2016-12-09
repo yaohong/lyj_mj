@@ -5,50 +5,92 @@ namespace hh
     void InitPool( MainLogic *logic )
     {
         //初始化池里的牌 (万子 条子 筒子)
-		qp_uint8 writeOffset = 0;
-		for (qp_uint8 i = 0; i < 3; i++)
-        {
-			for (qp_uint8 j = 0; j < 9; j++)
-            {
-				for (qp_uint8 k = 0; k < 4; k++)
-                {
-                    logic->pool_[writeOffset++] = PAI( i + 1, j + 1 );
-                }
-            }
-        }
-
-        //插入中发白
-		for (qp_uint8 i = 0; i < 3; i++)
-        {
-			for (qp_uint8 j = 0; j < 4; j++)
-            {
-                logic->pool_[writeOffset++] = PAI( FA, i + 1 );
-            }
-        }
-
-        assert( HH_MAX_COUNT == writeOffset );
+		memcpy(logic->pool_, HH_PAI_ARRAY, HH_MAX_COUNT*sizeof(qp_uint8));
+		common::Random(logic->pool_, HH_MAX_COUNT);
     }
+
+	void Init_AnGang_Pool(MainLogic *logic)
+	{
+		qp_uint8 writeIndex = 0;
+		for (qp_uint8 i = 0; i < 4; i++)
+		{
+			logic->pool_[writeIndex++] = PAI(1, 1);
+		}
+
+		for (qp_uint8 i = 0; i < 4; i++)
+		{
+			logic->pool_[writeIndex++] = PAI(1, 2);
+		}
+
+		for (qp_uint8 i = 0; i < 4; i++)
+		{
+			logic->pool_[writeIndex++] = PAI(1, 3);
+		}
+
+		for (qp_uint8 i = 0; i < 4; i++)
+		{
+			logic->pool_[writeIndex++] = PAI(1, 4);
+		}
+
+		//添加剩下的万字
+		for (qp_uint8 i = 4; i < 9; i++)
+		{
+			for (qp_uint8 j = 0; j < 4; j++)
+			{
+				logic->pool_[writeIndex++] = PAI(1, i+1);
+			}
+		}
+
+		//添加剩下条子
+		for (qp_uint8 i = 0; i < 9; i++)
+		{
+			for (qp_uint8 j = 0; j < 4; j++)
+			{
+				logic->pool_[writeIndex++] = PAI(2, i + 1);
+			}
+		}
+
+		//添加剩下的筒子
+		for (qp_uint8 i = 0; i < 9; i++)
+		{
+			for (qp_uint8 j = 0; j < 4; j++)
+			{
+				logic->pool_[writeIndex++] = PAI(3, i + 1);
+			}
+		}
+
+		//中发白
+		for (qp_uint8 i = 0; i < 3; i++)
+		{
+			for (qp_uint8 j = 0; j < 4; j++)
+			{
+				logic->pool_[writeIndex++] = PAI(5, i + 1);
+			}
+		}
+
+		common::Random((qp_uint8 *)logic->pool_ + 16, HH_MAX_COUNT - 16);
+	}
 
 	void Init(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint32 randSeed)
     {
         memset( logic, 0, sizeof(MainLogic) );
+		if (-1 == bankerSeatNumber)
+		{
+			logic->bankerSeatNumber_ = rand() % 4;
+		}
+		else
+		{
+			assert(bankerSeatNumber >= 0 && bankerSeatNumber <= 3);
+			logic->bankerSeatNumber_ = bankerSeatNumber;
+		}
+
 		srand(randSeed);
-		InitPool(logic);
-		common::Random(logic->pool_, HH_MAX_COUNT);
+		Init_AnGang_Pool(logic);
 		common::Crc(logic->pool_, HH_MAX_COUNT);
         //随即一个庄家
         logic->poolHeadReadIndex_ = 0;
         logic->poolTailReadIndex_ = HH_MAX_COUNT - 1;
-        if (-1 == bankerSeatNumber)
-        {
-            logic->bankerSeatNumber_ = rand() % 4;
-        }
-        else
-        {
-			assert(bankerSeatNumber >= 0 && bankerSeatNumber <= 3);
-            logic->bankerSeatNumber_ = bankerSeatNumber;
-        }
-		
+
         //发三轮四张
         for (int i = 0; i < 3; i++)
         {

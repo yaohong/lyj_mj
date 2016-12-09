@@ -2,10 +2,31 @@
 #define _game_logic_h__
 #include "common.h"
 //最大麻将牌数
-#define HH_MAX_COUNT 3 * 9 * 4 + 3*4
+#define HH_MAX_COUNT 120 //3 * 9 * 4 + 3*4
 #define HH_LOG_LEN 255
 namespace hh
 {
+	static qp_uint8 HH_PAI_ARRAY[HH_MAX_COUNT] = {
+		PAI(1, 1), PAI(1, 2), PAI(1, 3), PAI(1, 4), PAI(1, 5), PAI(1, 6), PAI(1, 7), PAI(1, 8), PAI(1, 9),        //万
+		PAI(1, 1), PAI(1, 2), PAI(1, 3), PAI(1, 4), PAI(1, 5), PAI(1, 6), PAI(1, 7), PAI(1, 8), PAI(1, 9),
+		PAI(1, 1), PAI(1, 2), PAI(1, 3), PAI(1, 4), PAI(1, 5), PAI(1, 6), PAI(1, 7), PAI(1, 8), PAI(1, 9),
+		PAI(1, 1), PAI(1, 2), PAI(1, 3), PAI(1, 4), PAI(1, 5), PAI(1, 6), PAI(1, 7), PAI(1, 8), PAI(1, 9),
+
+		PAI(2, 1), PAI(2, 2), PAI(2, 3), PAI(2, 4), PAI(2, 5), PAI(2, 6), PAI(2, 7), PAI(2, 8), PAI(2, 9),        //条
+		PAI(2, 1), PAI(2, 2), PAI(2, 3), PAI(2, 4), PAI(2, 5), PAI(2, 6), PAI(2, 7), PAI(2, 8), PAI(2, 9),
+		PAI(2, 1), PAI(2, 2), PAI(2, 3), PAI(2, 4), PAI(2, 5), PAI(2, 6), PAI(2, 7), PAI(2, 8), PAI(2, 9),
+		PAI(2, 1), PAI(2, 2), PAI(2, 3), PAI(2, 4), PAI(2, 5), PAI(2, 6), PAI(2, 7), PAI(2, 8), PAI(2, 9),
+
+		PAI(3, 1), PAI(3, 2), PAI(3, 3), PAI(3, 4), PAI(3, 5), PAI(3, 6), PAI(3, 7), PAI(3, 8), PAI(3, 9),        //筒
+		PAI(3, 1), PAI(3, 2), PAI(3, 3), PAI(3, 4), PAI(3, 5), PAI(3, 6), PAI(3, 7), PAI(3, 8), PAI(3, 9),
+		PAI(3, 1), PAI(3, 2), PAI(3, 3), PAI(3, 4), PAI(3, 5), PAI(3, 6), PAI(3, 7), PAI(3, 8), PAI(3, 9),
+		PAI(3, 1), PAI(3, 2), PAI(3, 3), PAI(3, 4), PAI(3, 5), PAI(3, 6), PAI(3, 7), PAI(3, 8), PAI(3, 9),
+
+		PAI(5, 1), PAI(5, 2), PAI(5, 3),  //中发白   
+		PAI(5, 1), PAI(5, 2), PAI(5, 3),
+		PAI(5, 1), PAI(5, 2), PAI(5, 3),
+		PAI(5, 1), PAI(5, 2), PAI(5, 3)
+	};
 	struct SeatGang
 	{
 		qp_uint8 pai_;
