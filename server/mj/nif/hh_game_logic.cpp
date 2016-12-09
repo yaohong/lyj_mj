@@ -71,6 +71,18 @@ namespace hh
 		common::Random((qp_uint8 *)logic->pool_ + 16, HH_MAX_COUNT - 16);
 	}
 
+	void Init_MinGang_Pool(MainLogic *logic)
+	{
+
+	}
+
+	void Init_BugGang_Pool(MainLogic *logic)
+	{
+		//初始化池里的牌 (万子 条子 筒子)
+		memcpy(logic->pool_, HH_PAI_ARRAY, HH_MAX_COUNT*sizeof(qp_uint8));
+		common::Random(logic->pool_, HH_MAX_COUNT);
+	}
+
 	void Init(MainLogic *logic, qp_int8 bankerSeatNumber, qp_uint32 randSeed)
     {
         memset( logic, 0, sizeof(MainLogic) );
