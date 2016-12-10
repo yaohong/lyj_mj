@@ -278,7 +278,7 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 		"hupai_result:\n"
 		"	seat_number:~p\n"
 		"	value:~p\n"
-		"	type:~p\n"
+		"   type:~p\n"
 		"   level:~p\n"
 		"	fangpao_set_number:~p\n"
 		"error_log:~p\n"
