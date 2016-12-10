@@ -53,6 +53,7 @@
 	seat_number :: integer(),
 	value :: integer(),
 	type :: integer(),
+	level :: integer(),
 	fangpao_set_number :: integer()
 }).
 

@@ -97,7 +97,7 @@ namespace hh
 		}
 
 		srand(randSeed);
-		Init_AnGang_Pool(logic);
+		InitPool(logic);
 		common::Crc(logic->pool_, HH_MAX_COUNT);
         //随即一个庄家
         logic->poolHeadReadIndex_ = 0;
@@ -446,6 +446,67 @@ namespace hh
 		}
 
 		return false;
+	}
+
+
+	qp_uint8 getHuPaiLevel(MainLogic *logic, qp_int8 seatNumber)
+	{
+		assert(seatNumber >= 0 && seatNumber <= 3);
+		Seat &seat = logic->seats_[seatNumber];
+		assert(common::IsHu(seat.pai_, seat.writeIndex_));
+		//检测是否有吃碰明杠
+		bool isChi = false;
+		bool isPeng = false;
+		bool isMinGang = false;
+
+		for (qp_uint8 i = 0; i < 4; i++)
+		{
+			if (seat.chi_[i].pai_ > 0)
+			{
+				isChi = true;
+				break;
+			}
+		}
+
+		for (qp_uint8 i = 0; i < 4; i++)
+		{
+			if (seat.peng_[i].pai_ > 0)
+			{
+				isPeng = true;
+				break;
+			}
+		}
+
+		for (qp_uint8 i = 0; i < 4; i++)
+		{
+			if (seat.gang_[i].pai_ > 0 && seat.gang_[i].type_ == MING_GANG)
+			{
+				isMinGang = true;
+				break;
+			}
+		}
+
+		if (isChi || isPeng || isMinGang)
+		{
+			return HU_PI;
+		}
+
+		if (common::CheckChaoHaoHuaQiDui(seat.pai_, seat.writeIndex_))
+		{
+			return HU_CHAOHAOHUA_QI_DUI;
+		}
+
+		if (common::CheckHaoHuaQiDui(seat.pai_, seat.writeIndex_))
+		{
+			return HU_HAOHUA_QI_DUI;
+		}
+
+		if (common::CheckQiDui(seat.pai_, seat.writeIndex_))
+		{
+			return HU_QI_DUI;
+		}
+
+		return HU_DAO;
 	}
 
 	void Oper(MainLogic *logic, qp_int8 operSeatNumber, qp_uint8 operType, qp_uint8 v1, qp_uint8 v2)
@@ -820,6 +881,7 @@ namespace hh
 					logic->hupaiSeatNumber_ = operSeatNumber;
 					logic->hupaiValue_ = logic->nextOperValue2_;
 					logic->hupaiType_ = 0;
+					logic->hupaiLevel_ = getHuPaiLevel(logic, operSeatNumber);
 					logic->fangpaoSeatNumber_ = -1;
 
 					logic->stateFlag_ = 2;
@@ -841,6 +903,7 @@ namespace hh
 					logic->hupaiSeatNumber_ = operSeatNumber;
 					logic->hupaiValue_ = logic->nextOperValue1_;
 					logic->hupaiType_ = 1;
+					logic->hupaiLevel_ = getHuPaiLevel(logic, operSeatNumber);
 					logic->fangpaoSeatNumber_ = logic->chuPaiSeatNumber_;
 
 					logic->stateFlag_ = 2;
@@ -1012,7 +1075,10 @@ int main( int argc, const char * argv[] )
 	////qp_uint8 source[5] = { 4, 15, 5, 5,14};
 	////bool ret = common::CheckPai(source, 5, dest, 14);
 	printf("size=%u\n", sizeof(hh::MainLogic));
-	//qp_uint8 pai[14] = { 18, 18, 18, 18, 19, 19, 19, 19, 20,20,20,20, 21,21 };
+	qp_uint8 pai[14] = { 18, 18, 19, 19, 20,20,21,21, 22,22, 23,23, 24,24 };
+	printf("%d,%d,%d\n", common::CheckQiDui(pai, 14) ? 1 : 0, common::CheckHaoHuaQiDui(pai, 14) ? 1 : 0, common::CheckChaoHaoHuaQiDui(pai, 14) ? 1 : 0);
+	int ret = 0;
+	scanf("%d", &ret);
 	////qp_uint8 pai[14] = { 18, 18, 19, 19, 20, 20, 21, 21, 22,22,22,23,23,23};
 	////qp_uint8 pai[14] = { 18, 18 };
 	////qp_uint8 pai[14] = { 18, 18, 18, 19, 20, 21, 22, 23, 23, 23, 22, 23, 23, 23 };
@@ -1035,16 +1101,16 @@ int main( int argc, const char * argv[] )
 	//}
 	//qp_uint8 pai[13] = {17,17,17, 18, 19, 20, 21, 22, 23, 24, 25, 25, 25 };
 	//qp_uint8 pai[10] = { 18, 18, 18, 19, 20, 21, 22, 23, 23, 23 };
-	qp_uint8 pai[4] = { 21, 22, 34, 34};
-	printf("ting: \n");
-	for (qp_uint8 i = 0; i < common::MAX_TITLE_INDEX; i++)
-	{
-		if (common::IsTing(pai, 4, common::PAI_ARRAY[i]))
-		{
-			printf("%s ", common::getPaiString(common::PAI_ARRAY[i]).c_str());
-		}
-	}
-	printf("\n");
+	//qp_uint8 pai[4] = { 21, 22, 34, 34};
+	//printf("ting: \n");
+	//for (qp_uint8 i = 0; i < common::MAX_TITLE_INDEX; i++)
+	//{
+	//	if (common::IsTing(pai, 4, common::PAI_ARRAY[i]))
+	//	{
+	//		printf("%s ", common::getPaiString(common::PAI_ARRAY[i]).c_str());
+	//	}
+	//}
+	//printf("\n");
     return 0;
 }
 #endif

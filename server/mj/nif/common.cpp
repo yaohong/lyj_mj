@@ -447,9 +447,99 @@ namespace common {
 		}
 	}
 
+	bool CheckQiDui(qp_uint8 source[], qp_uint8 sourceLen)
+	{
+		if (sourceLen != 14) 
+		{
+			return false;
+		}
+
+		for (qp_uint8 i = 0; i < MAX_TITLE_INDEX; i++)
+		{
+			qp_uint8 paiCount = common::GetPaiCount(source, sourceLen, PAI_ARRAY[i]);
+			if (paiCount > 0 && paiCount != 2 && paiCount != 4)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool CheckHaoHuaQiDui(qp_uint8 source[], qp_uint8 sourceLen)
+	{
+		if (sourceLen != 14)
+		{
+			return false;
+		}
+
+		qp_uint8 siZhangCount = 0;
+		for (qp_uint8 i = 0; i < MAX_TITLE_INDEX; i++)
+		{
+			qp_uint8 paiCount = common::GetPaiCount(source, sourceLen, PAI_ARRAY[i]);
+			if (paiCount > 0)
+			{
+				if (paiCount == 1 || paiCount == 3)
+				{
+					return false;
+				}
+
+				if (paiCount == 4)
+				{
+					siZhangCount++;
+				}
+			}
+		}
+
+		return siZhangCount >= 1;
+	}
+
+	bool CheckChaoHaoHuaQiDui(qp_uint8 source[], qp_uint8 sourceLen)
+	{
+		if (sourceLen != 14)
+		{
+			return false;
+		}
+
+		qp_uint8 siZhangCount = 0;
+		for (qp_uint8 i = 0; i < MAX_TITLE_INDEX; i++)
+		{
+			qp_uint8 paiCount = common::GetPaiCount(source, sourceLen, PAI_ARRAY[i]);
+			if (paiCount > 0)
+			{
+				if (paiCount == 1 || paiCount == 3)
+				{
+					return false;
+				}
+
+				if (paiCount == 4)
+				{
+					siZhangCount++;
+				}
+			}
+		}
+
+		return siZhangCount >= 2;
+	}
+
 	bool CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen)
 	{
 		assert(sourceLen >= 1 && sourceLen <= 14);
+		if (CheckChaoHaoHuaQiDui(source, sourceLen))
+		{
+			return true;
+		}
+
+		if (CheckHaoHuaQiDui(source, sourceLen))
+		{
+			return true;
+		}
+
+		if (CheckQiDui(source, sourceLen))
+		{
+			return true;
+		}
+
 		std::vector<HuBasicResult> result;
 		GetBasicHuPai(source, sourceLen, result);
 		return result.size() > 0;

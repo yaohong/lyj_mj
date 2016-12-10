@@ -22,13 +22,19 @@ generate_main_logic(Bin) ->
 		BrankerNumber:?BIG_UINT8,SpecialData:8/binary, HuData:5/binary,
 		ChuPaiSeatNum:?BIG_INT8, ChuPaiValue:?BIG_UINT8,
 		OldData:5/binary, NextData:4/binary,StateFlag:?BIG_UINT8,ErrorFlag:?BIG_UINT8,
-		HupaiResult:4/binary, ErrorLogData:256/binary
+		HupaiResult:5/binary, ErrorLogData:256/binary
 	>> = Bin,
-	HeadLen = PoolHeadReadIndex,
-	TailLen = ?HH_POOL_COUNT - 1 - PoolTailReadIndex,
-	ValidPoolLen = ?HH_POOL_COUNT - HeadLen - TailLen,
-	<<_:HeadLen/binary, ValidPool:ValidPoolLen/binary, _:TailLen/binary>> = PaiPool,
-	ValidPoolList = binary_to_list(ValidPool),
+	ValidPoolList =
+		if
+			PoolHeadReadIndex =:= PoolTailReadIndex andalso PoolHeadReadIndex =:= 0 ->
+				[];
+			true ->
+				HeadLen = PoolHeadReadIndex,
+				TailLen = ?HH_POOL_COUNT - 1 - PoolTailReadIndex,
+				ValidPoolLen = ?HH_POOL_COUNT - HeadLen - TailLen,
+				<<_:HeadLen/binary, ValidPool:ValidPoolLen/binary, _:TailLen/binary>> = PaiPool,
+				binary_to_list(ValidPool)
+		end,
 	#hh_main_logic{
 		pool = ValidPoolList,
 		seat0 = generate_seat(Seat0),
@@ -109,7 +115,7 @@ generage_special(SpecialData) ->
 		Oper2SeatNum:?BIG_UINT8,Oper2Flag:?BIG_UINT8,
 		OperCount:?BIG_UINT8, OperIndex:?BIG_UINT8
 	>> = SpecialData,
-    L1 = [{Oper0SeatNum, Oper0Flag},{Oper1SeatNum, Oper1Flag},{Oper2SeatNum, Oper2Flag}],
+	L1 = [{Oper0SeatNum, Oper0Flag},{Oper1SeatNum, Oper1Flag},{Oper2SeatNum, Oper2Flag}],
 	{VaildQueue, _} = lists:split(OperCount, L1),
 	#hh_special {
 		oper_queue = VaildQueue,
@@ -157,12 +163,13 @@ generage_next(NextData) ->
 generage_hupai_result(Data) ->
 	<<
 		SeatNumber:?BIG_INT8, Value:?BIG_UINT8,
-		Type:?BIG_UINT8, FangpaoSeatNumber:?BIG_INT8
+		Type:?BIG_UINT8, Level:?BIG_UINT8, FangpaoSeatNumber:?BIG_INT8
 	>> = Data,
 	#hh_hupai_result{
 		seat_number = SeatNumber,
 		value = Value,
 		type = Type,
+		level = Level,
 		fangpao_set_number = FangpaoSeatNumber
 	}.
 
@@ -246,7 +253,7 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 		"	peng:~p\n"
 		"	gang:~p\n"
 		"	pai:~p ~p\n"
-	    "banker_seat_number:~p\n"
+		"banker_seat_number:~p\n"
 		"special:\n"
 		"	oper_queue:~p\n"
 		"	oper_index:~p\n"
@@ -272,6 +279,7 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 		"	seat_number:~p\n"
 		"	value:~p\n"
 		"	type:~p\n"
+		"   level:~p\n"
 		"	fangpao_set_number:~p\n"
 		"error_log:~p\n"
 		,
@@ -332,6 +340,7 @@ print(Logic) when is_record(Logic, hh_main_logic) ->
 			Result#hh_hupai_result.seat_number,
 			str_pai(Result#hh_hupai_result.value),
 			Result#hh_hupai_result.type,
+			Result#hh_hupai_result.level,
 			Result#hh_hupai_result.fangpao_set_number,
 
 			Logic#hh_main_logic.error_log#hh_error_log.log

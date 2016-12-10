@@ -105,6 +105,9 @@ namespace common {
 	bool CheckBasicHuPai(qp_uint8 source[], qp_uint8 sourceLen);
 	bool IsHu(qp_uint8 source[], qp_uint8 sourceLen);
 
+	bool CheckQiDui(qp_uint8 source[], qp_uint8 sourceLen);
+	bool CheckHaoHuaQiDui(qp_uint8 source[], qp_uint8 sourceLen);
+	bool CheckChaoHaoHuaQiDui(qp_uint8 source[], qp_uint8 sourceLen);
 
 	bool IsTing(qp_uint8 source[], qp_uint8 sourceLen, qp_uint8 pai);
 }
