@@ -36,7 +36,7 @@ game_start(OldGameBin) when is_binary(OldGameBin) ->
 				?FILE_LOG_DEBUG("game_start, old game_end state_flag=2, banker_seat_number=~p", [Result#hh_hupai_result.seat_number]),
 				Result#hh_hupai_result.seat_number;
 			true ->
-				?FILE_LOG_DEBUG("game_start, old game_end state_flag=~p, banker_seat_number=~p", [Logic#hh_main_logic.state_flag, Logic#hh_main_logic.chupai_seatnumber]),
+				?FILE_LOG_DEBUG("game_start, old game_end state_flag=~p, banker_seat_number=~p", [Logic#hh_main_logic.state_flag, Logic#hh_main_logic.banker_seat_number]),
 				Logic#hh_main_logic.banker_seat_number
 		end,
 	{success, GameBin} = mj_nif:game_start(?GAME_TYPE, BankerSeatNumber, qp_util:timestamp()),
