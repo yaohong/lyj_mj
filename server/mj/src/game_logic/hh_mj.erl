@@ -115,6 +115,11 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 					?FILE_LOG_DEBUG("state_flag=1 game_end.", []),
 					%%穿掉了
 					GameValueList = compute_result(Logic),
+					ScoreItemList =
+						lists:map(
+							fun({ScoreSeatNumber, ScoreValue}) ->
+								#seat_score_item{seat_number = ScoreSeatNumber, score = ScoreValue}
+							end, GameValueList),
 					QpEndResult1 =
 						#qp_mj_game_end_notify {
 							end_type = 1,
@@ -125,7 +130,8 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 							seat0_pai = Logic#hh_main_logic.seat0#hh_seat.pai,
 							seat1_pai = Logic#hh_main_logic.seat1#hh_seat.pai,
 							seat2_pai = Logic#hh_main_logic.seat2#hh_seat.pai,
-							seat3_pai = Logic#hh_main_logic.seat3#hh_seat.pai
+							seat3_pai = Logic#hh_main_logic.seat3#hh_seat.pai,
+							scores = ScoreItemList
 						},
 					HuPaiResultBin1 = hh_mj_proto:encode_packet(QpEndResult1),
 					{game_end, {GameBin, HuPaiResultBin1}};
@@ -133,6 +139,11 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 					%%游戏结束了
 					?FILE_LOG_DEBUG("state_flag=2 game_end,result=~p.", [Result]),
 					GameValueList = compute_result(Logic),
+					ScoreItemList =
+						lists:map(
+							fun({ScoreSeatNumber, ScoreValue}) ->
+								#seat_score_item{seat_number = ScoreSeatNumber, score = ScoreValue}
+							end, GameValueList),
 					%%计算分数
 					QpEndResult2 =
 						#qp_mj_game_end_notify {
@@ -144,7 +155,8 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 							seat0_pai = Logic#hh_main_logic.seat0#hh_seat.pai,
 							seat1_pai = Logic#hh_main_logic.seat1#hh_seat.pai,
 							seat2_pai = Logic#hh_main_logic.seat2#hh_seat.pai,
-							seat3_pai = Logic#hh_main_logic.seat3#hh_seat.pai
+							seat3_pai = Logic#hh_main_logic.seat3#hh_seat.pai,
+							scores = ScoreItemList
 						},
 					HuPaiResultBin2 = hh_mj_proto:encode_packet(QpEndResult2),
 					{game_end, {GameBin, HuPaiResultBin2}}

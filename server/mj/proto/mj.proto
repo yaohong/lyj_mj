@@ -25,6 +25,11 @@ message qp_mj_game_start_notify {
 	optional uint32 oper_flag = 3;				//操作信息(庄家自己才会有效)
 }
 
+message seat_score_item {
+    required int32 seat_number = 1;
+    required int32 score = 2;
+}
+
 message qp_mj_game_end_notify {
     required uint32 end_type = 1;               //0：中途有人退出了 1：游戏穿掉了 2：游戏正常结束
     required int32  hupai_seatnumber = 2;       //end_type=2时，胡牌的座位号
@@ -35,6 +40,7 @@ message qp_mj_game_end_notify {
     repeated uint32 seat1_pai = 7;
     repeated uint32 seat2_pai = 8;
     repeated uint32 seat3_pai = 9;
+    repeated seat_score_item scores = 10;       //获取的分值
 }
 
 message qp_mj_oper_req {
