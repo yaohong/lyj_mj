@@ -101,7 +101,6 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 			if
 				Logic#hh_main_logic.state_flag =:= 0 ->
 					Old = Logic#hh_main_logic.old,
-
 					Notify1 =
 						#qp_mj_oper_notify{
 							seat_numer = Old#hh_old_oper.seat_number,
@@ -115,6 +114,7 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 				Logic#hh_main_logic.state_flag =:= 1 ->
 					?FILE_LOG_DEBUG("state_flag=1 game_end.", []),
 					%%穿掉了
+					GameValueList = compute_result(Logic),
 					QpEndResult1 =
 						#qp_mj_game_end_notify {
 							end_type = 1,
@@ -131,7 +131,9 @@ game_oper(GameBin, SeatNum, OperBin) when is_binary(GameBin) andalso is_integer(
 					{game_end, {GameBin, HuPaiResultBin1}};
 				Logic#hh_main_logic.state_flag =:= 2 ->
 					%%游戏结束了
-					?FILE_LOG_DEBUG("state_flag=2 game_end.", []),
+					?FILE_LOG_DEBUG("state_flag=2 game_end,result=~p.", [Result]),
+					GameValueList = compute_result(Logic),
+					%%计算分数
 					QpEndResult2 =
 						#qp_mj_game_end_notify {
 							end_type = 2,
@@ -183,6 +185,93 @@ encode_oper_seat_data(Next, Notify, [SeatNum|T], Out) ->
 
 undefine_transform(undefined) -> 0;
 undefine_transform(V) -> V.
+
+
+%%计算分数
+compute_result(Logic) when is_record(Logic, hh_main_logic) ->
+	T = gb_trees:empty(),
+	T0 = gb_trees:insert(0, 0, T),
+	T1 = gb_trees:insert(1, 0, T0),
+	T2 = gb_trees:insert(2, 0, T1),
+	T3 = gb_trees:insert(3, 0, T2),
+	T4 = compute_gang_result(Logic, [0, 1, 2, 3], T3),
+	%%计算胡的分数
+	HuResult = Logic#hh_main_logic.hupai_result,
+	if
+		Logic#hh_main_logic.state_flag =:= 1 -> gb_trees:to_list(T4);
+		Logic#hh_main_logic.state_flag =:= 2 ->
+			HuSeatNumber = HuResult#hh_hupai_result.seat_number,
+			HuValue = get_hu_value(HuResult#hh_hupai_result.level),
+			if
+				HuResult#hh_hupai_result.type =:= 0 ->
+					%%自摸,三家给分
+					%%自己先加分
+					T5 = otherseat_value_change([HuSeatNumber], 3 * HuValue, T4),
+					%%另外三家减分
+					T6 = otherseat_value_change(other_seatnumber_list(HuSeatNumber), 0 - HuValue, T5),
+					gb_trees:to_list(T6);
+				HuResult#hh_hupai_result.type =:= 1 ->
+					%%放炮,胡牌的加分
+					T5 = otherseat_value_change([HuSeatNumber], HuValue, T4),
+					%%放炮的减分
+					T6 = otherseat_value_change([HuResult#hh_hupai_result.fangpao_set_number], 0 - HuValue, T5),
+					gb_trees:to_list(T6)
+			end
+	end.
+
+compute_gang_result(_Logic, [], Tree) -> Tree;
+compute_gang_result(Logic, [SeatNumber|T], Tree) ->
+	SeatData = seatnumber_to_seatdata(SeatNumber, Logic),
+	NewTree =
+		lists:foldr(
+			fun(GangItem, TmpTree) ->
+				if
+					GangItem#hh_seat_gang.type =:= 0 ->
+						%%明杠
+						TmpTree1 = otherseat_value_change([SeatNumber], 4, TmpTree),		%%杠牌的+4分
+						otherseat_value_change([GangItem#hh_seat_gang.seat_number], - 4, TmpTree1); %%放杠的-4分
+					GangItem#hh_seat_gang.type =:= 1 ->
+						%%补杠
+						%%另外三家每家-2分
+						%%自己加6分
+						TmpTree1 = otherseat_value_change([SeatNumber], 6, TmpTree),
+						otherseat_value_change(other_seatnumber_list(SeatNumber), -2, TmpTree1);
+					GangItem#hh_seat_gang.type =:= 2 ->
+						%%暗杠
+						%%另外三家每家-4分
+						%%自己加12分
+						TmpTree1 = otherseat_value_change([SeatNumber], 12, TmpTree),
+						otherseat_value_change(other_seatnumber_list(SeatNumber), -4, TmpTree1)
+				end
+			end, Tree, SeatData#hh_seat.gang),
+	compute_gang_result(Logic, T, NewTree).
+
+seatnumber_to_seatdata(0, Logic) ->Logic#hh_main_logic.seat0;
+seatnumber_to_seatdata(1, Logic) ->Logic#hh_main_logic.seat1;
+seatnumber_to_seatdata(2, Logic) ->Logic#hh_main_logic.seat2;
+seatnumber_to_seatdata(3, Logic) ->Logic#hh_main_logic.seat3.
+
+other_seatnumber_list(0) -> [1,2,3];
+other_seatnumber_list(1) -> [0,2,3];
+other_seatnumber_list(2) -> [0,1,3];
+other_seatnumber_list(3) -> [0,1,2].
+
+otherseat_value_change(SeatNumberList, ChangeValue, Tree) ->
+	lists:foldr(
+		fun(SeatNumber, TmpTree) ->
+			OldValue = gb_trees:get(SeatNumber, TmpTree),
+			gb_trees:update(SeatNumber, OldValue + ChangeValue, TmpTree)
+		end, Tree, SeatNumberList).
+
+get_hu_value(1) -> 2;			%%屁胡
+get_hu_value(2) -> 4;			%%刀胡
+get_hu_value(3) -> 8;			%%七对
+get_hu_value(4) -> 16;			%%豪华七对
+get_hu_value(5) -> 32.			%%超豪华七对
+
+
+
+
 
 
 test_game_start() ->
